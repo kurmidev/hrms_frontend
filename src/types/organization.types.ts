@@ -1,0 +1,140 @@
+export type LeaveType = 'CASUAL' | 'SICK' | 'EARNED' | 'LOSS_OF_PAY' | 'MATERNITY' | 'PATERNITY' | 'COMPENSATORY'
+export type PayrollCalculationType = 'PERCENTAGE' | 'FIXED' | 'SLAB_BASED'
+export type PayrollApplicableOn = 'GROSS' | 'NET'
+
+export interface Organization {
+  id: string
+  name: string
+  slug: string
+  logoUrl: string | null
+  address: string | null
+  phone: string | null
+  email: string | null
+  website: string | null
+  currency: string
+  isActive: boolean
+  allowAnonymousServiceRequests: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Department {
+  id: string
+  organizationId: string
+  name: string
+  parentId: string | null
+  headEmployeeId: string | null
+  hierarchyLevel: number
+  childCount?: number
+  employeeCount?: number
+  parent?: { id: string; name: string }
+  head?: { id: string; firstName: string; lastName: string }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DepartmentTreeNode extends Department {
+  children: DepartmentTreeNode[]
+}
+
+export interface Designation {
+  id: string
+  organizationId: string
+  departmentId: string
+  name: string
+  level: number
+  payrollStructureId: string | null
+  employeeCount?: number
+  department?: { id: string; name: string }
+  payrollStructure?: { id: string; name: string }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Role {
+  id: string
+  organizationId: string
+  name: string
+  description: string | null
+  permissions: string[]
+  isSystemRole: boolean
+  userCount?: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface SalaryComponent {
+  name: string
+  type: 'earning' | 'deduction'
+  amount?: number
+  percentage?: number
+}
+
+export interface PayrollStructure {
+  id: string
+  organizationId: string
+  name: string
+  components: SalaryComponent[]
+  isActive: boolean
+  employeeCount?: number
+  designations?: Designation[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface LeavePolicy {
+  id: string
+  organizationId: string
+  name: string
+  leaveType: LeaveType
+  daysPerYear: number
+  carryForwardMax: number
+  accrualType: string
+  isEncashable: boolean
+  isLopEligible: boolean
+  minAdvanceDays: number | null
+  maxConsecutiveDays: number | null
+  allowedInProbation: boolean
+  genderRestriction: string | null
+  isActive: boolean
+  rules?: LeavePolicyRule[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface LeavePolicyRule {
+  id: string
+  organizationId: string
+  leavePolicyId: string
+  name: string
+  ruleType: string
+  conditionLogic: string
+  conditions: Record<string, unknown>
+  action: Record<string, unknown>
+  priority: number
+  isActive: boolean
+}
+
+export interface TaxRule {
+  id: string
+  organizationId: string
+  name: string
+  code: string | null
+  type: string
+  calculationType: PayrollCalculationType
+  applicableOn: PayrollApplicableOn
+  isStatutory: boolean
+  config: Record<string, unknown>
+  applicabilityRules: Record<string, unknown> | null
+  effectiveFrom: string
+  effectiveTo: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Currency {
+  code: string
+  name: string
+  symbol: string
+}

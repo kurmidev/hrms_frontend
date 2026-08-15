@@ -1,0 +1,223 @@
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { MapPin, LogIn, LogOut, Loader2, CalendarClock } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { attendanceApi } from '@/api/attendance.api'
+import type { AttendanceLog } from '@/types/attendance.types'
+import { ATTENDANCE_STATUS_COLORS, ATTENDANCE_STATUS_LABELS } from '@/lib/constants'
+import { formatDateTime, cn } from '@/lib/utils'
+import { toast } from 'sonner'
+
+interface Coords {
+  lat: number
+  lng: number
+  accuracy?: number
+}
+
+function getCurrentPosition(): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation is not supported by this browser.'))
+      return
+    }
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: 10000,
+    })
+  })
+}
+
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function monthRange(): { fromDate: string; toDate: string; year: number; month: number } {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth()
+  const fromDate = new Date(year, month, 1).toISOString().slice(0, 10)
+  const toDate = new Date(year, month + 1, 0).toISOString().slice(0, 10)
+  return { fromDate, toDate, year, month }
+}
+
+export function MyAttendancePage() {
+  const qc = useQueryClient()
+  const [coords, setCoords] = useState<Coords | null>(null)
+  const [locating, setLocating] = useState(false)
+  const range = monthRange()
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['my-attendance', range.fromDate, range.toDate],
+    queryFn: () => attendanceApi.myAttendance({ fromDate: range.fromDate, toDate: range.toDate, limit: 31 }),
+  })
+
+  const logs: AttendanceLog[] = (data as { data?: AttendanceLog[] })?.data ?? []
+  const todayLog = logs.find((l) => l.date.slice(0, 10) === todayIso())
+  const hasCheckedIn = !!todayLog?.checkInAt
+  const hasCheckedOut = !!todayLog?.checkOutAt
+
+  const { mutate: checkIn, isPending: checkingIn } = useMutation({
+    mutationFn: () =>
+      attendanceApi.checkIn({
+        lat: coords!.lat,
+        lng: coords!.lng,
+        accuracy: coords!.accuracy,
+        source: 'WEB',
+        timestamp: new Date().toISOString(),
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['my-attendance'] })
+      toast.success('Checked in successfully.')
+    },
+    onError: () => toast.error('Check-in failed. You may already have an open check-in today.'),
+  })
+
+  const { mutate: checkOut, isPending: checkingOut } = useMutation({
+    mutationFn: () =>
+      attendanceApi.checkOut({
+        lat: coords?.lat,
+        lng: coords?.lng,
+        source: 'WEB',
+        timestamp: new Date().toISOString(),
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['my-attendance'] })
+      toast.success('Checked out successfully.')
+    },
+    onError: () => toast.error('Check-out failed.'),
+  })
+
+  const handleLocateAndAct = async (action: 'in' | 'out') => {
+    setLocating(true)
+    try {
+      const position = await getCurrentPosition()
+      const next: Coords = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+      }
+      setCoords(next)
+      if (action === 'in') checkIn()
+      else checkOut()
+    } catch {
+      toast.error('Unable to fetch your location. Please enable location access.')
+    } finally {
+      setLocating(false)
+    }
+  }
+
+  const daysInMonth = new Date(range.year, range.month + 1, 0).getDate()
+  const firstWeekday = new Date(range.year, range.month, 1).getDay()
+  const logByDay = new Map<number, AttendanceLog>()
+  logs.forEach((l) => {
+    const d = new Date(l.date)
+    logByDay.set(d.getDate(), l)
+  })
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+          <CalendarClock className="h-5 w-5 text-blue-600" />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-foreground">My Attendance</h1>
+          <p className="text-sm text-muted-foreground">Check in and view your monthly attendance</p>
+        </div>
+      </div>
+
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-sm font-semibold">Today</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {coords && (
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5" />
+              {coords.lat.toFixed(6)}, {coords.lng.toFixed(6)}
+            </p>
+          )}
+          <div className="grid gap-3 sm:grid-cols-2 text-sm">
+            <div className="space-y-0.5">
+              <span className="text-muted-foreground">Check-in</span>
+              <p className="font-medium text-foreground">{todayLog?.checkInAt ? formatDateTime(todayLog.checkInAt) : '—'}</p>
+              {todayLog?.checkInLocationName && (
+                <p className="flex items-center gap-1 text-xs text-emerald-600">
+                  <MapPin className="h-3 w-3" />
+                  {todayLog.checkInLocationName}
+                </p>
+              )}
+            </div>
+            <div className="space-y-0.5">
+              <span className="text-muted-foreground">Check-out</span>
+              <p className="font-medium text-foreground">{todayLog?.checkOutAt ? formatDateTime(todayLog.checkOutAt) : '—'}</p>
+              {todayLog?.checkOutLocationName && (
+                <p className="flex items-center gap-1 text-xs text-emerald-600">
+                  <MapPin className="h-3 w-3" />
+                  {todayLog.checkOutLocationName}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => handleLocateAndAct('in')}
+              disabled={hasCheckedIn || locating || checkingIn}
+            >
+              {(locating || checkingIn) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
+              Check In
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleLocateAndAct('out')}
+              disabled={!hasCheckedIn || hasCheckedOut || locating || checkingOut}
+            >
+              {(locating || checkingOut) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
+              Check Out
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-sm font-semibold">
+            {new Date(range.year, range.month).toLocaleString('default', { month: 'long', year: 'numeric' })}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          ) : (
+            <div className="grid grid-cols-7 gap-2">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                <div key={d} className="text-center text-xs font-medium text-muted-foreground">{d}</div>
+              ))}
+              {Array.from({ length: firstWeekday }).map((_, i) => (
+                <div key={`empty-${i}`} />
+              ))}
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const day = i + 1
+                const log = logByDay.get(day)
+                const colorClass = log ? ATTENDANCE_STATUS_COLORS[log.status] : 'bg-muted/40 text-muted-foreground'
+                return (
+                  <div
+                    key={day}
+                    title={log ? ATTENDANCE_STATUS_LABELS[log.status] : undefined}
+                    className={cn(
+                      'flex items-center justify-center h-10 rounded-lg text-xs font-medium border-0',
+                      colorClass
+                    )}
+                  >
+                    {day}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
