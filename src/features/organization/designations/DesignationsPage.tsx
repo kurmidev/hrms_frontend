@@ -16,6 +16,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import type { Designation } from '@/types/organization.types'
 import { toast } from 'sonner'
 import { usePagination } from '@/hooks/usePagination'
+import { usePermission } from '@/hooks/usePermission'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -29,6 +30,7 @@ type FormValues = z.infer<typeof schema>
 
 export function DesignationsPage() {
   const qc = useQueryClient()
+  const canView = usePermission('org:read')
   const { page, limit, setPage } = usePagination()
   const [open, setOpen] = useState(false)
   const [editItem, setEditItem] = useState<Designation | null>(null)
@@ -38,9 +40,14 @@ export function DesignationsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['designations', { page, limit, departmentId: deptFilter || undefined }],
     queryFn: () => designationsApi.list({ page, limit, departmentId: deptFilter || undefined }),
+    enabled: canView,
   })
 
-  const { data: deptTree = [] } = useQuery({ queryKey: ['departments-tree'], queryFn: departmentsApi.tree })
+  const { data: deptTree = [] } = useQuery({
+    queryKey: ['departments-tree'],
+    queryFn: departmentsApi.tree,
+    enabled: canView,
+  })
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
@@ -101,6 +108,24 @@ export function DesignationsPage() {
 
   const items: Designation[] = (data as { data?: Designation[] })?.data ?? []
   const meta = (data as { meta?: { total: number; page: number; limit: number; totalPages: number } })?.meta
+
+  if (!canView) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+            <Briefcase className="h-5 w-5 text-emerald-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Designations</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to view designations.
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

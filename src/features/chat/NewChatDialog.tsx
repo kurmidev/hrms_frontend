@@ -36,14 +36,14 @@ export function NewChatDialog({ open, onOpenChange, onCreated }: Props) {
 
   const { data: employeesData } = useQuery({
     queryKey: ['employees', { forSelect: true }],
-    queryFn: () => employeesApi.list({ limit: 200 }),
+    queryFn: () => employeesApi.list({ limit: 100 }),
     enabled: open,
   })
   const employees = (employeesData as { data?: Employee[] })?.data ?? []
 
   const { data: deptsData } = useQuery({
     queryKey: ['departments', { forSelect: true }],
-    queryFn: () => departmentsApi.list({ limit: 200 }),
+    queryFn: () => departmentsApi.list({ limit: 100 }),
     enabled: open && type === 'DEPARTMENT',
   })
   const departments = (deptsData as { data?: Department[] })?.data ?? []

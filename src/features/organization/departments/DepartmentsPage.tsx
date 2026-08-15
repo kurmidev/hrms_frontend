@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { departmentsApi } from '@/api/departments.api'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import type { DepartmentTreeNode } from '@/types/organization.types'
+import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -78,6 +79,7 @@ function TreeNode({ node, depth, onEdit, onDelete }: { node: DepartmentTreeNode;
 
 export function DepartmentsPage() {
   const qc = useQueryClient()
+  const canView = usePermission('org:read')
   const [open, setOpen] = useState(false)
   const [editNode, setEditNode] = useState<DepartmentTreeNode | null>(null)
   const [deleteNode, setDeleteNode] = useState<DepartmentTreeNode | null>(null)
@@ -86,6 +88,7 @@ export function DepartmentsPage() {
   const { data: tree = [], isLoading } = useQuery({
     queryKey: ['departments-tree'],
     queryFn: departmentsApi.tree,
+    enabled: canView,
   })
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
@@ -130,6 +133,24 @@ export function DepartmentsPage() {
   }
 
   const filtered = filterTree(tree, search)
+
+  if (!canView) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+            <GitBranch className="h-5 w-5 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Departments</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to view departments.
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

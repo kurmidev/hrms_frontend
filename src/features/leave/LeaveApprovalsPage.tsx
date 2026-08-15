@@ -27,6 +27,7 @@ import type { LeaveApplication } from '@/types/leave.types'
 import { LEAVE_TYPE_LABELS, LEAVE_STATUS_LABELS } from '@/lib/constants'
 import { formatDate } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
+import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
 type DecisionMode = 'approve' | 'reject'
@@ -34,6 +35,7 @@ type DecisionMode = 'approve' | 'reject'
 export function LeaveApprovalsPage() {
   const qc = useQueryClient()
   const { page, limit, setPage, reset } = usePagination()
+  const canApprove = usePermission('leave:approve')
   const [status, setStatus] = useState('PENDING')
   const [decisionTarget, setDecisionTarget] = useState<LeaveApplication | null>(null)
   const [decisionMode, setDecisionMode] = useState<DecisionMode>('approve')
@@ -42,6 +44,7 @@ export function LeaveApprovalsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['leave-approvals', { page, limit, status }],
     queryFn: () => leaveApi.list({ page, limit, status: status || undefined }),
+    enabled: canApprove,
   })
 
   const applications: LeaveApplication[] = (data as { data?: LeaveApplication[] })?.data ?? []
@@ -106,6 +109,24 @@ export function LeaveApprovalsPage() {
         ) : null,
     },
   ]
+
+  if (!canApprove) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+            <CheckSquare className="h-5 w-5 text-violet-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Leave Approvals</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to approve leave applications.
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

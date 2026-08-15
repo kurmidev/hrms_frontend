@@ -204,9 +204,22 @@ export function Sidebar() {
     return location.pathname.startsWith(href)
   }
 
-  const filteredItems = NAV_ITEMS.filter((item) =>
-    !item.permission || hasPermission(item.permission)
-  )
+  // A parent nav item must be visible if the user passes ITS OWN permission
+  // OR at least one of its children's permissions — otherwise a user whose
+  // only granted permission lives on a child (e.g. the seeded `employee`
+  // role has `attendance:checkin` but not the parent Attendance item's
+  // `attendance:read`) can never discover that child via the sidebar at
+  // all, even though the page itself is fully reachable and functional via
+  // direct URL. Confirmed live: shi1878@igreentec.in (employee role) could
+  // load `/attendance/my` directly with real data, but "Attendance" never
+  // appeared in the sidebar because only the parent's `attendance:read` was
+  // checked. See known-issues.md.
+  const canSeeNavItem = (item: NavItem): boolean => {
+    if (!item.permission || hasPermission(item.permission)) return true
+    return !!item.children?.some((c) => !c.permission || hasPermission(c.permission))
+  }
+
+  const filteredItems = NAV_ITEMS.filter(canSeeNavItem)
 
   return (
     <>

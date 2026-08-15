@@ -49,7 +49,7 @@ export function NoticeFormDialog({ open, onOpenChange, notice }: Props) {
 
   const { data: deptsData } = useQuery({
     queryKey: ['departments', { forSelect: true }],
-    queryFn: () => departmentsApi.list({ limit: 200 }),
+    queryFn: () => departmentsApi.list({ limit: 100 }),
     enabled: open,
   })
   const departments = (deptsData as { data?: Department[] })?.data ?? []

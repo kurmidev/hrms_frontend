@@ -20,7 +20,9 @@ interface RegisterOrgDto {
 export const platformOrgsApi = {
   list: (params?: { page?: number; limit?: number }) =>
     platformClient
-      .get<{ data: { items: PlatformOrg[]; total: number } }>('/platform/organizations', { params })
+      .get<{
+        data: { data: PlatformOrg[]; meta: { total: number; page: number; limit: number; totalPages: number } }
+      }>('/platform/organizations', { params })
       .then((r) => r.data.data),
   get: (id: string) =>
     platformClient

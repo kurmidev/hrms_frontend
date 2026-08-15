@@ -67,7 +67,7 @@ export function PerformanceCycleDetailPage() {
 
   const { data: employeesData } = useQuery({
     queryKey: ['employees', { forSelect: true }],
-    queryFn: () => employeesApi.list({ limit: 200 }),
+    queryFn: () => employeesApi.list({ limit: 100 }),
     enabled: !!id && cycle?.status === 'ACTIVE',
   })
   const employees = (employeesData as { data?: Employee[] })?.data ?? []

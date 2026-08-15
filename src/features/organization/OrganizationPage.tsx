@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { organizationsApi } from '@/api/organizations.api'
+import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
 const schema = z.object({
@@ -23,9 +24,11 @@ type FormValues = z.infer<typeof schema>
 
 export function OrganizationPage() {
   const qc = useQueryClient()
+  const canView = usePermission('org:read')
   const { data: org, isLoading } = useQuery({
     queryKey: ['organization'],
     queryFn: organizationsApi.get,
+    enabled: canView,
   })
 
   const { register, handleSubmit, formState: { errors, isDirty } } = useForm<FormValues>({
@@ -48,6 +51,24 @@ export function OrganizationPage() {
     },
     onError: () => toast.error('Failed to update organization.'),
   })
+
+  if (!canView) {
+    return (
+      <div className="max-w-2xl space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <Building2 className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Organization Profile</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to view the organization profile.
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl space-y-6">

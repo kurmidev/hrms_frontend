@@ -13,8 +13,8 @@ export function PlatformDashboardPage() {
     queryFn: () => platformInvoicesApi.list({ status: 'OVERDUE', limit: 100 }),
   })
 
-  const orgs = orgsData?.items ?? []
-  const total = orgsData?.total ?? 0
+  const orgs = orgsData?.data ?? []
+  const total = orgsData?.meta.total ?? 0
   const active = orgs.filter((o) => o.isActive).length
   const suspended = orgs.filter((o) => o.subscription?.status === 'SUSPENDED').length
   const overdue = invoicesData?.total ?? 0

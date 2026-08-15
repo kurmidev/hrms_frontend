@@ -88,14 +88,14 @@ export function ProfilePage() {
                   <IdCard className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-xs text-muted-foreground">Department</p>
-                    <p className="text-sm font-medium text-foreground">{employee.departmentId || '—'}</p>
+                    <p className="text-sm font-medium text-foreground">{employee.department || '—'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
                   <IdCard className="h-4 w-4 text-muted-foreground mt-0.5" />
                   <div>
                     <p className="text-xs text-muted-foreground">Designation</p>
-                    <p className="text-sm font-medium text-foreground">{employee.designationId || '—'}</p>
+                    <p className="text-sm font-medium text-foreground">{employee.designation || '—'}</p>
                   </div>
                 </div>
               </div>

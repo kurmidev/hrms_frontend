@@ -16,6 +16,7 @@ import { rolesApi } from '@/api/roles.api'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { PERMISSION_GROUPS } from '@/lib/constants'
 import type { Role } from '@/types/organization.types'
+import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
 const schema = z.object({
@@ -27,6 +28,7 @@ type FormValues = z.infer<typeof schema>
 
 export function RolesPage() {
   const qc = useQueryClient()
+  const canView = usePermission('role:read')
   const [open, setOpen] = useState(false)
   const [editRole, setEditRole] = useState<Role | null>(null)
   const [deleteRole, setDeleteRole] = useState<Role | null>(null)
@@ -34,6 +36,7 @@ export function RolesPage() {
   const { data: roles = [], isLoading } = useQuery({
     queryKey: ['roles'],
     queryFn: rolesApi.list,
+    enabled: canView,
   })
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<FormValues>({
@@ -74,6 +77,24 @@ export function RolesPage() {
   const togglePermission = (perm: string) => {
     const cur = selectedPerms ?? []
     setValue('permissions', cur.includes(perm) ? cur.filter((p) => p !== perm) : [...cur, perm], { shouldValidate: true })
+  }
+
+  if (!canView) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+            <Shield className="h-5 w-5 text-violet-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Roles & Permissions</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to view roles.
+        </div>
+      </div>
+    )
   }
 
   return (

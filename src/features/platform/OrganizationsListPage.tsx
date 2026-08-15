@@ -180,7 +180,7 @@ export function OrganizationsListPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const orgs: PlatformOrg[] = orgsData?.items ?? []
+  const orgs: PlatformOrg[] = orgsData?.data ?? []
 
   const selectedPlan = plans.find((p) => p.id === form.planId)
 
@@ -192,7 +192,7 @@ export function OrganizationsListPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Organizations</h1>
-          <p className="text-slate-400 text-sm mt-1">{orgsData?.total ?? 0} registered companies</p>
+          <p className="text-slate-400 text-sm mt-1">{orgsData?.meta.total ?? 0} registered companies</p>
         </div>
         <button
           onClick={openRegister}

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ShieldCheck, Monitor, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -93,26 +92,19 @@ export function SessionsPage() {
               </TableRow>
             ) : (
               sessions.map((session) => (
-                <TableRow key={session.sessionId}>
+                <TableRow key={session.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Monitor className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{session.deviceInfo || 'Unknown device'}</span>
-                      {session.isCurrent && (
-                        <Badge className="border-0 bg-emerald-100 text-emerald-700 text-xs" variant="secondary">
-                          Current
-                        </Badge>
-                      )}
+                      <span className="text-sm">{session.userAgent || 'Unknown device'}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{session.ip || '—'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{formatDateTime(session.lastActiveAt)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{session.ipAddress || '—'}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{formatDateTime(session.loginAt)}</TableCell>
                   <TableCell>
-                    {!session.isCurrent && (
-                      <Button variant="outline" size="sm" onClick={() => setRevokeTarget(session)}>
-                        Revoke
-                      </Button>
-                    )}
+                    <Button variant="outline" size="sm" onClick={() => setRevokeTarget(session)}>
+                      Revoke
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -125,9 +117,9 @@ export function SessionsPage() {
         open={!!revokeTarget}
         onOpenChange={(o) => !o && setRevokeTarget(null)}
         title="Revoke Session"
-        description={`Revoke session for "${revokeTarget?.deviceInfo || 'this device'}"? This will sign it out immediately.`}
+        description={`Revoke session for "${revokeTarget?.userAgent || 'this device'}"? This will sign it out immediately.`}
         confirmLabel={revoking ? 'Revoking…' : 'Revoke'}
-        onConfirm={() => revokeTarget && revoke(revokeTarget.sessionId)}
+        onConfirm={() => revokeTarget && revoke(revokeTarget.id)}
         variant="destructive"
       />
 

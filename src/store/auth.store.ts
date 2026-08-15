@@ -32,6 +32,16 @@ export const useAuthStore = create<AuthState>()(
       hasPermission: (permission: string) => {
         const { user } = get()
         if (!user) return false
+        // Mirror the backend's wildcard convention exactly (see
+        // `backend/src/common/guards/roles.guard.ts`: `if
+        // (userPerms.includes('*')) return true;`). The seeded `super_admin`
+        // role literally has `permissions: ['*']` — without this check, every
+        // `usePermission()`-gated sidebar item, page self-gate, and action
+        // button collapses to hidden/blocked for super_admin client-side,
+        // even though the backend would allow every one of those requests.
+        // Confirmed live: sidebar showed only Dashboard/Chat/Settings for
+        // admin@igreentec.in before this fix.
+        if (user.permissions.includes('*')) return true
         return user.permissions.includes(permission)
       },
     }),

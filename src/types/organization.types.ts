@@ -63,11 +63,19 @@ export interface Role {
   updatedAt: string
 }
 
+// Matches `SalaryComponentDto` (backend/src/modules/organizations/payroll-structures/dto/salary-component.dto.ts)
+// exactly. Previous shape here (`type: 'earning'|'deduction'`, `amount`/`percentage`)
+// never matched the real API response (`type: 'FIXED'|'VARIABLE'|'PERCENTAGE'`, `value`,
+// `isDeductible`), so every component amount on the Payroll Structures page silently
+// rendered as "—" instead of the real value.
 export interface SalaryComponent {
   name: string
-  type: 'earning' | 'deduction'
-  amount?: number
-  percentage?: number
+  type: 'FIXED' | 'VARIABLE' | 'PERCENTAGE'
+  value: number
+  baseOn?: 'CTC' | 'BASIC' | 'GROSS'
+  isDeductible: boolean
+  isStatutory?: boolean
+  description?: string
 }
 
 export interface PayrollStructure {

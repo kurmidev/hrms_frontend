@@ -17,9 +17,24 @@ function processQueue(token: string) {
 }
 
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = useAuthStore.getState().accessToken
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`
+  const { accessToken, user } = useAuthStore.getState()
+  if (accessToken && config.headers) {
+    config.headers.Authorization = `Bearer ${accessToken}`
+  }
+  // CRITICAL multi-tenancy header — see CLAUDE.md ("Every authenticated
+  // request must include X-Organization-ID header") and
+  // `TenantMiddleware`/`@OrganizationId()` on the backend. This was
+  // previously never set anywhere in the client, so every controller
+  // endpoint using `@OrganizationId()` (as opposed to the JWT-payload-based
+  // `@CurrentUser('organizationId')`) silently received `undefined` —
+  // Prisma treats `undefined` `where` filter values as "omit this filter
+  // entirely" (org-scope silently dropped, matching rows across ALL
+  // organizations) and treats `undefined` on a required `create()` field as
+  // a hard validation error (uncaught 500), e.g.
+  // `GreenThanksConfigService.get()`'s upsert-on-read `create()` call. See
+  // known-issues.md.
+  if (user?.organizationId && config.headers) {
+    config.headers['X-Organization-ID'] = user.organizationId
   }
   return config
 })

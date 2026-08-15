@@ -17,6 +17,7 @@ import type { OnboardingLink } from '@/types/onboarding.types'
 import { ONBOARDING_STATUS_LABELS } from '@/lib/constants'
 import { formatDateTime } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
+import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
 const schema = z.object({
@@ -33,6 +34,7 @@ export function OnboardingHRPage() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const { page, limit, setPage, reset } = usePagination()
+  const canManage = usePermission('onboarding:manage')
   const [open, setOpen] = useState(false)
   const [statusFilter, setStatusFilter] = useState('')
   const [search, setSearch] = useState('')
@@ -40,6 +42,7 @@ export function OnboardingHRPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['onboarding-links', { page, limit, status: statusFilter, email: search }],
     queryFn: () => onboardingApi.list({ page, limit, status: statusFilter || undefined, email: search || undefined }),
+    enabled: canManage,
   })
 
   const { register, handleSubmit, reset: resetForm, formState: { errors } } = useForm<FormValues>({
@@ -76,6 +79,24 @@ export function OnboardingHRPage() {
     { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} type="onboarding" /> },
     { key: 'expiresAt', header: 'Expires', render: (row) => formatDateTime(row.expiresAt) },
   ]
+
+  if (!canManage) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+            <UserCheck className="h-5 w-5 text-violet-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Onboarding</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to manage onboarding.
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

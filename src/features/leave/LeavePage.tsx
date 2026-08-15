@@ -31,7 +31,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { leaveApi } from '@/api/leave.api'
 import type { LeaveApplication, LeaveBalance, LeavePolicy } from '@/types/leave.types'
 import { LEAVE_TYPE_LABELS } from '@/lib/constants'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
 import { toast } from 'sonner'
 
@@ -98,7 +98,7 @@ export function LeavePage() {
       setOpen(false)
       toast.success('Leave application submitted.')
     },
-    onError: () => toast.error('Failed to submit leave application.'),
+    onError: (err) => toast.error(getApiErrorMessage(err, 'Failed to submit leave application.')),
   })
 
   const { mutate: cancel, isPending: cancelling } = useMutation({
@@ -109,7 +109,7 @@ export function LeavePage() {
       setCancelTarget(null)
       toast.success('Leave application cancelled.')
     },
-    onError: () => toast.error('Failed to cancel leave application.'),
+    onError: (err) => toast.error(getApiErrorMessage(err, 'Failed to cancel leave application.')),
   })
 
   const columns: Column<LeaveApplication>[] = [

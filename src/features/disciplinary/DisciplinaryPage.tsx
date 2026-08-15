@@ -39,7 +39,7 @@ export function DisciplinaryPage() {
 
   const { data: employeesData } = useQuery({
     queryKey: ['employees', { forSelect: true }],
-    queryFn: () => employeesApi.list({ limit: 200 }),
+    queryFn: () => employeesApi.list({ limit: 100 }),
     enabled: canManage,
   })
   const employeeMap = useMemo(() => {

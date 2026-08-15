@@ -37,7 +37,7 @@ export function EnrollDialog({ open, onOpenChange }: Props) {
 
   const { data: employeesData } = useQuery({
     queryKey: ['employees', { forSelect: true }],
-    queryFn: () => employeesApi.list({ limit: 200 }),
+    queryFn: () => employeesApi.list({ limit: 100 }),
     enabled: open,
   })
   const employees = (employeesData as { data?: Employee[] })?.data ?? []

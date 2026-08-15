@@ -1,18 +1,22 @@
+// Matches `AuthService.login()`/`getMe()` exactly (backend/src/modules/auth/auth.service.ts).
+// Previous shape declared `isActive`/`lastLoginAt` (never sent by either endpoint) and
+// `employee.departmentId`/`employee.designationId` (the real response sends the resolved
+// `department`/`designation` NAME strings instead, plus no such IDs) — the department/id
+// mismatch silently rendered "—" for every employee's own department/designation on
+// `ProfilePage.tsx`, even when the data was present in the API response the whole time.
 export interface AuthUser {
   id: string
   email: string
   phone: string | null
-  isActive: boolean
   mustChangePassword: boolean
-  lastLoginAt: string | null
   employee: {
     id: string
     firstName: string
     lastName: string
     profilePhotoUrl: string | null
     empCode: string
-    departmentId: string | null
-    designationId: string | null
+    department: string | null
+    designation: string | null
   } | null
   roles: Array<{ id: string; name: string }>
   permissions: string[]

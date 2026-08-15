@@ -15,6 +15,7 @@ import { incentiveRulesApi } from '@/api/incentives.api'
 import type { IncentiveRule } from '@/types/incentives.types'
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
+import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
 const schema = z.object({
@@ -28,12 +29,14 @@ type FormValues = z.infer<typeof schema>
 export function IncentiveRulesPage() {
   const qc = useQueryClient()
   const { page, limit, setPage } = usePagination()
+  const canManage = usePermission('todo:approve')
   const [open, setOpen] = useState(false)
   const [editItem, setEditItem] = useState<IncentiveRule | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['incentive-rules', { page, limit }],
     queryFn: () => incentiveRulesApi.list({ page, limit }),
+    enabled: canManage,
   })
 
   const rules = (data as { data?: IncentiveRule[] })?.data ?? []
@@ -97,6 +100,24 @@ export function IncentiveRulesPage() {
       ),
     },
   ]
+
+  if (!canManage) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+            <Award className="h-5 w-5 text-emerald-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Incentive Rules</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to view incentive rules.
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

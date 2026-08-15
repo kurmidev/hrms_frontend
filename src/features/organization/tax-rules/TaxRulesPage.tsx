@@ -5,13 +5,16 @@ import { Badge } from '@/components/ui/badge'
 import { taxRulesApi } from '@/api/tax-rules.api'
 import { formatDate } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
+import { usePermission } from '@/hooks/usePermission'
 import type { TaxRule } from '@/types/organization.types'
 
 export function TaxRulesPage() {
   const { page, limit, setPage } = usePagination()
+  const canView = usePermission('payroll:read')
   const { data, isLoading } = useQuery({
     queryKey: ['tax-rules', { page, limit }],
     queryFn: () => taxRulesApi.list({ page, limit }),
+    enabled: canView,
   })
 
   const rules: TaxRule[] = (data as { data?: TaxRule[] })?.data ?? []
@@ -38,6 +41,24 @@ export function TaxRulesPage() {
       ),
     },
   ]
+
+  if (!canView) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+            <Receipt className="h-5 w-5 text-red-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Tax Rules</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to view tax rules.
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
