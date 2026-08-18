@@ -30,7 +30,10 @@ type FormValues = z.infer<typeof schema>
 
 export function DesignationsPage() {
   const qc = useQueryClient()
-  const canView = usePermission('org:read')
+  const canView = usePermission('employee:read')
+  const canCreate = usePermission('employee:create')
+  const canEdit = usePermission('employee:update')
+  const canDelete = usePermission('employee:delete')
   const { page, limit, setPage } = usePagination()
   const [open, setOpen] = useState(false)
   const [editItem, setEditItem] = useState<Designation | null>(null)
@@ -90,20 +93,26 @@ export function DesignationsPage() {
     { key: 'department', header: 'Department', render: (row) => row.department?.name ?? '—' },
     { key: 'level', header: 'Level', render: (row) => `L${row.level}` },
     { key: 'employeeCount', header: 'Employees', render: (row) => row.employeeCount ?? 0 },
-    {
-      key: 'actions', header: '',
-      className: 'w-20 text-right',
-      render: (row) => (
-        <div className="flex gap-1 justify-end">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); openEdit(row) }}>
-            <Pencil className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteItem(row) }}>
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      ),
-    },
+    ...(canEdit || canDelete
+      ? [{
+          key: 'actions', header: '',
+          className: 'w-20 text-right',
+          render: (row: Designation) => (
+            <div className="flex gap-1 justify-end">
+              {canEdit && (
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); openEdit(row) }}>
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              )}
+              {canDelete && (
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteItem(row) }}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
+          ),
+        } as Column<Designation>]
+      : []),
   ]
 
   const items: Designation[] = (data as { data?: Designation[] })?.data ?? []
@@ -139,10 +148,12 @@ export function DesignationsPage() {
             <p className="text-sm text-muted-foreground">Job titles and seniority levels</p>
           </div>
         </div>
-        <Button onClick={openCreate} size="sm">
-          <Plus className="h-4 w-4 mr-1.5" />
-          Add Designation
-        </Button>
+        {canCreate && (
+          <Button onClick={openCreate} size="sm">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Add Designation
+          </Button>
+        )}
       </div>
 
       <div className="flex gap-3">

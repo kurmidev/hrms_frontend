@@ -36,6 +36,8 @@ export function ServiceRequestsPage() {
   const navigate = useNavigate()
   const { page, limit, setPage } = usePagination()
   const canManage = usePermission('service_request:manage')
+  const canRead = usePermission('service_request:read')
+  const canCreate = usePermission('service_request:create')
   const [category, setCategory] = useState<ServiceRequestCategory | ''>('')
   const [status, setStatus] = useState<ServiceRequestStatus | ''>('')
   const [raiseOpen, setRaiseOpen] = useState(false)
@@ -49,6 +51,7 @@ export function ServiceRequestsPage() {
         category: category || undefined,
         status: status || undefined,
       }),
+    enabled: canRead,
   })
 
   const rows = (data as { data?: ServiceRequest[] })?.data ?? []
@@ -96,6 +99,24 @@ export function ServiceRequestsPage() {
     { key: 'createdAt', header: 'Raised', render: (row) => formatDate(row.createdAt) },
   ]
 
+  if (!canRead) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+            <Ticket className="h-5 w-5 text-indigo-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Service Requests</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to view service requests.
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -110,10 +131,12 @@ export function ServiceRequestsPage() {
             </p>
           </div>
         </div>
-        <Button size="sm" onClick={() => setRaiseOpen(true)}>
-          <Plus className="h-4 w-4 mr-1.5" />
-          Raise Request
-        </Button>
+        {canCreate && (
+          <Button size="sm" onClick={() => setRaiseOpen(true)}>
+            <Plus className="h-4 w-4 mr-1.5" />
+            Raise Request
+          </Button>
+        )}
       </div>
 
       <div className="flex items-center gap-3">

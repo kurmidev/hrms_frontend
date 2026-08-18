@@ -33,8 +33,8 @@ const NAV_ITEMS: NavItem[] = [
     permission: 'org:read',
     children: [
       { label: 'Profile', href: '/organization', permission: 'org:read' },
-      { label: 'Departments', href: '/organization/departments', permission: 'org:read' },
-      { label: 'Designations', href: '/organization/designations', permission: 'org:read' },
+      { label: 'Departments', href: '/organization/departments', permission: 'employee:read' },
+      { label: 'Designations', href: '/organization/designations', permission: 'employee:read' },
       { label: 'Leave Policies', href: '/organization/leave-policies', permission: 'org:read' },
       { label: 'Work Locations', href: '/organization/work-locations', permission: 'org:read' },
       { label: 'Payroll Structures', href: '/organization/payroll-structures', permission: 'payroll:read' },

@@ -33,6 +33,7 @@ import type { LeaveApplication, LeaveBalance, LeavePolicy } from '@/types/leave.
 import { LEAVE_TYPE_LABELS } from '@/lib/constants'
 import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
+import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
 const schema = z.object({
@@ -52,20 +53,31 @@ export function LeavePage() {
   const { page, limit, setPage } = usePagination()
   const [open, setOpen] = useState(false)
   const [cancelTarget, setCancelTarget] = useState<LeaveApplication | null>(null)
+  // The whole page (balance, my applications, apply, cancel) is backed by
+  // endpoints that require `leave:apply` server-side (see leave.controller.ts:
+  // GET /leave/my-balance, GET /leave/my, POST /leave/apply, PUT /leave/:id/cancel).
+  // A user reachable here via the sidebar's child-permission fallback (rule
+  // #15) may hold `leave:read` but not `leave:apply` — self-gate so we never
+  // fire requests that user can't make and never render an Apply button that
+  // will 403.
+  const canApply = usePermission('leave:apply')
 
   const { data: balances, isLoading: balancesLoading } = useQuery({
     queryKey: ['my-leave-balance'],
     queryFn: () => leaveApi.getMyBalance(),
+    enabled: canApply,
   })
 
   const { data: policiesData } = useQuery({
     queryKey: ['leave-policies-active'],
     queryFn: () => leaveApi.getPolicies(),
+    enabled: canApply,
   })
 
   const { data, isLoading } = useQuery({
     queryKey: ['my-leave-applications', { page, limit }],
     queryFn: () => leaveApi.myList({ page, limit }),
+    enabled: canApply,
   })
 
   const applications: LeaveApplication[] = (data as { data?: LeaveApplication[] })?.data ?? []
@@ -133,6 +145,24 @@ export function LeavePage() {
         ) : null,
     },
   ]
+
+  if (!canApply) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+            <CalendarDays className="h-5 w-5 text-amber-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Leave</h1>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to apply for leave.
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

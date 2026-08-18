@@ -25,6 +25,7 @@ type FormValues = z.infer<typeof schema>
 export function OrganizationPage() {
   const qc = useQueryClient()
   const canView = usePermission('org:read')
+  const canUpdate = usePermission('org:update')
   const { data: org, isLoading } = useQuery({
     queryKey: ['organization'],
     queryFn: organizationsApi.get,
@@ -103,7 +104,7 @@ export function OrganizationPage() {
                 ].map(({ id, label, placeholder }) => (
                   <div key={id} className="space-y-1.5">
                     <Label htmlFor={id}>{label}</Label>
-                    <Input id={id} placeholder={placeholder} {...register(id as keyof FormValues)} />
+                    <Input id={id} placeholder={placeholder} readOnly={!canUpdate} {...register(id as keyof FormValues)} />
                     {errors[id as keyof FormValues] && (
                       <p className="text-xs text-destructive">{errors[id as keyof FormValues]?.message}</p>
                     )}
@@ -112,18 +113,20 @@ export function OrganizationPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="address">Address</Label>
-                <Input id="address" placeholder="123 Main Street, City, State" {...register('address')} />
+                <Input id="address" placeholder="123 Main Street, City, State" readOnly={!canUpdate} {...register('address')} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="logoUrl">Logo URL</Label>
-                <Input id="logoUrl" placeholder="https://cdn.company.com/logo.png" {...register('logoUrl')} />
+                <Input id="logoUrl" placeholder="https://cdn.company.com/logo.png" readOnly={!canUpdate} {...register('logoUrl')} />
               </div>
-              <div className="flex justify-end pt-2">
-                <Button type="submit" disabled={!isDirty || isPending}>
-                  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
-                </Button>
-              </div>
+              {canUpdate && (
+                <div className="flex justify-end pt-2">
+                  <Button type="submit" disabled={!isDirty || isPending}>
+                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Save Changes
+                  </Button>
+                </div>
+              )}
             </form>
           )}
         </CardContent>

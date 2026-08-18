@@ -23,7 +23,7 @@ const schema = z.object({
 })
 type FormValues = z.infer<typeof schema>
 
-function TreeNode({ node, depth, onEdit, onDelete }: { node: DepartmentTreeNode; depth: number; onEdit: (n: DepartmentTreeNode) => void; onDelete: (n: DepartmentTreeNode) => void }) {
+function TreeNode({ node, depth, onEdit, onDelete, canEdit, canDelete }: { node: DepartmentTreeNode; depth: number; onEdit: (n: DepartmentTreeNode) => void; onDelete: (n: DepartmentTreeNode) => void; canEdit: boolean; canDelete: boolean }) {
   const [expanded, setExpanded] = useState(depth < 2)
   const hasChildren = node.children.length > 0
 
@@ -56,20 +56,26 @@ function TreeNode({ node, depth, onEdit, onDelete }: { node: DepartmentTreeNode;
           </Badge>
         </div>
 
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onEdit(node)}>
-            <Pencil className="h-3 w-3" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:text-destructive" onClick={() => onDelete(node)}>
-            <Trash2 className="h-3 w-3" />
-          </Button>
-        </div>
+        {(canEdit || canDelete) && (
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {canEdit && (
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onEdit(node)}>
+                <Pencil className="h-3 w-3" />
+              </Button>
+            )}
+            {canDelete && (
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:text-destructive" onClick={() => onDelete(node)}>
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {expanded && hasChildren && (
         <div className="border-l border-border ml-9">
           {node.children.map((child) => (
-            <TreeNode key={child.id} node={child} depth={depth + 1} onEdit={onEdit} onDelete={onDelete} />
+            <TreeNode key={child.id} node={child} depth={depth + 1} onEdit={onEdit} onDelete={onDelete} canEdit={canEdit} canDelete={canDelete} />
           ))}
         </div>
       )}
@@ -79,7 +85,10 @@ function TreeNode({ node, depth, onEdit, onDelete }: { node: DepartmentTreeNode;
 
 export function DepartmentsPage() {
   const qc = useQueryClient()
-  const canView = usePermission('org:read')
+  const canView = usePermission('employee:read')
+  const canCreate = usePermission('employee:create')
+  const canEdit = usePermission('employee:update')
+  const canDelete = usePermission('employee:delete')
   const [open, setOpen] = useState(false)
   const [editNode, setEditNode] = useState<DepartmentTreeNode | null>(null)
   const [deleteNode, setDeleteNode] = useState<DepartmentTreeNode | null>(null)
@@ -164,10 +173,12 @@ export function DepartmentsPage() {
             <p className="text-sm text-muted-foreground">Organizational hierarchy</p>
           </div>
         </div>
-        <Button onClick={openCreate} size="sm">
-          <Plus className="h-4 w-4 mr-1.5" />
-          Add Department
-        </Button>
+        {canCreate && (
+          <Button onClick={openCreate} size="sm">
+            <Plus className="h-4 w-4 mr-1.5" />
+            Add Department
+          </Button>
+        )}
       </div>
 
       <Input
@@ -195,6 +206,8 @@ export function DepartmentsPage() {
                 depth={0}
                 onEdit={openEdit}
                 onDelete={setDeleteNode}
+                canEdit={canEdit}
+                canDelete={canDelete}
               />
             ))}
           </div>

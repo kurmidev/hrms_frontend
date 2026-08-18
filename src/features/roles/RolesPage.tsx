@@ -29,6 +29,9 @@ type FormValues = z.infer<typeof schema>
 export function RolesPage() {
   const qc = useQueryClient()
   const canView = usePermission('role:read')
+  const canCreate = usePermission('role:create')
+  const canEdit = usePermission('role:update')
+  const canDelete = usePermission('role:delete')
   const [open, setOpen] = useState(false)
   const [editRole, setEditRole] = useState<Role | null>(null)
   const [deleteRole, setDeleteRole] = useState<Role | null>(null)
@@ -109,10 +112,12 @@ export function RolesPage() {
             <p className="text-sm text-muted-foreground">Manage access control roles</p>
           </div>
         </div>
-        <Button onClick={openCreate} size="sm">
-          <Plus className="h-4 w-4 mr-1.5" />
-          New Role
-        </Button>
+        {canCreate && (
+          <Button onClick={openCreate} size="sm">
+            <Plus className="h-4 w-4 mr-1.5" />
+            New Role
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
@@ -131,16 +136,20 @@ export function RolesPage() {
                   </div>
                   {role.isSystemRole ? (
                     <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 border-0">System</Badge>
-                  ) : (
+                  ) : (canEdit || canDelete) ? (
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(role)}>
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeleteRole(role)}>
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
+                      {canEdit && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(role)}>
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                      {canDelete && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeleteRole(role)}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </CardHeader>
               <CardContent>
