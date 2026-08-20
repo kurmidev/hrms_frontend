@@ -63,7 +63,7 @@ export function ReturnAssetDialog({ open, onOpenChange, asset }: Props) {
         if (!o) reset()
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Return Asset {asset ? `— ${asset.name}` : ''}</DialogTitle>
         </DialogHeader>
@@ -83,7 +83,7 @@ export function ReturnAssetDialog({ open, onOpenChange, asset }: Props) {
                   value={field.value ?? ''}
                   onValueChange={(v) => field.onChange(v ?? '')}
                 >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {RETURN_STATUSES.map((s) => (
                       <SelectItem key={s} value={s}>{s.replace('_', ' ')}</SelectItem>

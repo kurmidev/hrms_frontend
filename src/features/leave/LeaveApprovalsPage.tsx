@@ -167,7 +167,7 @@ export function LeaveApprovalsPage() {
       />
 
       <AlertDialog open={!!decisionTarget} onOpenChange={(o) => !o && setDecisionTarget(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
           <AlertDialogHeader>
             <AlertDialogTitle>
               {decisionMode === 'approve' ? 'Approve Leave Application' : 'Reject Leave Application'}

@@ -119,7 +119,7 @@ export function NoticeFormDialog({ open, onOpenChange, notice }: Props) {
         onOpenChange(o)
       }}
     >
-      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Notice' : 'Create Notice'}</DialogTitle>
         </DialogHeader>
@@ -153,7 +153,7 @@ export function NoticeFormDialog({ open, onOpenChange, notice }: Props) {
 
           {targetType === 'TARGETED' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label>Roles</Label>
                 <div className="max-h-32 overflow-y-auto space-y-1.5 rounded-md border border-border p-2">
                   {roles.map((r) => (
@@ -164,7 +164,7 @@ export function NoticeFormDialog({ open, onOpenChange, notice }: Props) {
                   ))}
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label>Departments</Label>
                 <div className="max-h-32 overflow-y-auto space-y-1.5 rounded-md border border-border p-2">
                   {departments.map((d) => (

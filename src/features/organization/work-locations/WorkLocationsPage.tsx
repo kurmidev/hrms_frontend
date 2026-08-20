@@ -163,7 +163,7 @@ export function WorkLocationsPage() {
       />
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editItem ? 'Edit Work Location' : 'New Work Location'}</DialogTitle>
           </DialogHeader>
@@ -173,7 +173,7 @@ export function WorkLocationsPage() {
               <Input id="wl-name" placeholder="e.g. HQ - Andheri" {...register('name')} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="wl-lat">Latitude *</Label>
                 <Input id="wl-lat" type="number" step="any" placeholder="19.076" {...register('lat')} />

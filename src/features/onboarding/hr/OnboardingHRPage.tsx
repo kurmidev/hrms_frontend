@@ -249,64 +249,70 @@ export function OnboardingHRPage() {
       />
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Invite Candidate</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit((v) => create(v))} className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="candidateName">Full Name *</Label>
-              <Input id="candidateName" placeholder="Priya Sharma" {...register('candidateName')} />
-              {errors.candidateName && <p className="text-xs text-destructive">{errors.candidateName.message}</p>}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="candidateName">Full Name *</Label>
+                <Input id="candidateName" placeholder="Priya Sharma" {...register('candidateName')} />
+                {errors.candidateName && <p className="text-xs text-destructive">{errors.candidateName.message}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email *</Label>
+                <Input id="email" placeholder="priya@example.com" {...register('email')} />
+                {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email *</Label>
-              <Input id="email" placeholder="priya@example.com" {...register('email')} />
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="phone">Mobile *</Label>
+                <Input id="phone" placeholder="9876543210" {...register('phone')} />
+                {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="workLocation">Work Location</Label>
+                <Input id="workLocation" placeholder="Bangalore, WFH" {...register('workLocation')} />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="phone">Mobile *</Label>
-              <Input id="phone" placeholder="9876543210" {...register('phone')} />
-              {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <Label>Department *</Label>
-              <Select
-                items={Object.fromEntries(flatDepts(deptTree).map((d) => [d.name, d.name]))}
-                value={selectedDepartmentName}
-                onValueChange={(v) => setValue('departmentName', v ?? '', { shouldValidate: true })}
-              >
-                <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
-                <SelectContent>
-                  {flatDepts(deptTree).map((d) => (
-                    <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.departmentName && <p className="text-xs text-destructive">{errors.departmentName.message}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <Label>Job Title *</Label>
-              <Select
-                items={Object.fromEntries(designations.map((d) => [d.name, d.name]))}
-                value={watch('jobTitle')}
-                onValueChange={(v) => setValue('jobTitle', v ?? '', { shouldValidate: true })}
-                disabled={!selectedDeptId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={selectedDeptId ? 'Select job title' : 'Select department first'} />
-                </SelectTrigger>
-                <SelectContent>
-                  {designations.map((d) => (
-                    <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.jobTitle && <p className="text-xs text-destructive">{errors.jobTitle.message}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="workLocation">Work Location</Label>
-              <Input id="workLocation" placeholder="Bangalore, WFH" {...register('workLocation')} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Department *</Label>
+                <Select
+                  items={Object.fromEntries(flatDepts(deptTree).map((d) => [d.name, d.name]))}
+                  value={selectedDepartmentName}
+                  onValueChange={(v) => setValue('departmentName', v ?? '', { shouldValidate: true })}
+                >
+                  <SelectTrigger className="w-full"><SelectValue placeholder="Select department" /></SelectTrigger>
+                  <SelectContent>
+                    {flatDepts(deptTree).map((d) => (
+                      <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.departmentName && <p className="text-xs text-destructive">{errors.departmentName.message}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label>Job Title *</Label>
+                <Select
+                  items={Object.fromEntries(designations.map((d) => [d.name, d.name]))}
+                  value={watch('jobTitle')}
+                  onValueChange={(v) => setValue('jobTitle', v ?? '', { shouldValidate: true })}
+                  disabled={!selectedDeptId}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={selectedDeptId ? 'Select job title' : 'Select department first'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {designations.map((d) => (
+                      <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.jobTitle && <p className="text-xs text-destructive">{errors.jobTitle.message}</p>}
+              </div>
             </div>
             <DialogFooter>
               <Button variant="outline" type="button" onClick={() => setOpen(false)}>Cancel</Button>
@@ -320,7 +326,7 @@ export function OnboardingHRPage() {
       </Dialog>
 
       <Dialog open={!!createdLink} onOpenChange={(o) => !o && setCreatedLink(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Invite Link Generated</DialogTitle>
           </DialogHeader>

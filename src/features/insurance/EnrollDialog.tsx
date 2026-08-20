@@ -81,12 +81,12 @@ export function EnrollDialog({ open, onOpenChange }: Props) {
         if (!o) reset({ familyMembers: [] })
       }}
     >
-      <DialogContent className="max-w-lg">
+      <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Enroll in Insurance</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit((v) => enroll(v))} className="space-y-4 py-2 max-h-[70vh] overflow-y-auto">
-          <div className="grid grid-cols-2 gap-3">
+        <form onSubmit={handleSubmit((v) => enroll(v))} className="space-y-4 py-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Employee *</Label>
               <Select
@@ -132,7 +132,7 @@ export function EnrollDialog({ open, onOpenChange }: Props) {
               </Button>
             </div>
             {fields.map((field, index) => (
-              <div key={field.id} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end">
+              <div key={field.id} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_auto] gap-2 sm:items-end">
                 <div className="space-y-1">
                   <Label className="text-xs">Name</Label>
                   <Input {...register(`familyMembers.${index}.name`)} />

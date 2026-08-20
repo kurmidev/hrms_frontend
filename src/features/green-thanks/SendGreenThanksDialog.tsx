@@ -68,7 +68,7 @@ export function SendGreenThanksDialog({ open, onOpenChange }: Props) {
         if (!o) reset()
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Send Green Thanks</DialogTitle>
         </DialogHeader>

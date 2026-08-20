@@ -66,7 +66,7 @@ export function ApproveGreenThanksDialog({ open, onOpenChange, greenThanks }: Pr
         if (!o) resetForm()
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Review Green Thanks</DialogTitle>
         </DialogHeader>
@@ -91,7 +91,7 @@ export function ApproveGreenThanksDialog({ open, onOpenChange, greenThanks }: Pr
           </div>
 
           {decision === 'approve' && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label>Payroll Month</Label>
                 <Select

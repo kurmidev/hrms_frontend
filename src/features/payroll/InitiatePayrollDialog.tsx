@@ -69,42 +69,44 @@ export function InitiatePayrollDialog({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Run Payroll</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit((v) => initiate(v))} className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="month">Month *</Label>
-            <Select
-              items={Object.fromEntries(MONTH_OPTIONS.map((m) => [String(m.value), m.label]))}
-              value={month != null ? String(month) : ''}
-              onValueChange={(v) => setValue('month', v ? Number(v) : (undefined as unknown as number))}
-            >
-              <SelectTrigger className="w-full"><SelectValue placeholder="Select month" /></SelectTrigger>
-              <SelectContent>
-                {MONTH_OPTIONS.map((m) => (
-                  <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.month && <p className="text-xs text-destructive">{errors.month.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="year">Year *</Label>
-            <Select
-              items={Object.fromEntries(YEAR_OPTIONS.map((y) => [String(y), String(y)]))}
-              value={year != null ? String(year) : ''}
-              onValueChange={(v) => setValue('year', v ? Number(v) : (undefined as unknown as number))}
-            >
-              <SelectTrigger className="w-full"><SelectValue placeholder="Select year" /></SelectTrigger>
-              <SelectContent>
-                {YEAR_OPTIONS.map((y) => (
-                  <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.year && <p className="text-xs text-destructive">{errors.year.message}</p>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="month">Month *</Label>
+              <Select
+                items={Object.fromEntries(MONTH_OPTIONS.map((m) => [String(m.value), m.label]))}
+                value={month != null ? String(month) : ''}
+                onValueChange={(v) => setValue('month', v ? Number(v) : (undefined as unknown as number))}
+              >
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select month" /></SelectTrigger>
+                <SelectContent>
+                  {MONTH_OPTIONS.map((m) => (
+                    <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.month && <p className="text-xs text-destructive">{errors.month.message}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="year">Year *</Label>
+              <Select
+                items={Object.fromEntries(YEAR_OPTIONS.map((y) => [String(y), String(y)]))}
+                value={year != null ? String(year) : ''}
+                onValueChange={(v) => setValue('year', v ? Number(v) : (undefined as unknown as number))}
+              >
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select year" /></SelectTrigger>
+                <SelectContent>
+                  {YEAR_OPTIONS.map((y) => (
+                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.year && <p className="text-xs text-destructive">{errors.year.message}</p>}
+            </div>
           </div>
           <p className="text-xs text-muted-foreground">
             This will initiate payroll processing for all active employees for the selected period.

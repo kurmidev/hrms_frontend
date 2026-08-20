@@ -58,7 +58,7 @@ export function DepartmentEmployeesDialog({ open, onOpenChange, department }: Pr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Employees — {department?.name}</DialogTitle>
         </DialogHeader>

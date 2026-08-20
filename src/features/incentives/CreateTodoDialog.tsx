@@ -73,7 +73,7 @@ export function CreateTodoDialog({ open, onOpenChange }: Props) {
         if (!o) reset()
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>New Todo</DialogTitle>
         </DialogHeader>
@@ -102,7 +102,7 @@ export function CreateTodoDialog({ open, onOpenChange }: Props) {
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="quantity">Quantity</Label>
               <Input id="quantity" type="number" step="0.01" min="0" {...register('quantity')} />

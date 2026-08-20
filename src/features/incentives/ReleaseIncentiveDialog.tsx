@@ -56,7 +56,7 @@ export function ReleaseIncentiveDialog({ open, onOpenChange, entry }: Props) {
         if (!o) resetForm()
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Release Incentive</DialogTitle>
         </DialogHeader>
@@ -66,7 +66,7 @@ export function ReleaseIncentiveDialog({ open, onOpenChange, entry }: Props) {
             {entry?.employee ? `${entry.employee.firstName} ${entry.employee.lastName}` : 'this employee'}.
             Leave the target period blank to use the original payroll month/year.
           </p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Target Month</Label>
               <Select

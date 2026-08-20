@@ -9,7 +9,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { onboardingApi } from '@/api/onboarding.api'
+import { ApproveOnboardingDialog } from './ApproveOnboardingDialog'
 import { formatDateTime } from '@/lib/utils'
+import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
 const RESENDABLE_STATUSES = new Set(['PENDING', 'IN_PROGRESS', 'CHANGES_REQUESTED'])
@@ -93,13 +95,15 @@ export function OnboardingDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const canManage = usePermission('onboarding:manage')
   const [notesDialog, setNotesDialog] = useState<'changes' | 'reject' | null>(null)
   const [notes, setNotes] = useState('')
+  const [approveOpen, setApproveOpen] = useState(false)
 
   const { data: link, isLoading } = useQuery({
     queryKey: ['onboarding-link', id],
     queryFn: () => onboardingApi.get(id!),
-    enabled: !!id,
+    enabled: !!id && canManage,
   })
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['onboarding-link', id] })
@@ -124,6 +128,22 @@ export function OnboardingDetailPage() {
     onSuccess: () => { invalidate(); toast.success('Invite resent.') },
     onError: () => toast.error('Failed to resend invite.'),
   })
+
+  if (!canManage) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate('/onboarding')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-xl font-bold text-foreground">Onboarding</h1>
+        </div>
+        <div className="rounded-lg border border-border bg-card py-16 text-center text-sm text-muted-foreground">
+          You do not have permission to manage onboarding.
+        </div>
+      </div>
+    )
+  }
 
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-8 w-40" /><Skeleton className="h-64 w-full" /></div>
   if (!link) return <div className="text-muted-foreground">Not found.</div>
@@ -266,7 +286,7 @@ export function OnboardingDetailPage() {
               <XCircle className="mr-2 h-4 w-4" />
               Reject
             </Button>
-            <Button onClick={() => toast.info('Use the Approve flow to create the employee account.')}>
+            <Button onClick={() => setApproveOpen(true)}>
               <CheckCircle className="mr-2 h-4 w-4" />
               Approve
             </Button>
@@ -297,7 +317,7 @@ export function OnboardingDetailPage() {
 
       {/* Notes dialog */}
       <Dialog open={!!notesDialog} onOpenChange={(o) => !o && setNotesDialog(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{notesDialog === 'changes' ? 'Request Changes' : 'Reject Application'}</DialogTitle>
           </DialogHeader>
@@ -322,6 +342,10 @@ export function OnboardingDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {link.status === 'UNDER_REVIEW' && (
+        <ApproveOnboardingDialog open={approveOpen} onOpenChange={setApproveOpen} link={link} />
+      )}
     </div>
   )
 }

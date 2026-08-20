@@ -184,7 +184,7 @@ export function DesignationsPage() {
       />
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-[92vw] sm:w-[85vw] max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editItem ? 'Edit Designation' : 'New Designation'}</DialogTitle>
           </DialogHeader>
@@ -201,7 +201,7 @@ export function DesignationsPage() {
                 value={selectedDept}
                 onValueChange={(v) => setValue('departmentId', v ?? '', { shouldValidate: true })}
               >
-                <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select department" /></SelectTrigger>
                 <SelectContent>
                   {flatDepts(deptTree).map((d) => (
                     <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>

@@ -226,7 +226,7 @@ export function DepartmentsPage() {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editNode ? 'Edit Department' : 'New Department'}</DialogTitle>
           </DialogHeader>

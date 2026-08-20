@@ -71,7 +71,7 @@ export function ApproveTodoDialog({ open, onOpenChange, todo }: Props) {
         if (!o) resetForm()
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Review Todo</DialogTitle>
         </DialogHeader>
@@ -105,7 +105,7 @@ export function ApproveTodoDialog({ open, onOpenChange, todo }: Props) {
                 />
                 <Label htmlFor="hold" className="cursor-pointer">Hold for later payroll</Label>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label>Payroll Month</Label>
                   <Select

@@ -197,18 +197,18 @@ export function LeavePoliciesPage() {
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editItem ? 'Edit Leave Policy' : 'New Leave Policy'}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit((v) => save(v))} className="space-y-4 py-2 max-h-[70vh] overflow-y-auto">
+          <form onSubmit={handleSubmit((v) => save(v))} className="space-y-4 py-2">
             <div className="space-y-1.5">
               <Label htmlFor="lp-name">Name *</Label>
               <Input id="lp-name" placeholder="e.g. Annual Casual Leave" {...register('name')} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label>Leave Type *</Label>
                 <Select
@@ -216,7 +216,7 @@ export function LeavePoliciesPage() {
                   value={leaveTypeValue ?? ''}
                   onValueChange={(v) => setValue('leaveType', v ?? '')}
                 >
-                  <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                  <SelectTrigger className="w-full"><SelectValue placeholder="Select type" /></SelectTrigger>
                   <SelectContent>
                     {LEAVE_TYPES.map((t) => (
                       <SelectItem key={t} value={t}>{LEAVE_TYPE_LABELS[t] ?? t}</SelectItem>
@@ -232,7 +232,7 @@ export function LeavePoliciesPage() {
                   value={accrualValue ?? ''}
                   onValueChange={(v) => setValue('accrualType', v ?? '')}
                 >
-                  <SelectTrigger><SelectValue placeholder="Accrual" /></SelectTrigger>
+                  <SelectTrigger className="w-full"><SelectValue placeholder="Accrual" /></SelectTrigger>
                   <SelectContent>
                     {ACCRUAL_TYPES.map((a) => (
                       <SelectItem key={a} value={a}>{a}</SelectItem>
@@ -242,7 +242,7 @@ export function LeavePoliciesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="lp-days">Days / Year *</Label>
                 <Input id="lp-days" type="number" step="any" placeholder="12" {...register('daysPerYear')} />
@@ -255,7 +255,7 @@ export function LeavePoliciesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="lp-min">Min Advance Days</Label>
                 <Input id="lp-min" type="number" placeholder="0" {...register('minAdvanceDays')} />
@@ -269,7 +269,7 @@ export function LeavePoliciesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" className="h-4 w-4" {...register('isEncashable')} />
                 Encashable

@@ -80,7 +80,7 @@ export function AssetFormDialog({ open, onOpenChange, asset }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{asset ? 'Edit Asset' : 'New Asset'}</DialogTitle>
         </DialogHeader>
@@ -96,7 +96,7 @@ export function AssetFormDialog({ open, onOpenChange, asset }: Props) {
                   value={field.value}
                   onValueChange={(v) => field.onChange(v ?? '')}
                 >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {ASSET_TYPES.map((t) => (
                       <SelectItem key={t} value={t}>{t.replace('_', ' ')}</SelectItem>
@@ -115,7 +115,7 @@ export function AssetFormDialog({ open, onOpenChange, asset }: Props) {
             <Label htmlFor="serialNumber">Serial Number</Label>
             <Input id="serialNumber" {...register('serialNumber')} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="purchaseDate">Purchase Date</Label>
               <Input id="purchaseDate" type="date" {...register('purchaseDate')} />

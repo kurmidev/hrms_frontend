@@ -58,7 +58,7 @@ export function CreateCycleDialog({ open, onOpenChange }: Props) {
         if (!o) reset()
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Performance Cycle</DialogTitle>
         </DialogHeader>
@@ -68,15 +68,17 @@ export function CreateCycleDialog({ open, onOpenChange }: Props) {
             <Input id="name" placeholder="e.g. Q1 2026" {...register('name')} />
             {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="startDate">Start Date *</Label>
-            <Input id="startDate" type="date" {...register('startDate')} />
-            {errors.startDate && <p className="text-xs text-destructive">{errors.startDate.message}</p>}
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="endDate">End Date *</Label>
-            <Input id="endDate" type="date" {...register('endDate')} />
-            {errors.endDate && <p className="text-xs text-destructive">{errors.endDate.message}</p>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="startDate">Start Date *</Label>
+              <Input id="startDate" type="date" {...register('startDate')} />
+              {errors.startDate && <p className="text-xs text-destructive">{errors.startDate.message}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="endDate">End Date *</Label>
+              <Input id="endDate" type="date" {...register('endDate')} />
+              {errors.endDate && <p className="text-xs text-destructive">{errors.endDate.message}</p>}
+            </div>
           </div>
           <p className="text-xs text-muted-foreground">
             Cycle is created as DRAFT. Activate it later to accept ratings.

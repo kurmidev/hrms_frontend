@@ -12,7 +12,7 @@ export const payrollStructuresApi = {
   get: (id: string) =>
     apiClient.get<{ data: PayrollStructure }>(`/payroll-structures/${id}`).then(unwrap<PayrollStructure>),
 
-  create: (data: { name: string; components: PayrollStructure['components'] }) =>
+  create: (data: { name: string; components: PayrollStructure['components']; isActive?: boolean }) =>
     apiClient.post<{ data: PayrollStructure }>('/payroll-structures', data).then(unwrap<PayrollStructure>),
 
   update: (id: string, data: Partial<PayrollStructure>) =>

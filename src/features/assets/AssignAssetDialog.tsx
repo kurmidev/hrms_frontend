@@ -69,7 +69,7 @@ export function AssignAssetDialog({ open, onOpenChange, asset }: Props) {
         if (!o) reset()
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Assign Asset {asset ? `— ${asset.name}` : ''}</DialogTitle>
         </DialogHeader>

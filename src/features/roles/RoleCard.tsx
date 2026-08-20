@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil, Trash2, ChevronDown, ChevronUp, Users2 } from 'lucide-react'
+import { Pencil, Trash2, Copy, ChevronDown, ChevronUp, Users2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -12,11 +12,13 @@ interface RoleCardProps {
   role: Role
   canEdit: boolean
   canDelete: boolean
+  canDuplicate: boolean
   onEdit: (role: Role) => void
   onDelete: (role: Role) => void
+  onDuplicate: (role: Role) => void
 }
 
-export function RoleCard({ role, canEdit, canDelete, onEdit, onDelete }: RoleCardProps) {
+export function RoleCard({ role, canEdit, canDelete, canDuplicate, onEdit, onDelete, onDuplicate }: RoleCardProps) {
   const [expanded, setExpanded] = useState(false)
   const theme = getRoleTheme(role)
   const Icon = theme.icon
@@ -52,18 +54,30 @@ export function RoleCard({ role, canEdit, canDelete, onEdit, onDelete }: RoleCar
               )}
             </div>
           </div>
-          {!role.isSystemRole && (canEdit || canDelete) && (
+          {(canDuplicate || (!role.isSystemRole && (canEdit || canDelete))) && (
             <div className="flex gap-1 shrink-0">
-              {canEdit && (
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(role)}>
+              {canDuplicate && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  title="Duplicate as a new custom role"
+                  onClick={() => onDuplicate(role)}
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                </Button>
+              )}
+              {!role.isSystemRole && canEdit && (
+                <Button variant="ghost" size="icon" className="h-7 w-7" title="Edit role" onClick={() => onEdit(role)}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
               )}
-              {canDelete && (
+              {!role.isSystemRole && canDelete && (
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 text-destructive hover:text-destructive"
+                  title="Delete role"
                   onClick={() => onDelete(role)}
                 >
                   <Trash2 className="h-3.5 w-3.5" />

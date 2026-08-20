@@ -95,7 +95,7 @@ export function NewChatDialog({ open, onOpenChange, onCreated }: Props) {
         if (!o) resetForm()
       }}
     >
-      <DialogContent className="max-w-md">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Start a new chat</DialogTitle>
         </DialogHeader>

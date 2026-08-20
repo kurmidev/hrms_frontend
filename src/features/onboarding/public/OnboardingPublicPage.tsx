@@ -395,6 +395,7 @@ export function OnboardingPublicPage() {
                     <div className="space-y-1.5">
                       <Label>Document Type</Label>
                       <Select
+                        items={Object.fromEntries(DOCUMENT_TYPES.map((t) => [t, t.replace(/_/g, ' ')]))}
                         value={row.documentType}
                         onValueChange={(v) => updateRow(row.id, { documentType: v ?? '' })}
                         disabled={submitting}

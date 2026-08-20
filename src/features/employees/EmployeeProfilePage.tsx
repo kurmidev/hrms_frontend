@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, Briefcase, Users } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, Briefcase, Users, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -10,6 +11,8 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { employeesApi } from '@/api/employees.api'
 import { EMPLOYMENT_TYPE_LABELS } from '@/lib/constants'
 import { formatDate, getInitials } from '@/lib/utils'
+import { usePermission } from '@/hooks/usePermission'
+import { ChangePayrollStructureDialog } from './ChangePayrollStructureDialog'
 
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -23,6 +26,8 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
 export function EmployeeProfilePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const canUpdate = usePermission('employee:update')
+  const [changePayrollOpen, setChangePayrollOpen] = useState(false)
 
   const { data: emp, isLoading } = useQuery({
     queryKey: ['employee', id],
@@ -47,7 +52,13 @@ export function EmployeeProfilePage() {
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate('/employees')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-xl font-bold text-foreground">Employee Profile</h1>
+        <h1 className="text-xl font-bold text-foreground flex-1">Employee Profile</h1>
+        {canUpdate && (
+          <Button variant="outline" size="sm" onClick={() => setChangePayrollOpen(true)}>
+            <Wallet className="h-4 w-4 mr-1.5" />
+            Change Payroll Structure
+          </Button>
+        )}
       </div>
 
       {/* Header card */}
@@ -203,6 +214,14 @@ export function EmployeeProfilePage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {canUpdate && (
+        <ChangePayrollStructureDialog
+          open={changePayrollOpen}
+          onOpenChange={setChangePayrollOpen}
+          employee={emp}
+        />
       )}
     </div>
   )

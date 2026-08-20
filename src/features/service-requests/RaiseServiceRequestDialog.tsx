@@ -78,12 +78,12 @@ export function RaiseServiceRequestDialog({ open, onOpenChange }: Props) {
         if (!o) reset()
       }}
     >
-      <DialogContent className="max-w-md">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Raise a Service Request</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit((v) => create(v))} className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Category *</Label>
               <Controller
@@ -95,7 +95,7 @@ export function RaiseServiceRequestDialog({ open, onOpenChange }: Props) {
                     value={field.value}
                     onValueChange={(v) => field.onChange(v ?? '')}
                   >
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {CATEGORIES.map((c) => (
                         <SelectItem key={c} value={c}>{c.replace('_', ' ')}</SelectItem>
@@ -116,7 +116,7 @@ export function RaiseServiceRequestDialog({ open, onOpenChange }: Props) {
                     value={field.value ?? ''}
                     onValueChange={(v) => field.onChange(v ?? '')}
                   >
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {PRIORITIES.map((p) => (
                         <SelectItem key={p} value={p}>{p}</SelectItem>

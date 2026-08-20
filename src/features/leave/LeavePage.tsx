@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -36,17 +36,32 @@ import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
-const schema = z.object({
-  leavePolicyId: z.string().min(1, 'Leave type is required'),
-  fromDate: z.string().min(1, 'From date is required'),
-  toDate: z.string().min(1, 'To date is required'),
-  days: z.preprocess(
-    (v) => (v === '' ? undefined : Number(v)),
-    z.number().min(0.5, 'Days must be at least 0.5')
-  ),
-  reason: z.string().optional(),
-})
+const schema = z
+  .object({
+    leavePolicyId: z.string().min(1, 'Leave type is required'),
+    fromDate: z.string().min(1, 'From date is required'),
+    toDate: z.string().min(1, 'To date is required'),
+    days: z.preprocess(
+      (v) => (v === '' ? undefined : Number(v)),
+      z.number().min(0.5, 'Days must be at least 0.5')
+    ),
+    reason: z.string().min(1, 'Reason is required'),
+  })
+  .refine((v) => !v.fromDate || !v.toDate || v.toDate >= v.fromDate, {
+    message: 'To date must be on or after the from date',
+    path: ['toDate'],
+  })
 type FormValues = z.infer<typeof schema>
+
+// Inclusive calendar-day count between two yyyy-mm-dd date strings.
+function calculateLeaveDays(fromDate: string, toDate: string): number | undefined {
+  if (!fromDate || !toDate) return undefined
+  const from = new Date(fromDate)
+  const to = new Date(toDate)
+  if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || to < from) return undefined
+  const MS_PER_DAY = 24 * 60 * 60 * 1000
+  return Math.round((to.getTime() - from.getTime()) / MS_PER_DAY) + 1
+}
 
 export function LeavePage() {
   const qc = useQueryClient()
@@ -89,6 +104,13 @@ export function LeavePage() {
     resolver: zodResolver(schema) as Resolver<FormValues>,
   })
   const selectedPolicyId = watch('leavePolicyId')
+  const watchedFromDate = watch('fromDate')
+  const watchedToDate = watch('toDate')
+
+  useEffect(() => {
+    const computed = calculateLeaveDays(watchedFromDate, watchedToDate)
+    setValue('days', computed as number, { shouldValidate: true })
+  }, [watchedFromDate, watchedToDate, setValue])
 
   const openApply = () => {
     reset({ leavePolicyId: '', fromDate: '', toDate: '', days: undefined, reason: '' })
@@ -102,7 +124,7 @@ export function LeavePage() {
         fromDate: values.fromDate,
         toDate: values.toDate,
         days: values.days,
-        reason: values.reason || undefined,
+        reason: values.reason,
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['my-leave-applications'] })
@@ -250,12 +272,20 @@ export function LeavePage() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="days">Days *</Label>
-              <Input id="days" type="number" step="0.5" min="0.5" {...register('days')} />
+              <Input
+                id="days"
+                type="number"
+                readOnly
+                className="bg-muted/50 cursor-not-allowed"
+                {...register('days')}
+              />
+              <p className="text-xs text-muted-foreground">Calculated automatically from the selected dates.</p>
               {errors.days && <p className="text-xs text-destructive">{errors.days.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="reason">Reason</Label>
+              <Label htmlFor="reason">Reason *</Label>
               <Textarea id="reason" placeholder="Reason for leave…" {...register('reason')} />
+              {errors.reason && <p className="text-xs text-destructive">{errors.reason.message}</p>}
             </div>
             <SheetFooter>
               <Button variant="outline" type="button" onClick={() => setOpen(false)}>Cancel</Button>

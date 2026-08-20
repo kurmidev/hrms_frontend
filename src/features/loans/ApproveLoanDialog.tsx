@@ -68,7 +68,7 @@ export function ApproveLoanDialog({ open, onOpenChange, loan }: Props) {
         if (!o) reset()
       }}
     >
-      <DialogContent className="max-w-sm">
+      <DialogContent className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Approve Loan</DialogTitle>
         </DialogHeader>

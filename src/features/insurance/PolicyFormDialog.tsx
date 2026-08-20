@@ -87,7 +87,7 @@ export function PolicyFormDialog({ open, onOpenChange, policy }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{policy ? 'Edit Policy' : 'Add Policy'}</DialogTitle>
         </DialogHeader>
@@ -97,7 +97,7 @@ export function PolicyFormDialog({ open, onOpenChange, policy }: Props) {
             <Input id="name" {...register('name')} />
             {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="provider">Provider *</Label>
               <Input id="provider" {...register('provider')} />
@@ -125,7 +125,7 @@ export function PolicyFormDialog({ open, onOpenChange, policy }: Props) {
             </Select>
             {errors.type && <p className="text-xs text-destructive">{errors.type.message}</p>}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="coverageAmount">Coverage Amount *</Label>
               <Input id="coverageAmount" type="number" min="0" step="0.01" {...register('coverageAmount')} />
@@ -137,7 +137,7 @@ export function PolicyFormDialog({ open, onOpenChange, policy }: Props) {
               {errors.premium && <p className="text-xs text-destructive">{errors.premium.message}</p>}
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="validFrom">Valid From</Label>
               <Input id="validFrom" type="date" {...register('validFrom')} />

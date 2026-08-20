@@ -86,28 +86,47 @@ export function IssueMemoDialog({ open, onOpenChange }: Props) {
         if (!o) reset()
       }}
     >
-      <DialogContent className="max-w-md">
+      <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Issue Disciplinary Memo</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit((v) => create(v))} className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label>Employee *</Label>
-            <Select
-              items={Object.fromEntries(employees.map((e) => [e.id, `${e.firstName} ${e.lastName} (${e.empCode})`]))}
-              value={employeeId ?? ''}
-              onValueChange={(v) => setValue('employeeId', v ?? '')}
-            >
-              <SelectTrigger className="w-full"><SelectValue placeholder="Select employee" /></SelectTrigger>
-              <SelectContent>
-                {employees.map((e) => (
-                  <SelectItem key={e.id} value={e.id}>
-                    {e.firstName} {e.lastName} ({e.empCode})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.employeeId && <p className="text-xs text-destructive">{errors.employeeId.message}</p>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Employee *</Label>
+              <Select
+                items={Object.fromEntries(employees.map((e) => [e.id, `${e.firstName} ${e.lastName} (${e.empCode})`]))}
+                value={employeeId ?? ''}
+                onValueChange={(v) => setValue('employeeId', v ?? '')}
+              >
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select employee" /></SelectTrigger>
+                <SelectContent>
+                  {employees.map((e) => (
+                    <SelectItem key={e.id} value={e.id}>
+                      {e.firstName} {e.lastName} ({e.empCode})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.employeeId && <p className="text-xs text-destructive">{errors.employeeId.message}</p>}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Type *</Label>
+              <Select
+                items={Object.fromEntries(MEMO_TYPES.map((t) => [t, t.replace('_', ' ')]))}
+                value={type ?? ''}
+                onValueChange={(v) => setValue('type', (v ?? '') as DisciplinaryActionType)}
+              >
+                <SelectTrigger className="w-full"><SelectValue placeholder="Select type" /></SelectTrigger>
+                <SelectContent>
+                  {MEMO_TYPES.map((t) => (
+                    <SelectItem key={t} value={t}>{t.replace('_', ' ')}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.type && <p className="text-xs text-destructive">{errors.type.message}</p>}
+            </div>
           </div>
 
           {summary && summary.activeMemoCount >= 4 && (
@@ -126,23 +145,6 @@ export function IssueMemoDialog({ open, onOpenChange }: Props) {
           )}
 
           <div className="space-y-1.5">
-            <Label>Type *</Label>
-            <Select
-              items={Object.fromEntries(MEMO_TYPES.map((t) => [t, t.replace('_', ' ')]))}
-              value={type ?? ''}
-              onValueChange={(v) => setValue('type', (v ?? '') as DisciplinaryActionType)}
-            >
-              <SelectTrigger className="w-full"><SelectValue placeholder="Select type" /></SelectTrigger>
-              <SelectContent>
-                {MEMO_TYPES.map((t) => (
-                  <SelectItem key={t} value={t}>{t.replace('_', ' ')}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.type && <p className="text-xs text-destructive">{errors.type.message}</p>}
-          </div>
-
-          <div className="space-y-1.5">
             <Label htmlFor="title">Title *</Label>
             <Input id="title" {...register('title')} />
             {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
@@ -154,14 +156,16 @@ export function IssueMemoDialog({ open, onOpenChange }: Props) {
             {errors.reason && <p className="text-xs text-destructive">{errors.reason.message}</p>}
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="issuingAuthority">Issuing Authority</Label>
-            <Input id="issuingAuthority" {...register('issuingAuthority')} />
-          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="issuingAuthority">Issuing Authority</Label>
+              <Input id="issuingAuthority" {...register('issuingAuthority')} />
+            </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="approvalReference">Approval Reference</Label>
-            <Input id="approvalReference" {...register('approvalReference')} />
+            <div className="space-y-1.5">
+              <Label htmlFor="approvalReference">Approval Reference</Label>
+              <Input id="approvalReference" {...register('approvalReference')} />
+            </div>
           </div>
 
           <DialogFooter>

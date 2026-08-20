@@ -71,7 +71,7 @@ export function ForceChangePasswordDialog() {
   return (
     <Dialog open={!!user?.mustChangePassword} onOpenChange={() => {}}>
       <DialogContent
-        className="sm:max-w-md [&>button[aria-label='Close']]:hidden"
+        className="w-[92vw] sm:w-[85vw] max-w-md max-h-[85vh] overflow-y-auto [&>button[aria-label='Close']]:hidden"
       >
         <DialogHeader>
           <div className="flex items-center gap-3 mb-1">

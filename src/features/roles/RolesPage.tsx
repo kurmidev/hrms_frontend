@@ -80,6 +80,16 @@ export function RolesPage() {
     setCollapsedGroups(new Set(groupNames.slice(INITIAL_OPEN_GROUP_COUNT)))
     setOpen(true)
   }
+  const openDuplicate = (role: Role) => {
+    reset({
+      name: `${titleCaseRoleName(role.name)} Copy`,
+      description: role.description ?? '',
+      permissions: role.permissions,
+    })
+    setEditRole(null)
+    setCollapsedGroups(new Set(groupNames.slice(INITIAL_OPEN_GROUP_COUNT)))
+    setOpen(true)
+  }
 
   const toggleGroupCollapsed = (group: string) => {
     setCollapsedGroups((prev) => {
@@ -184,8 +194,10 @@ export function RolesPage() {
               role={role}
               canEdit={canEdit}
               canDelete={canDelete}
+              canDuplicate={canCreate}
               onEdit={openEdit}
               onDelete={setDeleteRole}
+              onDuplicate={openDuplicate}
             />
           ))}
         </div>
@@ -193,7 +205,7 @@ export function RolesPage() {
 
       {/* Create / Edit Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center gap-2.5">
               {editTheme && (
@@ -246,14 +258,15 @@ export function RolesPage() {
                         )}
                       </button>
                       {!isCollapsed && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 px-3 pb-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-2 px-3 pb-3">
                           {perms.map((perm) => (
-                            <label key={perm} className="flex items-center gap-2 cursor-pointer">
+                            <label key={perm} className="flex items-start gap-2 cursor-pointer min-w-0">
                               <Checkbox
+                                className="mt-0.5"
                                 checked={selectedPerms?.includes(perm) ?? false}
                                 onCheckedChange={() => togglePermission(perm)}
                               />
-                              <span className="text-sm text-foreground">{perm}</span>
+                              <span className="text-sm text-foreground break-all">{perm}</span>
                             </label>
                           ))}
                         </div>

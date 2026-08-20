@@ -121,7 +121,7 @@ export function NoticeBoardPage() {
       )}
 
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="w-[92vw] sm:w-[85vw] max-w-xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selected?.title}</DialogTitle>
           </DialogHeader>

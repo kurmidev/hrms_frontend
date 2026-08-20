@@ -77,7 +77,7 @@ export function InitiateExitDialog({ open, onOpenChange }: Props) {
         if (!o) reset()
       }}
     >
-      <DialogContent className="max-w-md">
+      <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Initiate Exit</DialogTitle>
         </DialogHeader>
@@ -101,7 +101,7 @@ export function InitiateExitDialog({ open, onOpenChange }: Props) {
             {errors.employeeId && <p className="text-xs text-destructive">{errors.employeeId.message}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Type *</Label>
               <Select
@@ -142,7 +142,7 @@ export function InitiateExitDialog({ open, onOpenChange }: Props) {
             {errors.reason && <p className="text-xs text-destructive">{errors.reason.message}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="noticeStartDate">Notice Start Date</Label>
               <Input id="noticeStartDate" type="date" {...register('noticeStartDate')} />
