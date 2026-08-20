@@ -52,3 +52,32 @@ export interface SubmitRatingDto {
   comments?: string
   isEligibleForIncrement?: boolean
 }
+
+export type EmployeeKpiStatus = 'PENDING' | 'IN_PROGRESS' | 'ACHIEVED' | 'MISSED'
+
+export interface EmployeeKpiRow {
+  id: string
+  employeeId: string
+  employeeName: string
+  designationId: string | null
+  designationName: string | null
+  kpiTitle: string
+  // Backend `Kpi.targetValue`/`Kpi.unit` are optional columns (Float?/String?
+  // in prisma/schema.prisma) — there is no create-KPI endpoint yet, but the
+  // seed data always populates them, so DO NOT widen this back to a
+  // non-nullable type without re-checking the schema; a future KPI created
+  // without a target would otherwise render "null %" (see KpiPage.tsx render).
+  targetValue: number | null
+  unit: string | null
+  achievedValue: number | null
+  status: EmployeeKpiStatus
+}
+
+export interface Kpi {
+  id: string
+  title: string
+  designationId: string | null
+  designationName: string | null
+  targetValue: number | null
+  unit: string | null
+}

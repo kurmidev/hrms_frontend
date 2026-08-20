@@ -211,7 +211,11 @@ export function LeavePoliciesPage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Leave Type *</Label>
-                <Select value={leaveTypeValue ?? ''} onValueChange={(v) => setValue('leaveType', v ?? '')}>
+                <Select
+                  items={Object.fromEntries(LEAVE_TYPES.map((t) => [t, LEAVE_TYPE_LABELS[t] ?? t]))}
+                  value={leaveTypeValue ?? ''}
+                  onValueChange={(v) => setValue('leaveType', v ?? '')}
+                >
                   <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                   <SelectContent>
                     {LEAVE_TYPES.map((t) => (
@@ -223,7 +227,11 @@ export function LeavePoliciesPage() {
               </div>
               <div className="space-y-1.5">
                 <Label>Accrual</Label>
-                <Select value={accrualValue ?? ''} onValueChange={(v) => setValue('accrualType', v ?? '')}>
+                <Select
+                  items={Object.fromEntries(ACCRUAL_TYPES.map((a) => [a, a]))}
+                  value={accrualValue ?? ''}
+                  onValueChange={(v) => setValue('accrualType', v ?? '')}
+                >
                   <SelectTrigger><SelectValue placeholder="Accrual" /></SelectTrigger>
                   <SelectContent>
                     {ACCRUAL_TYPES.map((a) => (

@@ -76,7 +76,11 @@ export function AssignAssetDialog({ open, onOpenChange, asset }: Props) {
         <form onSubmit={handleSubmit((v) => assign(v))} className="space-y-4 py-2">
           <div className="space-y-1.5">
             <Label>Employee *</Label>
-            <Select value={employeeId ?? ''} onValueChange={(v) => setValue('employeeId', v ?? '')}>
+            <Select
+              items={Object.fromEntries(employees.map((e) => [e.id, `${e.firstName} ${e.lastName} (${e.empCode})`]))}
+              value={employeeId ?? ''}
+              onValueChange={(v) => setValue('employeeId', v ?? '')}
+            >
               <SelectTrigger className="w-full"><SelectValue placeholder="Select employee" /></SelectTrigger>
               <SelectContent>
                 {employees.map((e) => (

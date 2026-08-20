@@ -70,6 +70,7 @@ export function ReleaseIncentiveDialog({ open, onOpenChange, entry }: Props) {
             <div className="space-y-1.5">
               <Label>Target Month</Label>
               <Select
+                items={Object.fromEntries(MONTH_OPTIONS.map((m) => [String(m.value), m.label]))}
                 value={payrollMonth != null ? String(payrollMonth) : ''}
                 onValueChange={(v) => setPayrollMonth(v ? Number(v) : undefined)}
               >
@@ -84,6 +85,7 @@ export function ReleaseIncentiveDialog({ open, onOpenChange, entry }: Props) {
             <div className="space-y-1.5">
               <Label>Target Year</Label>
               <Select
+                items={Object.fromEntries(YEAR_OPTIONS.map((y) => [String(y), String(y)]))}
                 value={payrollYear != null ? String(payrollYear) : ''}
                 onValueChange={(v) => setPayrollYear(v ? Number(v) : undefined)}
               >

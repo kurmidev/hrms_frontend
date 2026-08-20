@@ -29,6 +29,65 @@ const EMPLOYMENT_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ec4899']
 const OPEN_TODO_STATUSES = new Set(['PENDING', 'SUBMITTED'])
 const MAX_DASHBOARD_TODOS = 5
 
+interface StatCardData {
+  title: string
+  value: number | string
+  icon: React.ElementType
+  color: string
+  bg: string
+  href?: string
+}
+
+interface StatCardProps {
+  card: StatCardData
+  isLoading: boolean
+}
+
+function StatCard({ card, isLoading }: StatCardProps) {
+  // Bug (2026-08-20): several cards format `value` as a display string (e.g.
+  // Attendance % renders "95%", not the number 95) so `typeof card.value ===
+  // 'number'` was always false for them and the href never activated no
+  // matter the underlying data — silently dead links. Parse the leading
+  // numeric portion of whatever `value` actually is instead of requiring it
+  // to already be a `number`.
+  const numericValue = typeof card.value === 'number' ? card.value : parseFloat(card.value)
+  const isLinkable = !!card.href && !Number.isNaN(numericValue) && numericValue > 0
+
+  const content = (
+    <CardContent className="p-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">{card.title}</p>
+          {isLoading ? (
+            <Skeleton className="h-8 w-16 mt-1" />
+          ) : (
+            <p className="text-3xl font-bold text-foreground mt-1">{card.value}</p>
+          )}
+          {isLinkable && !isLoading && (
+            <span className="flex items-center gap-1 text-xs font-medium text-blue-600 mt-1.5">
+              View details
+              <ArrowRight className="h-3 w-3" />
+            </span>
+          )}
+        </div>
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${card.bg}`}>
+          <card.icon className={`h-6 w-6 ${card.color}`} />
+        </div>
+      </div>
+    </CardContent>
+  )
+
+  if (isLinkable) {
+    return (
+      <Card className="shadow-sm hover:shadow-md transition-shadow">
+        <Link to={card.href as string}>{content}</Link>
+      </Card>
+    )
+  }
+
+  return <Card className="shadow-sm">{content}</Card>
+}
+
 export function DashboardPage() {
   // GET /todos requires todo:create server-side (see TodosController) — several
   // seeded roles (hr_manager, finance_manager, dept_manager, field_supervisor,
@@ -130,28 +189,12 @@ export function DashboardPage() {
       {/* KPI cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { title: 'Total Employees', value: totalEmployees, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { title: 'Active', value: activeCount, icon: UserCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { title: 'Pre-Boarding', value: onboardingCount, icon: Shield, color: 'text-violet-600', bg: 'bg-violet-50' },
-          { title: 'Departments', value: deptCount, icon: Building2, color: 'text-amber-600', bg: 'bg-amber-50' },
-        ].map((kpi) => (
-          <Card key={kpi.title} className="shadow-sm">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{kpi.title}</p>
-                  {empLoading ? (
-                    <Skeleton className="h-8 w-16 mt-1" />
-                  ) : (
-                    <p className="text-3xl font-bold text-foreground mt-1">{kpi.value}</p>
-                  )}
-                </div>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${kpi.bg}`}>
-                  <kpi.icon className={`h-6 w-6 ${kpi.color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          { title: 'Total Employees', value: totalEmployees, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50', href: '/employees' },
+          { title: 'Active', value: activeCount, icon: UserCheck, color: 'text-emerald-600', bg: 'bg-emerald-50', href: '/employees?status=active' },
+          { title: 'Pre-Boarding', value: onboardingCount, icon: Shield, color: 'text-violet-600', bg: 'bg-violet-50', href: '/onboarding' },
+          { title: 'Departments', value: deptCount, icon: Building2, color: 'text-amber-600', bg: 'bg-amber-50', href: '/organization/departments' },
+        ].map((card) => (
+          <StatCard key={card.title} card={card} isLoading={empLoading} />
         ))}
       </div>
 
@@ -171,6 +214,7 @@ export function DashboardPage() {
             icon: Clock,
             color: 'text-yellow-600',
             bg: 'bg-yellow-50',
+            href: '/performance/kpis',
           },
           {
             title: 'Active Loans',
@@ -178,6 +222,7 @@ export function DashboardPage() {
             icon: TrendingUp,
             color: 'text-indigo-600',
             bg: 'bg-indigo-50',
+            href: '/loans',
           },
           {
             title: 'Attendance %',
@@ -185,25 +230,10 @@ export function DashboardPage() {
             icon: BarChart3,
             color: 'text-purple-600',
             bg: 'bg-purple-50',
+            href: '/attendance',
           },
-        ].map((kpi) => (
-          <Card key={kpi.title} className="shadow-sm">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{kpi.title}</p>
-                  {kpisLoading ? (
-                    <Skeleton className="h-8 w-16 mt-1" />
-                  ) : (
-                    <p className="text-3xl font-bold text-foreground mt-1">{kpi.value}</p>
-                  )}
-                </div>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${kpi.bg}`}>
-                  <kpi.icon className={`h-6 w-6 ${kpi.color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        ].map((card) => (
+          <StatCard key={card.title} card={card} isLoading={kpisLoading} />
         ))}
       </div>
 

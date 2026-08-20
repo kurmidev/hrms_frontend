@@ -157,7 +157,11 @@ export function DesignationsPage() {
       </div>
 
       <div className="flex gap-3">
-        <Select value={deptFilter} onValueChange={(v) => setDeptFilter(v ?? '')}>
+        <Select
+          items={{ '': 'All Departments', ...Object.fromEntries(flatDepts(deptTree).map((d) => [d.id, d.name])) }}
+          value={deptFilter}
+          onValueChange={(v) => setDeptFilter(v ?? '')}
+        >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="All Departments" />
           </SelectTrigger>
@@ -192,7 +196,11 @@ export function DesignationsPage() {
             </div>
             <div className="space-y-1.5">
               <Label>Department *</Label>
-              <Select value={selectedDept} onValueChange={(v) => setValue('departmentId', v ?? '', { shouldValidate: true })}>
+              <Select
+                items={Object.fromEntries(flatDepts(deptTree).map((d) => [d.id, d.name]))}
+                value={selectedDept}
+                onValueChange={(v) => setValue('departmentId', v ?? '', { shouldValidate: true })}
+              >
                 <SelectTrigger><SelectValue placeholder="Select department" /></SelectTrigger>
                 <SelectContent>
                   {flatDepts(deptTree).map((d) => (

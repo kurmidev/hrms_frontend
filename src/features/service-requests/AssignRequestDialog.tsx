@@ -69,7 +69,11 @@ export function AssignRequestDialog({ open, onOpenChange, request }: Props) {
         <form onSubmit={handleSubmit((v) => assign(v))} className="space-y-4 py-2">
           <div className="space-y-1.5">
             <Label>Assignee *</Label>
-            <Select value={assignedTo ?? ''} onValueChange={(v) => setValue('assignedTo', v ?? '')}>
+            <Select
+              items={Object.fromEntries(employees.map((e) => [e.id, `${e.firstName} ${e.lastName} (${e.empCode})`]))}
+              value={assignedTo ?? ''}
+              onValueChange={(v) => setValue('assignedTo', v ?? '')}
+            >
               <SelectTrigger className="w-full"><SelectValue placeholder="Select employee" /></SelectTrigger>
               <SelectContent>
                 {employees.map((e) => (

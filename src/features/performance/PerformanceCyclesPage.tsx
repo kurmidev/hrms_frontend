@@ -128,7 +128,11 @@ export function PerformanceCyclesPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Select value={status} onValueChange={(v) => setStatus((v as PerformanceCycleStatus) ?? '')}>
+        <Select
+          items={{ '': 'All statuses', DRAFT: 'Draft', ACTIVE: 'Active', CLOSED: 'Closed' }}
+          value={status}
+          onValueChange={(v) => setStatus((v as PerformanceCycleStatus) ?? '')}
+        >
           <SelectTrigger className="w-40"><SelectValue placeholder="All statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All statuses</SelectItem>

@@ -149,7 +149,11 @@ export function AssetsPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Select value={type} onValueChange={(v) => setType((v as AssetType) ?? '')}>
+        <Select
+          items={{ '': 'All types', ...Object.fromEntries(ASSET_TYPES.map((t) => [t, t.replace('_', ' ')])) }}
+          value={type}
+          onValueChange={(v) => setType((v as AssetType) ?? '')}
+        >
           <SelectTrigger className="w-44"><SelectValue placeholder="All types" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All types</SelectItem>
@@ -158,7 +162,11 @@ export function AssetsPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={status} onValueChange={(v) => setStatus((v as AssetStatus) ?? '')}>
+        <Select
+          items={{ '': 'All statuses', ...Object.fromEntries(ASSET_STATUSES.map((s) => [s, s.replace('_', ' ')])) }}
+          value={status}
+          onValueChange={(v) => setStatus((v as AssetStatus) ?? '')}
+        >
           <SelectTrigger className="w-44"><SelectValue placeholder="All statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All statuses</SelectItem>

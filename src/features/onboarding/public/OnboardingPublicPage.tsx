@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useForm, Controller } from 'react-hook-form'
@@ -91,10 +91,25 @@ export function OnboardingPublicPage() {
     retry: false,
   })
 
-  const { register, handleSubmit, control, formState: { errors } } = useForm<Step1Values>({
+  const { register, handleSubmit, control, reset, formState: { errors } } = useForm<Step1Values>({
     resolver: zodResolver(step1Schema),
     defaultValues: { accountType: 'SAVINGS', declarationAccepted: false },
   })
+
+  useEffect(() => {
+    if (!linkData) return
+    const link = linkData as { candidateName?: string; phone?: string }
+    const nameParts = (link.candidateName ?? '').trim().split(/\s+/).filter(Boolean)
+    const firstName = nameParts[0] ?? ''
+    const lastName = nameParts.slice(1).join(' ')
+    reset({
+      accountType: 'SAVINGS',
+      declarationAccepted: false,
+      firstName,
+      lastName,
+      phone: link.phone ?? '',
+    })
+  }, [linkData, reset])
 
   const { mutate: submitDetails, isPending: savingDetails } = useMutation({
     mutationFn: (data: Step1Values) =>
@@ -249,7 +264,11 @@ export function OnboardingPublicPage() {
                       name="gender"
                       control={control}
                       render={({ field }) => (
-                        <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v ?? '')}>
+                        <Select
+                          items={{ MALE: 'Male', FEMALE: 'Female', OTHER: 'Other' }}
+                          value={field.value ?? ''}
+                          onValueChange={(v) => field.onChange(v ?? '')}
+                        >
                           <SelectTrigger id="gender"><SelectValue placeholder="Select gender" /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="MALE">Male</SelectItem>
@@ -306,7 +325,11 @@ export function OnboardingPublicPage() {
                       name="accountType"
                       control={control}
                       render={({ field }) => (
-                        <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v ?? '')}>
+                        <Select
+                          items={{ SAVINGS: 'Savings', CURRENT: 'Current' }}
+                          value={field.value ?? ''}
+                          onValueChange={(v) => field.onChange(v ?? '')}
+                        >
                           <SelectTrigger id="accountType"><SelectValue placeholder="Select type" /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="SAVINGS">Savings</SelectItem>

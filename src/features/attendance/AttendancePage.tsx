@@ -167,7 +167,11 @@ export function AttendancePage() {
           onChange={(e) => { setDate(e.target.value); reset() }}
           className="w-44"
         />
-        <Select value={status} onValueChange={(v) => { setStatus(v ?? ''); reset() }}>
+        <Select
+          items={{ '': 'All Statuses', ...ATTENDANCE_STATUS_LABELS }}
+          value={status}
+          onValueChange={(v) => { setStatus(v ?? ''); reset() }}
+        >
           <SelectTrigger className="w-44"><SelectValue placeholder="All Statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All Statuses</SelectItem>

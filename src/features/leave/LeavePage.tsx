@@ -225,6 +225,7 @@ export function LeavePage() {
             <div className="space-y-1.5">
               <Label htmlFor="leavePolicyId">Leave Type *</Label>
               <Select
+                items={Object.fromEntries(policies.map((p) => [p.id, p.name]))}
                 value={selectedPolicyId ?? ''}
                 onValueChange={(v) => setValue('leavePolicyId', v ?? '')}
               >

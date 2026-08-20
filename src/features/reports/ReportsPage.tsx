@@ -209,7 +209,11 @@ export function ReportsPage() {
       </div>
 
       <div className="flex flex-wrap gap-3 items-center">
-        <Select value={reportType} onValueChange={handleTypeChange}>
+        <Select
+          items={Object.fromEntries(REPORT_TYPE_OPTIONS.map((opt) => [opt.value, opt.label]))}
+          value={reportType}
+          onValueChange={handleTypeChange}
+        >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Report Type" />
           </SelectTrigger>
@@ -246,7 +250,11 @@ export function ReportsPage() {
           </>
         )}
 
-        <Select value={departmentId} onValueChange={(v) => { setDepartmentId(v ?? ''); reset() }}>
+        <Select
+          items={{ '': 'All Departments', ...Object.fromEntries(flatDepts(deptTree).map((d) => [d.id, d.name])) }}
+          value={departmentId}
+          onValueChange={(v) => { setDepartmentId(v ?? ''); reset() }}
+        >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="All Departments" />
           </SelectTrigger>

@@ -113,7 +113,11 @@ export function ExitPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Select value={type} onValueChange={(v) => setType((v as ExitType) ?? '')}>
+        <Select
+          items={{ '': 'All types', ...Object.fromEntries(EXIT_TYPES.map((t) => [t, t])) }}
+          value={type}
+          onValueChange={(v) => setType((v as ExitType) ?? '')}
+        >
           <SelectTrigger className="w-48"><SelectValue placeholder="All types" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All types</SelectItem>
@@ -122,7 +126,11 @@ export function ExitPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={status} onValueChange={(v) => setStatus((v as ExitStatus) ?? '')}>
+        <Select
+          items={{ '': 'All statuses', ...Object.fromEntries(EXIT_STATUSES.map((s) => [s, s.replace('_', ' ')])) }}
+          value={status}
+          onValueChange={(v) => setStatus((v as ExitStatus) ?? '')}
+        >
           <SelectTrigger className="w-48"><SelectValue placeholder="All statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All statuses</SelectItem>

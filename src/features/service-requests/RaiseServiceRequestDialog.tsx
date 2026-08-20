@@ -90,7 +90,11 @@ export function RaiseServiceRequestDialog({ open, onOpenChange }: Props) {
                 name="category"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={(v) => field.onChange(v ?? '')}>
+                  <Select
+                    items={Object.fromEntries(CATEGORIES.map((c) => [c, c.replace('_', ' ')]))}
+                    value={field.value}
+                    onValueChange={(v) => field.onChange(v ?? '')}
+                  >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {CATEGORIES.map((c) => (
@@ -107,7 +111,11 @@ export function RaiseServiceRequestDialog({ open, onOpenChange }: Props) {
                 name="priority"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v ?? '')}>
+                  <Select
+                    items={Object.fromEntries(PRIORITIES.map((p) => [p, p]))}
+                    value={field.value ?? ''}
+                    onValueChange={(v) => field.onChange(v ?? '')}
+                  >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {PRIORITIES.map((p) => (

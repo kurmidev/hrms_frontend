@@ -139,6 +139,7 @@ export function NoticeFormDialog({ open, onOpenChange, notice }: Props) {
           <div className="space-y-1.5">
             <Label>Target Audience *</Label>
             <Select
+              items={{ ALL: 'All Employees', TARGETED: 'Targeted (Roles / Departments)' }}
               value={targetType ?? 'ALL'}
               onValueChange={(v) => setValue('targetType', (v as NoticeTargetType) ?? 'ALL')}
             >

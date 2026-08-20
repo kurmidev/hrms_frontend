@@ -84,7 +84,11 @@ export function InitiateExitDialog({ open, onOpenChange }: Props) {
         <form onSubmit={handleSubmit((v) => initiate(v))} className="space-y-4 py-2">
           <div className="space-y-1.5">
             <Label>Employee *</Label>
-            <Select value={employeeId ?? ''} onValueChange={(v) => setValue('employeeId', v ?? '')}>
+            <Select
+              items={Object.fromEntries(employees.map((e) => [e.id, `${e.firstName} ${e.lastName} (${e.empCode})`]))}
+              value={employeeId ?? ''}
+              onValueChange={(v) => setValue('employeeId', v ?? '')}
+            >
               <SelectTrigger className="w-full"><SelectValue placeholder="Select employee" /></SelectTrigger>
               <SelectContent>
                 {employees.map((e) => (
@@ -100,7 +104,11 @@ export function InitiateExitDialog({ open, onOpenChange }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Type *</Label>
-              <Select value={type ?? ''} onValueChange={(v) => setValue('type', (v ?? '') as ExitType)}>
+              <Select
+                items={Object.fromEntries(EXIT_TYPES.map((t) => [t, t]))}
+                value={type ?? ''}
+                onValueChange={(v) => setValue('type', (v ?? '') as ExitType)}
+              >
                 <SelectTrigger className="w-full"><SelectValue placeholder="Select type" /></SelectTrigger>
                 <SelectContent>
                   {EXIT_TYPES.map((t) => (
@@ -112,7 +120,11 @@ export function InitiateExitDialog({ open, onOpenChange }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>Initiated By *</Label>
-              <Select value={initiatedBy ?? ''} onValueChange={(v) => setValue('initiatedBy', (v ?? '') as ExitInitiator)}>
+              <Select
+                items={Object.fromEntries(INITIATORS.map((i) => [i, i]))}
+                value={initiatedBy ?? ''}
+                onValueChange={(v) => setValue('initiatedBy', (v ?? '') as ExitInitiator)}
+              >
                 <SelectTrigger className="w-full"><SelectValue placeholder="Select initiator" /></SelectTrigger>
                 <SelectContent>
                   {INITIATORS.map((i) => (

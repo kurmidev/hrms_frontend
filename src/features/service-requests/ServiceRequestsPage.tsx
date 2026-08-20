@@ -140,7 +140,11 @@ export function ServiceRequestsPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Select value={category} onValueChange={(v) => setCategory((v as ServiceRequestCategory) ?? '')}>
+        <Select
+          items={{ '': 'All categories', ...Object.fromEntries(CATEGORIES.map((c) => [c, c.replace('_', ' ')])) }}
+          value={category}
+          onValueChange={(v) => setCategory((v as ServiceRequestCategory) ?? '')}
+        >
           <SelectTrigger className="w-52"><SelectValue placeholder="All categories" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All categories</SelectItem>
@@ -149,7 +153,11 @@ export function ServiceRequestsPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={status} onValueChange={(v) => setStatus((v as ServiceRequestStatus) ?? '')}>
+        <Select
+          items={{ '': 'All statuses', ...Object.fromEntries(STATUSES.map((s) => [s, s.replace('_', ' ')])) }}
+          value={status}
+          onValueChange={(v) => setStatus((v as ServiceRequestStatus) ?? '')}
+        >
           <SelectTrigger className="w-44"><SelectValue placeholder="All statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All statuses</SelectItem>

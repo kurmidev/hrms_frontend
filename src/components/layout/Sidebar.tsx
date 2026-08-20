@@ -120,6 +120,11 @@ const NAV_ITEMS: NavItem[] = [
     href: '/performance',
     icon: Target,
     permission: 'employee:read',
+    children: [
+      { label: 'Cycles', href: '/performance', permission: 'employee:read' },
+      { label: 'My Ratings', href: '/performance/my-ratings', permission: 'employee:read' },
+      { label: 'KPIs', href: '/performance/kpis', permission: 'employee:read' },
+    ],
   },
   {
     label: 'Notices',

@@ -151,7 +151,11 @@ export function HolidaysPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={String(year)} onValueChange={(v) => setYear(Number(v ?? CURRENT_YEAR))}>
+          <Select
+            items={Object.fromEntries(YEAR_OPTIONS.map((y) => [String(y), String(y)]))}
+            value={String(year)}
+            onValueChange={(v) => setYear(Number(v ?? CURRENT_YEAR))}
+          >
             <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
             <SelectContent>
               {YEAR_OPTIONS.map((y) => (
@@ -195,6 +199,7 @@ export function HolidaysPage() {
             <div className="space-y-1.5">
               <Label htmlFor="type">Type *</Label>
               <Select
+                items={{ NATIONAL: 'National', OPTIONAL: 'Optional' }}
                 value={selectedType ?? ''}
                 onValueChange={(v) => setValue('type', (v ?? 'NATIONAL') as HolidayType)}
               >

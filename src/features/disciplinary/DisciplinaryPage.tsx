@@ -108,7 +108,11 @@ export function DisciplinaryPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Select value={type} onValueChange={(v) => setType((v as DisciplinaryActionType) ?? '')}>
+        <Select
+          items={{ '': 'All types', ...Object.fromEntries(MEMO_TYPES.map((t) => [t, t.replace('_', ' ')])) }}
+          value={type}
+          onValueChange={(v) => setType((v as DisciplinaryActionType) ?? '')}
+        >
           <SelectTrigger className="w-56"><SelectValue placeholder="All types" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All types</SelectItem>

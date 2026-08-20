@@ -95,7 +95,16 @@ export function EmployeesPage() {
             className="pl-9 w-64"
           />
         </div>
-        <Select value={status} onValueChange={(v) => { setStatus(v ?? ''); reset() }}>
+        <Select
+          items={{
+            '': 'All Statuses',
+            ...Object.fromEntries(
+              ['PRE_BOARDING', 'ACTIVE', 'ON_LEAVE', 'SUSPENDED', 'EXITED'].map((s) => [s, s.replace(/_/g, ' ')])
+            ),
+          }}
+          value={status}
+          onValueChange={(v) => { setStatus(v ?? ''); reset() }}
+        >
           <SelectTrigger className="w-40"><SelectValue placeholder="All Statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All Statuses</SelectItem>
@@ -104,7 +113,11 @@ export function EmployeesPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={employmentType} onValueChange={(v) => { setEmploymentType(v ?? ''); reset() }}>
+        <Select
+          items={{ '': 'All Types', ...EMPLOYMENT_TYPE_LABELS }}
+          value={employmentType}
+          onValueChange={(v) => { setEmploymentType(v ?? ''); reset() }}
+        >
           <SelectTrigger className="w-40"><SelectValue placeholder="All Types" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All Types</SelectItem>

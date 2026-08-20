@@ -141,7 +141,11 @@ export function LeaveApprovalsPage() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Select value={status} onValueChange={(v) => { setStatus(v ?? ''); reset() }}>
+        <Select
+          items={{ '': 'All Statuses', ...LEAVE_STATUS_LABELS }}
+          value={status}
+          onValueChange={(v) => { setStatus(v ?? ''); reset() }}
+        >
           <SelectTrigger className="w-44"><SelectValue placeholder="All Statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All Statuses</SelectItem>

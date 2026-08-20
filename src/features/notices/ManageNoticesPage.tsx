@@ -206,7 +206,11 @@ export function ManageNoticesPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Select value={status} onValueChange={(v) => setStatus((v as NoticeStatus) ?? '')}>
+        <Select
+          items={{ '': 'All statuses', draft: 'Draft', scheduled: 'Scheduled', published: 'Published' }}
+          value={status}
+          onValueChange={(v) => setStatus((v as NoticeStatus) ?? '')}
+        >
           <SelectTrigger className="w-40"><SelectValue placeholder="All statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All statuses</SelectItem>

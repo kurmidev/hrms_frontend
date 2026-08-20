@@ -93,7 +93,11 @@ export function IssueMemoDialog({ open, onOpenChange }: Props) {
         <form onSubmit={handleSubmit((v) => create(v))} className="space-y-4 py-2">
           <div className="space-y-1.5">
             <Label>Employee *</Label>
-            <Select value={employeeId ?? ''} onValueChange={(v) => setValue('employeeId', v ?? '')}>
+            <Select
+              items={Object.fromEntries(employees.map((e) => [e.id, `${e.firstName} ${e.lastName} (${e.empCode})`]))}
+              value={employeeId ?? ''}
+              onValueChange={(v) => setValue('employeeId', v ?? '')}
+            >
               <SelectTrigger className="w-full"><SelectValue placeholder="Select employee" /></SelectTrigger>
               <SelectContent>
                 {employees.map((e) => (
@@ -123,7 +127,11 @@ export function IssueMemoDialog({ open, onOpenChange }: Props) {
 
           <div className="space-y-1.5">
             <Label>Type *</Label>
-            <Select value={type ?? ''} onValueChange={(v) => setValue('type', (v ?? '') as DisciplinaryActionType)}>
+            <Select
+              items={Object.fromEntries(MEMO_TYPES.map((t) => [t, t.replace('_', ' ')]))}
+              value={type ?? ''}
+              onValueChange={(v) => setValue('type', (v ?? '') as DisciplinaryActionType)}
+            >
               <SelectTrigger className="w-full"><SelectValue placeholder="Select type" /></SelectTrigger>
               <SelectContent>
                 {MEMO_TYPES.map((t) => (

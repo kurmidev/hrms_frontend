@@ -33,6 +33,9 @@ export const onboardingApi = {
   revoke: (id: string) =>
     apiClient.delete(`/onboarding-links/${id}`).then(unwrap),
 
+  resend: (id: string) =>
+    apiClient.post(`/onboarding-links/${id}/resend`).then(unwrap),
+
   // Public / candidate endpoints
   getPublic: (token: string) =>
     apiClient.get(`/onboarding/public/${token}`).then(unwrap),

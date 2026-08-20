@@ -3,6 +3,7 @@ import type { Employee, CreateEmployeeDto, EmployeeStats } from '@/types/employe
 import type { PaginationParams } from '@/types/api.types'
 
 interface EmployeeParams extends PaginationParams {
+  search?: string
   status?: string
   departmentId?: string
   designationId?: string

@@ -54,8 +54,15 @@ apiClient.interceptors.response.use(
     }
 
     // If server says password change required, set the flag so the force dialog appears
-    const errBody = (error as { response?: { data?: { data?: { details?: { code?: string } } } } })?.response?.data
-    if (errBody?.data?.details?.code === 'MUST_CHANGE_PASSWORD') {
+    const errBody = (
+      error as {
+        response?: { data?: { errorType?: string; error?: { code?: string } } }
+      }
+    )?.response?.data
+    if (
+      errBody?.errorType === 'MUST_CHANGE_PASSWORD' ||
+      errBody?.error?.code === 'MUST_CHANGE_PASSWORD'
+    ) {
       const { user } = useAuthStore.getState()
       if (user && !user.mustChangePassword) {
         useAuthStore.setState({ user: { ...user, mustChangePassword: true } })

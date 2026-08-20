@@ -42,6 +42,7 @@ import { ManageNoticesPage } from '@/features/notices/ManageNoticesPage'
 import { PerformanceCyclesPage } from '@/features/performance/PerformanceCyclesPage'
 import { PerformanceCycleDetailPage } from '@/features/performance/PerformanceCycleDetailPage'
 import { MyRatingsPage } from '@/features/performance/MyRatingsPage'
+import { KpiPage } from '@/features/performance/KpiPage'
 import { ServiceRequestsPage } from '@/features/service-requests/ServiceRequestsPage'
 import { ServiceRequestDetailPage } from '@/features/service-requests/ServiceRequestDetailPage'
 import { DisciplinaryPage } from '@/features/disciplinary/DisciplinaryPage'
@@ -122,7 +123,7 @@ export const router = createBrowserRouter([
       { path: 'employees', element: <EmployeesPage /> },
       { path: 'employees/:id', element: <EmployeeProfilePage /> },
       { path: 'onboarding', element: <OnboardingHRPage /> },
-      { path: 'onboarding/:id', element: <OnboardingDetailPage /> },
+      { path: 'onboarding/invites/:id', element: <OnboardingDetailPage /> },
       { path: 'attendance', element: <AttendancePage /> },
       { path: 'attendance/my', element: <MyAttendancePage /> },
       { path: 'attendance/live', element: <LiveTrackingPage /> },
@@ -141,6 +142,7 @@ export const router = createBrowserRouter([
       { path: 'green-thanks/config', element: <GreenThanksConfigPage /> },
       { path: 'performance', element: <PerformanceCyclesPage /> },
       { path: 'performance/my-ratings', element: <MyRatingsPage /> },
+      { path: 'performance/kpis', element: <KpiPage /> },
       { path: 'performance/:id', element: <PerformanceCycleDetailPage /> },
       { path: 'notices', element: <NoticeBoardPage /> },
       { path: 'notices/manage', element: <ManageNoticesPage /> },

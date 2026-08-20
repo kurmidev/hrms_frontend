@@ -139,10 +139,25 @@ export const TODO_STATUS_COLORS: Record<string, string> = {
 export const PERMISSION_GROUPS: Record<string, string[]> = {
   'Organization': ['org:read', 'org:update'],
   'Employees': ['employee:read', 'employee:create', 'employee:update', 'employee:delete'],
-  'Payroll': ['payroll:read', 'payroll:create', 'payroll:update', 'payroll:delete'],
+  'Payroll': ['payroll:read', 'payroll:create', 'payroll:update', 'payroll:delete', 'payroll:run', 'payroll:approve'],
   'Roles': ['role:read', 'role:create', 'role:update', 'role:delete', 'role:assign'],
   'Reports': ['report:read'],
   'Dashboard': ['dashboard:read'],
+  'Performance': ['performance:read', 'performance:manage'],
+  'Incentives': ['incentive:read', 'incentive:manage'],
+  'Insurance': ['insurance:read', 'insurance:manage'],
+  'Disciplinary': ['disciplinary:read', 'disciplinary:manage'],
+  'Notices': ['notice:read', 'notice:manage'],
+  'Green Thanks': ['green_thanks:read', 'green_thanks:create', 'green_thanks:manage'],
+  'Assets': ['asset:read', 'asset:assign', 'asset:return'],
+  'Service Requests': ['service_request:read', 'service_request:create', 'service_request:manage'],
+  'Onboarding': ['onboarding:manage'],
+  'Exit': ['exit:manage'],
+  'Attendance': ['attendance:read', 'attendance:checkin', 'attendance:correct'],
+  'Leave': ['leave:read', 'leave:apply', 'leave:approve'],
+  'Loans': ['loan:read', 'loan:apply', 'loan:approve'],
+  'Tasks': ['todo:read', 'todo:create', 'todo:approve'],
+  'Users': ['user:read', 'user:manage'],
 }
 
 export const ALL_PERMISSIONS = Object.values(PERMISSION_GROUPS).flat()

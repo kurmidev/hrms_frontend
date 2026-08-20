@@ -91,7 +91,11 @@ export function AssetFormDialog({ open, onOpenChange, asset }: Props) {
               name="type"
               control={control}
               render={({ field }) => (
-                <Select value={field.value} onValueChange={(v) => field.onChange(v ?? '')}>
+                <Select
+                  items={Object.fromEntries(ASSET_TYPES.map((t) => [t, t.replace('_', ' ')]))}
+                  value={field.value}
+                  onValueChange={(v) => field.onChange(v ?? '')}
+                >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {ASSET_TYPES.map((t) => (

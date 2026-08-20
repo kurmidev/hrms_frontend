@@ -77,6 +77,7 @@ export function InitiatePayrollDialog({ open, onOpenChange }: Props) {
           <div className="space-y-1.5">
             <Label htmlFor="month">Month *</Label>
             <Select
+              items={Object.fromEntries(MONTH_OPTIONS.map((m) => [String(m.value), m.label]))}
               value={month != null ? String(month) : ''}
               onValueChange={(v) => setValue('month', v ? Number(v) : (undefined as unknown as number))}
             >
@@ -92,6 +93,7 @@ export function InitiatePayrollDialog({ open, onOpenChange }: Props) {
           <div className="space-y-1.5">
             <Label htmlFor="year">Year *</Label>
             <Select
+              items={Object.fromEntries(YEAR_OPTIONS.map((y) => [String(y), String(y)]))}
               value={year != null ? String(year) : ''}
               onValueChange={(v) => setValue('year', v ? Number(v) : (undefined as unknown as number))}
             >

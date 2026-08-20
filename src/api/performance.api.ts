@@ -11,6 +11,11 @@ interface CycleParams extends PaginationParams {
   status?: string
 }
 
+interface KpiParams extends PaginationParams {
+  designationId?: string
+  status?: string
+}
+
 export const performanceApi = {
   listCycles: (params?: CycleParams) =>
     apiClient.get('/performance/cycles', { params }).then(unwrap),
@@ -35,4 +40,7 @@ export const performanceApi = {
 
   myRatings: (params?: PaginationParams) =>
     apiClient.get('/performance/my-ratings', { params }).then(unwrap),
+
+  listKpis: (params?: KpiParams) =>
+    apiClient.get('/performance/kpis', { params }).then(unwrap),
 }

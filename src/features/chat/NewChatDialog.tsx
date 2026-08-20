@@ -145,7 +145,11 @@ export function NewChatDialog({ open, onOpenChange, onCreated }: Props) {
           {type === 'DEPARTMENT' && (
             <div className="space-y-1.5">
               <Label>Department *</Label>
-              <Select value={departmentId} onValueChange={(v) => setDepartmentId(v ?? '')}>
+              <Select
+                items={Object.fromEntries(departments.map((d) => [d.id, d.name]))}
+                value={departmentId}
+                onValueChange={(v) => setDepartmentId(v ?? '')}
+              >
                 <SelectTrigger className="w-full"><SelectValue placeholder="Select department" /></SelectTrigger>
                 <SelectContent>
                   {departments.map((d) => (

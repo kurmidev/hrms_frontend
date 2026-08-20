@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Skeleton } from '@/components/ui/skeleton'
 import { departmentsApi } from '@/api/departments.api'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
+import { DepartmentEmployeesDialog } from './DepartmentEmployeesDialog'
 import type { DepartmentTreeNode } from '@/types/organization.types'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
@@ -23,7 +24,7 @@ const schema = z.object({
 })
 type FormValues = z.infer<typeof schema>
 
-function TreeNode({ node, depth, onEdit, onDelete, canEdit, canDelete }: { node: DepartmentTreeNode; depth: number; onEdit: (n: DepartmentTreeNode) => void; onDelete: (n: DepartmentTreeNode) => void; canEdit: boolean; canDelete: boolean }) {
+function TreeNode({ node, depth, onEdit, onDelete, onCountClick, canEdit, canDelete }: { node: DepartmentTreeNode; depth: number; onEdit: (n: DepartmentTreeNode) => void; onDelete: (n: DepartmentTreeNode) => void; onCountClick: (n: DepartmentTreeNode) => void; canEdit: boolean; canDelete: boolean }) {
   const [expanded, setExpanded] = useState(depth < 2)
   const hasChildren = node.children.length > 0
 
@@ -46,10 +47,18 @@ function TreeNode({ node, depth, onEdit, onDelete, canEdit, canDelete }: { node:
           <GitBranch className="h-4 w-4 text-blue-500 flex-shrink-0" />
           <span className="text-sm font-medium text-foreground truncate">{node.name}</span>
           {node.employeeCount !== undefined && node.employeeCount > 0 && (
-            <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                onCountClick(node)
+              }}
+              aria-label={`View ${node.employeeCount} employees in ${node.name}`}
+              className="flex items-center gap-0.5 text-xs text-muted-foreground rounded px-1 -mx-1 transition-colors hover:text-primary hover:bg-primary/10 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+            >
               <Users className="h-3 w-3" />
               {node.employeeCount}
-            </span>
+            </button>
           )}
           <Badge variant="outline" className="text-[10px] py-0 ml-auto hidden group-hover:flex">
             Level {node.hierarchyLevel}
@@ -75,7 +84,7 @@ function TreeNode({ node, depth, onEdit, onDelete, canEdit, canDelete }: { node:
       {expanded && hasChildren && (
         <div className="border-l border-border ml-9">
           {node.children.map((child) => (
-            <TreeNode key={child.id} node={child} depth={depth + 1} onEdit={onEdit} onDelete={onDelete} canEdit={canEdit} canDelete={canDelete} />
+            <TreeNode key={child.id} node={child} depth={depth + 1} onEdit={onEdit} onDelete={onDelete} onCountClick={onCountClick} canEdit={canEdit} canDelete={canDelete} />
           ))}
         </div>
       )}
@@ -92,6 +101,7 @@ export function DepartmentsPage() {
   const [open, setOpen] = useState(false)
   const [editNode, setEditNode] = useState<DepartmentTreeNode | null>(null)
   const [deleteNode, setDeleteNode] = useState<DepartmentTreeNode | null>(null)
+  const [selectedDepartment, setSelectedDepartment] = useState<DepartmentTreeNode | null>(null)
   const [search, setSearch] = useState('')
 
   const { data: tree = [], isLoading } = useQuery({
@@ -206,6 +216,7 @@ export function DepartmentsPage() {
                 depth={0}
                 onEdit={openEdit}
                 onDelete={setDeleteNode}
+                onCountClick={setSelectedDepartment}
                 canEdit={canEdit}
                 canDelete={canDelete}
               />
@@ -251,6 +262,12 @@ export function DepartmentsPage() {
         confirmLabel={deleting ? 'Deleting…' : 'Delete'}
         onConfirm={() => deleteNode && del(deleteNode.id)}
         variant="destructive"
+      />
+
+      <DepartmentEmployeesDialog
+        open={!!selectedDepartment}
+        onOpenChange={(o) => !o && setSelectedDepartment(null)}
+        department={selectedDepartment}
       />
     </div>
   )

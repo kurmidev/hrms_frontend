@@ -89,7 +89,11 @@ export function CreateTodoDialog({ open, onOpenChange }: Props) {
           </div>
           <div className="space-y-1.5">
             <Label>Incentive Rule</Label>
-            <Select value={incentiveRuleId ?? ''} onValueChange={(v) => setValue('incentiveRuleId', v ?? '')}>
+            <Select
+              items={Object.fromEntries(rules.map((r) => [r.id, `${r.name} (${r.rate})`]))}
+              value={incentiveRuleId ?? ''}
+              onValueChange={(v) => setValue('incentiveRuleId', v ?? '')}
+            >
               <SelectTrigger className="w-full"><SelectValue placeholder="None" /></SelectTrigger>
               <SelectContent>
                 {rules.map((r) => (

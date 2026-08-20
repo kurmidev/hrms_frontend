@@ -215,7 +215,11 @@ export function PerformanceCycleDetailPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label>Employee *</Label>
-                  <Select value={employeeId ?? ''} onValueChange={(v) => setValue('employeeId', v ?? '')}>
+                  <Select
+                    items={Object.fromEntries(employees.map((e) => [e.id, `${e.firstName} ${e.lastName} (${e.empCode})`]))}
+                    value={employeeId ?? ''}
+                    onValueChange={(v) => setValue('employeeId', v ?? '')}
+                  >
                     <SelectTrigger className="w-full"><SelectValue placeholder="Select employee" /></SelectTrigger>
                     <SelectContent>
                       {employees.map((e) => (

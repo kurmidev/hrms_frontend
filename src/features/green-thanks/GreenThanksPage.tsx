@@ -142,7 +142,11 @@ export function GreenThanksPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Select value={direction} onValueChange={(v) => setDirection((v as GreenThanksDirection) ?? '')}>
+        <Select
+          items={{ '': 'All', sent: 'Sent', received: 'Received' }}
+          value={direction}
+          onValueChange={(v) => setDirection((v as GreenThanksDirection) ?? '')}
+        >
           <SelectTrigger className="w-40"><SelectValue placeholder="All" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All</SelectItem>
@@ -150,7 +154,11 @@ export function GreenThanksPage() {
             <SelectItem value="received">Received</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={status} onValueChange={(v) => setStatus((v as GreenThanksStatus) ?? '')}>
+        <Select
+          items={{ '': 'All statuses', pending: 'Pending', approved: 'Approved', rejected: 'Rejected' }}
+          value={status}
+          onValueChange={(v) => setStatus((v as GreenThanksStatus) ?? '')}
+        >
           <SelectTrigger className="w-40"><SelectValue placeholder="All statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="">All statuses</SelectItem>

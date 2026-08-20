@@ -78,7 +78,11 @@ export function ReturnAssetDialog({ open, onOpenChange, asset }: Props) {
               name="newStatus"
               control={control}
               render={({ field }) => (
-                <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v ?? '')}>
+                <Select
+                  items={Object.fromEntries(RETURN_STATUSES.map((s) => [s, s.replace('_', ' ')]))}
+                  value={field.value ?? ''}
+                  onValueChange={(v) => field.onChange(v ?? '')}
+                >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {RETURN_STATUSES.map((s) => (

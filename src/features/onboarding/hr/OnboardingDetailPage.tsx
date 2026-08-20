@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, CheckCircle, XCircle, MessageSquare, Loader2 } from 'lucide-react'
+import { ArrowLeft, CheckCircle, XCircle, MessageSquare, Loader2, Copy, Send } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,6 +11,83 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { onboardingApi } from '@/api/onboarding.api'
 import { formatDateTime } from '@/lib/utils'
 import { toast } from 'sonner'
+
+const RESENDABLE_STATUSES = new Set(['PENDING', 'IN_PROGRESS', 'CHANGES_REQUESTED'])
+
+interface SubmissionAddress {
+  line1?: string
+  city?: string
+  state?: string
+  pincode?: string
+}
+
+interface SubmissionDetails {
+  firstName?: string
+  lastName?: string
+  phone?: string
+  dateOfBirth?: string
+  gender?: string
+  nationality?: string
+  address?: SubmissionAddress
+  bankName?: string
+  accountNumber?: string
+  ifscCode?: string
+  accountType?: string
+  declarationAccepted?: boolean
+  [key: string]: unknown
+}
+
+interface InfoRow {
+  label: string
+  value: string
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+/** submissionData may be flat or wrapped under a `details` key — handle both. */
+function extractSubmissionDetails(submissionData: Record<string, unknown> | null): SubmissionDetails {
+  if (!submissionData) return {}
+  const nested = submissionData.details
+  if (isRecord(nested)) return nested as SubmissionDetails
+  return submissionData as SubmissionDetails
+}
+
+const KNOWN_KEYS = new Set([
+  'firstName', 'lastName', 'phone', 'dateOfBirth', 'gender', 'nationality',
+  'address', 'bankName', 'accountNumber', 'ifscCode', 'accountType', 'declarationAccepted',
+])
+
+function toDisplayValue(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
+  if (typeof value === 'string' || typeof value === 'number') return String(value)
+  return null
+}
+
+function buildRows(entries: Array<[string, unknown]>): InfoRow[] {
+  return entries.reduce<InfoRow[]>((rows, [key, raw]) => {
+    const value = toDisplayValue(raw)
+    if (value === null) return rows
+    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase())
+    return [...rows, { label, value }]
+  }, [])
+}
+
+function InfoRowList({ rows }: { rows: InfoRow[] }) {
+  if (rows.length === 0) return null
+  return (
+    <>
+      {rows.map(({ label, value }) => (
+        <div key={label} className="flex justify-between py-1.5 border-b border-border/50 last:border-0">
+          <span className="text-sm text-muted-foreground">{label}</span>
+          <span className="text-sm font-medium text-foreground">{value}</span>
+        </div>
+      ))}
+    </>
+  )
+}
 
 export function OnboardingDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -42,8 +119,44 @@ export function OnboardingDetailPage() {
     onSuccess: () => { invalidate(); setNotesDialog(null); toast.success('Application rejected.') },
   })
 
+  const { mutate: resend, isPending: resending } = useMutation({
+    mutationFn: () => onboardingApi.resend(id!),
+    onSuccess: () => { invalidate(); toast.success('Invite resent.') },
+    onError: () => toast.error('Failed to resend invite.'),
+  })
+
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-8 w-40" /><Skeleton className="h-64 w-full" /></div>
   if (!link) return <div className="text-muted-foreground">Not found.</div>
+
+  const submissionDetails = extractSubmissionDetails(link.submissionData)
+  const personalRows = buildRows([
+    ['Name', [submissionDetails.firstName, submissionDetails.lastName].filter(Boolean).join(' ')],
+    ['Gender', submissionDetails.gender],
+    ['Phone', submissionDetails.phone],
+    ['Date Of Birth', submissionDetails.dateOfBirth],
+    ['Nationality', submissionDetails.nationality],
+  ])
+  const addressLabels: Record<string, string> = {
+    line1: 'Address Line 1',
+    city: 'City',
+    state: 'State',
+    pincode: 'Pincode',
+  }
+  const addressRows = buildRows(
+    Object.entries(submissionDetails.address ?? {}).map(([key, value]) => [
+      addressLabels[key] ?? key,
+      value,
+    ]),
+  )
+  const bankRows = buildRows([
+    ['Bank Name', submissionDetails.bankName],
+    ['Account Number', submissionDetails.accountNumber],
+    ['IFSC Code', submissionDetails.ifscCode],
+    ['Account Type', submissionDetails.accountType],
+  ])
+  const otherRows = buildRows(
+    Object.entries(submissionDetails).filter(([key]) => !KNOWN_KEYS.has(key)),
+  )
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -74,6 +187,25 @@ export function OnboardingDetailPage() {
               <span className="text-sm font-medium text-foreground">{value ?? '—'}</span>
             </div>
           ))}
+          <div className="flex items-center justify-between py-1.5">
+            <span className="text-sm text-muted-foreground">Onboarding Link</span>
+            <div className="flex items-center gap-2 max-w-[70%]">
+              <span className="text-xs text-foreground truncate" title={`${window.location.origin}/onboarding/${link.token}`}>
+                {`${window.location.origin}/onboarding/${link.token}`}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 flex-shrink-0"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(`${window.location.origin}/onboarding/${link.token}`)
+                  toast.success('Link copied.')
+                }}
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -81,16 +213,43 @@ export function OnboardingDetailPage() {
       {link.submissionData && (
         <Card className="shadow-sm">
           <CardHeader><CardTitle className="text-base">Submitted Information</CardTitle></CardHeader>
-          <CardContent>
-            <pre className="text-xs bg-muted p-4 rounded-lg overflow-auto max-h-64">
-              {JSON.stringify(link.submissionData, null, 2)}
-            </pre>
+          <CardContent className="space-y-5">
+            {personalRows.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Personal Info</p>
+                <InfoRowList rows={personalRows} />
+              </div>
+            )}
+            {addressRows.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Address</p>
+                <InfoRowList rows={addressRows} />
+              </div>
+            )}
+            {bankRows.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Bank Details</p>
+                <InfoRowList rows={bankRows} />
+              </div>
+            )}
+            {otherRows.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">Other</p>
+                <InfoRowList rows={otherRows} />
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
 
       {/* Actions */}
       <div className="flex flex-wrap gap-3">
+        {RESENDABLE_STATUSES.has(link.status) && (
+          <Button variant="outline" onClick={() => resend()} disabled={resending}>
+            {resending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+            Resend Invite
+          </Button>
+        )}
         {link.status === 'SUBMITTED' && (
           <Button onClick={() => review()} disabled={reviewing}>
             {reviewing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

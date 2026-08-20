@@ -111,7 +111,11 @@ export function PolicyFormDialog({ open, onOpenChange, policy }: Props) {
           </div>
           <div className="space-y-1.5">
             <Label>Type *</Label>
-            <Select value={type ?? ''} onValueChange={(v) => setValue('type', (v ?? '') as InsuranceType)}>
+            <Select
+              items={Object.fromEntries(POLICY_TYPES.map((t) => [t, t]))}
+              value={type ?? ''}
+              onValueChange={(v) => setValue('type', (v ?? '') as InsuranceType)}
+            >
               <SelectTrigger className="w-full"><SelectValue placeholder="Select type" /></SelectTrigger>
               <SelectContent>
                 {POLICY_TYPES.map((t) => (

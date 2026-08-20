@@ -75,7 +75,11 @@ export function SendGreenThanksDialog({ open, onOpenChange }: Props) {
         <form onSubmit={handleSubmit((v) => send(v))} className="space-y-4 py-2">
           <div className="space-y-1.5">
             <Label>Recipient *</Label>
-            <Select value={toEmployeeId ?? ''} onValueChange={(v) => setValue('toEmployeeId', v ?? '')}>
+            <Select
+              items={Object.fromEntries(employees.map((e) => [e.id, `${e.firstName} ${e.lastName} (${e.empCode})`]))}
+              value={toEmployeeId ?? ''}
+              onValueChange={(v) => setValue('toEmployeeId', v ?? '')}
+            >
               <SelectTrigger className="w-full"><SelectValue placeholder="Select employee" /></SelectTrigger>
               <SelectContent>
                 {employees.map((e) => (
