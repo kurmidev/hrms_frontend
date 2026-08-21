@@ -1,5 +1,5 @@
 import { apiClient, unwrap } from './client'
-import type { TaxRule } from '@/types/organization.types'
+import type { TaxRule, CreateTaxRuleDto } from '@/types/organization.types'
 import type { PaginationParams } from '@/types/api.types'
 
 interface TaxRuleParams extends PaginationParams {
@@ -20,10 +20,10 @@ export const taxRulesApi = {
   get: (id: string) =>
     apiClient.get<{ data: TaxRule }>(`/tax-rules/${id}`).then(unwrap<TaxRule>),
 
-  create: (data: Partial<TaxRule>) =>
+  create: (data: CreateTaxRuleDto) =>
     apiClient.post<{ data: TaxRule }>('/tax-rules', data).then(unwrap<TaxRule>),
 
-  update: (id: string, data: Partial<TaxRule>) =>
+  update: (id: string, data: Partial<CreateTaxRuleDto>) =>
     apiClient.put<{ data: TaxRule }>(`/tax-rules/${id}`, data).then(unwrap<TaxRule>),
 
   patchStatus: (id: string, isActive: boolean) =>

@@ -43,7 +43,7 @@ const EMPTY_DEFAULTS: FormValues = {
   designationId: '',
   roleIds: [],
   payrollStructureId: '',
-  leavePolicyId: '',
+  leavePolicyIds: [],
   employmentType: '',
   joiningDate: '',
   reportingManagerId: '',
@@ -104,7 +104,7 @@ export function ApproveOnboardingDialog({ open, onOpenChange, link }: Props) {
   const designationId = watch('designationId')
   const roleIds = watch('roleIds')
   const payrollStructureId = watch('payrollStructureId')
-  const leavePolicyId = watch('leavePolicyId')
+  const leavePolicyIds = watch('leavePolicyIds')
   const employmentType = watch('employmentType')
   const reportingManagerId = watch('reportingManagerId')
 
@@ -147,6 +147,12 @@ export function ApproveOnboardingDialog({ open, onOpenChange, link }: Props) {
     setValue('roleIds', next, { shouldValidate: true })
   }
 
+  const toggleLeavePolicy = (policyId: string) => {
+    const current = leavePolicyIds ?? []
+    const next = current.includes(policyId) ? current.filter((p) => p !== policyId) : [...current, policyId]
+    setValue('leavePolicyIds', next, { shouldValidate: true })
+  }
+
   const { mutate: approve, isPending } = useMutation({
     mutationFn: (values: FormValues) =>
       onboardingApi.approve(link.id, {
@@ -154,7 +160,7 @@ export function ApproveOnboardingDialog({ open, onOpenChange, link }: Props) {
         designationId: values.designationId,
         roleIds: values.roleIds,
         payrollStructureId: values.payrollStructureId,
-        leavePolicyId: values.leavePolicyId,
+        leavePolicyIds: values.leavePolicyIds,
         employmentType: values.employmentType,
         joiningDate: values.joiningDate,
         reportingManagerId: values.reportingManagerId || undefined,
@@ -256,20 +262,20 @@ export function ApproveOnboardingDialog({ open, onOpenChange, link }: Props) {
               {errors.payrollStructureId && <p className="text-xs text-destructive">{errors.payrollStructureId.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label>Leave Policy *</Label>
-              <Select
-                items={Object.fromEntries(leavePolicies.map((p) => [p.id, p.name]))}
-                value={leavePolicyId}
-                onValueChange={(v) => setValue('leavePolicyId', v ?? '', { shouldValidate: true })}
-              >
-                <SelectTrigger className="w-full"><SelectValue placeholder="Select leave policy" /></SelectTrigger>
-                <SelectContent>
-                  {leavePolicies.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.leavePolicyId && <p className="text-xs text-destructive">{errors.leavePolicyId.message}</p>}
+              <Label>Leave Policies *</Label>
+              <div className="rounded-md border border-border max-h-40 overflow-y-auto p-2 space-y-1.5">
+                {leavePolicies.map((p) => (
+                  <label key={p.id} className="flex items-center gap-2 py-0.5 cursor-pointer">
+                    <Checkbox
+                      checked={leavePolicyIds?.includes(p.id) ?? false}
+                      onCheckedChange={() => toggleLeavePolicy(p.id)}
+                    />
+                    <span className="text-sm text-foreground">{p.name}</span>
+                  </label>
+                ))}
+                {leavePolicies.length === 0 && <p className="text-xs text-muted-foreground py-1">No leave policies found.</p>}
+              </div>
+              {errors.leavePolicyIds && <p className="text-xs text-destructive">{errors.leavePolicyIds.message}</p>}
             </div>
           </div>
 

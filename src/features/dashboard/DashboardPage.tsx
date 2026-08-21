@@ -1,106 +1,98 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { Users, UserCheck, Building2, Shield, Settings2, CreditCard, Clock, TrendingUp, BarChart3, ListTodo, ArrowRight, CircleCheck } from 'lucide-react'
+import { ListTodo, ArrowRight, CircleCheck, Settings2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge } from '@/components/shared/StatusBadge'
-import { employeesApi } from '@/api/employees.api'
 import { dashboardApi } from '@/api/dashboard.api'
 import { todosApi } from '@/api/incentives.api'
-import type { EmployeeStats } from '@/types/employee.types'
+import { useAuthStore } from '@/store/auth.store'
+import type { DashboardConfig, DashboardWidget } from '@/types/dashboard.types'
 import type { TodoTask } from '@/types/incentives.types'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import type { DashboardKpis } from '@/types/reports.types'
+import { formatDate } from '@/lib/utils'
 import { usePermission } from '@/hooks/usePermission'
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
-} from 'recharts'
-
-const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: '#22c55e',
-  PRE_BOARDING: '#3b82f6',
-  ON_LEAVE: '#f59e0b',
-  SUSPENDED: '#f97316',
-  EXITED: '#94a3b8',
-}
-
-const EMPLOYMENT_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ec4899']
+  KpiWidgetCard, EmployeeStatusChartCard, DepartmentHeadcountChartCard, RecentJoinersTableCard,
+  PendingLoansTableCard, PendingLeavesTableCard, ActivityPlaceholderCard, ClockCheckinCard,
+  ShieldPlaceholderCard, UnknownWidgetCard,
+} from './DashboardWidgets'
 
 const OPEN_TODO_STATUSES = new Set(['PENDING', 'SUBMITTED'])
 const MAX_DASHBOARD_TODOS = 5
 
-interface StatCardData {
-  title: string
-  value: number | string
-  icon: React.ElementType
-  color: string
-  bg: string
-  href?: string
+const KPI_WIDGET_TYPES = new Set([
+  'kpi_total_employees', 'kpi_active_employees', 'kpi_attendance_rate', 'kpi_pending_approvals',
+  'kpi_payroll_total', 'kpi_open_loans', 'kpi_on_leave', 'kpi_my_leave_balance', 'kpi_my_performance',
+  'kpi_open_assets', 'kpi_open_tickets',
+])
+
+const COL_SPAN_CLASS: Record<number, string> = {
+  1: 'lg:col-span-1',
+  2: 'lg:col-span-2',
+  3: 'lg:col-span-3',
+  4: 'lg:col-span-4',
 }
 
-interface StatCardProps {
-  card: StatCardData
-  isLoading: boolean
+// Picks the most specific dashboard config available: personal config for
+// this user, else the role-default config matching one of the user's roles,
+// else the first config returned. Matches `GET /dashboards` returning
+// `DashboardConfig[]` (personal + role-default) per the integration contract.
+function selectDashboardConfig(
+  configs: DashboardConfig[],
+  userId: string | undefined,
+  roleNames: string[],
+): DashboardConfig | undefined {
+  const personal = configs.find((c) => c.userId === userId)
+  if (personal) return personal
+  const roleDefault = configs.find((c) => c.isDefault && c.roleName && roleNames.includes(c.roleName))
+  if (roleDefault) return roleDefault
+  return configs[0]
 }
 
-function StatCard({ card, isLoading }: StatCardProps) {
-  // Bug (2026-08-20): several cards format `value` as a display string (e.g.
-  // Attendance % renders "95%", not the number 95) so `typeof card.value ===
-  // 'number'` was always false for them and the href never activated no
-  // matter the underlying data — silently dead links. Parse the leading
-  // numeric portion of whatever `value` actually is instead of requiring it
-  // to already be a `number`.
-  const numericValue = typeof card.value === 'number' ? card.value : parseFloat(card.value)
-  const isLinkable = !!card.href && !Number.isNaN(numericValue) && numericValue > 0
-
-  const content = (
-    <CardContent className="p-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{card.title}</p>
-          {isLoading ? (
-            <Skeleton className="h-8 w-16 mt-1" />
-          ) : (
-            <p className="text-3xl font-bold text-foreground mt-1">{card.value}</p>
-          )}
-          {isLinkable && !isLoading && (
-            <span className="flex items-center gap-1 text-xs font-medium text-blue-600 mt-1.5">
-              View details
-              <ArrowRight className="h-3 w-3" />
-            </span>
-          )}
-        </div>
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${card.bg}`}>
-          <card.icon className={`h-6 w-6 ${card.color}`} />
-        </div>
-      </div>
-    </CardContent>
-  )
-
-  if (isLinkable) {
-    return (
-      <Card className="shadow-sm hover:shadow-md transition-shadow">
-        <Link to={card.href as string}>{content}</Link>
-      </Card>
-    )
+function renderWidget(widget: DashboardWidget, kpis: DashboardKpis | undefined, kpisLoading: boolean) {
+  if (KPI_WIDGET_TYPES.has(widget.widgetType)) {
+    return <KpiWidgetCard widget={widget} kpis={kpis} isLoading={kpisLoading} />
   }
-
-  return <Card className="shadow-sm">{content}</Card>
+  switch (widget.widgetType) {
+    case 'chart_employee_status':
+      return <EmployeeStatusChartCard widget={widget} />
+    case 'chart_department_headcount':
+      return <DepartmentHeadcountChartCard widget={widget} />
+    case 'table_recent_joiners':
+      return <RecentJoinersTableCard widget={widget} />
+    case 'table_pending_loans':
+      return <PendingLoansTableCard widget={widget} />
+    case 'table_pending_leaves':
+      return <PendingLeavesTableCard widget={widget} />
+    case 'clock_checkin':
+      return <ClockCheckinCard widget={widget} />
+    case 'activity_recent':
+      return <ActivityPlaceholderCard widget={widget} />
+    case 'chart_payroll_trend':
+    case 'table_late_arrivals':
+    case 'schedule_upcoming':
+      return <ShieldPlaceholderCard widget={widget} />
+    default:
+      return <UnknownWidgetCard widget={widget} />
+  }
 }
 
 export function DashboardPage() {
+  const user = useAuthStore((s) => s.user)
   // GET /todos requires todo:create server-side (see TodosController) — several
   // seeded roles (hr_manager, finance_manager, dept_manager, field_supervisor,
   // it_admin) do NOT hold it, so this widget must self-gate with the exact same
   // permission string rather than firing a request that always 403s for them.
   const canSeeTasks = usePermission('todo:create')
 
-  const { data: stats, isLoading: empLoading } = useQuery<EmployeeStats>({
-    queryKey: ['employee-stats'],
-    queryFn: () => employeesApi.getStats(),
+  const { data: dashboardConfigs, isLoading: configLoading } = useQuery({
+    queryKey: ['dashboards'],
+    queryFn: () => dashboardApi.list(),
   })
 
-  const { data: kpis, isLoading: kpisLoading } = useQuery({
+  const { data: kpis, isLoading: kpisLoading } = useQuery<DashboardKpis>({
     queryKey: ['dashboard-kpis'],
     queryFn: () => dashboardApi.kpis(),
   })
@@ -115,20 +107,18 @@ export function DashboardPage() {
     .filter((t) => OPEN_TODO_STATUSES.has(t.status))
     .slice(0, MAX_DASHBOARD_TODOS)
 
-  const totalEmployees = stats?.total ?? 0
-  const activeCount = stats?.byStatus['ACTIVE'] ?? 0
-  const onboardingCount = stats?.byStatus['PRE_BOARDING'] ?? 0
-  const deptCount = stats?.byDepartment.length ?? 0
-
-  const statusData = Object.entries(stats?.byStatus ?? {}).map(([name, value]) => ({ name, value }))
-  const typeData = Object.entries(stats?.byType ?? {}).map(([name, value]) => ({ name, value }))
+  const roleNames = (user?.roles ?? []).map((r) => r.name)
+  const config = selectDashboardConfig(dashboardConfigs ?? [], user?.id, roleNames)
+  const widgets = (config?.widgets ?? []).slice().sort((a, b) => a.position - b.position)
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground text-sm mt-1">Overview of your organization</p>
+          <p className="text-muted-foreground text-sm mt-1">
+            {config?.name ? config.name : 'Overview of your organization'}
+          </p>
         </div>
         <button
           onClick={() => toast.info('Dashboard customization coming soon')}
@@ -186,99 +176,28 @@ export function DashboardPage() {
         </Card>
       )}
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { title: 'Total Employees', value: totalEmployees, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50', href: '/employees' },
-          { title: 'Active', value: activeCount, icon: UserCheck, color: 'text-emerald-600', bg: 'bg-emerald-50', href: '/employees?status=active' },
-          { title: 'Pre-Boarding', value: onboardingCount, icon: Shield, color: 'text-violet-600', bg: 'bg-violet-50', href: '/onboarding' },
-          { title: 'Departments', value: deptCount, icon: Building2, color: 'text-amber-600', bg: 'bg-amber-50', href: '/organization/departments' },
-        ].map((card) => (
-          <StatCard key={card.title} card={card} isLoading={empLoading} />
-        ))}
-      </div>
-
-      {/* Real-time KPI cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          {
-            title: 'Payroll Cost',
-            value: kpis?.kpi_payroll_total != null ? formatCurrency(kpis.kpi_payroll_total) : '—',
-            icon: CreditCard,
-            color: 'text-emerald-600',
-            bg: 'bg-emerald-50',
-          },
-          {
-            title: 'Pending Approvals',
-            value: kpis?.kpi_pending_approvals ?? '—',
-            icon: Clock,
-            color: 'text-yellow-600',
-            bg: 'bg-yellow-50',
-            href: '/performance/kpis',
-          },
-          {
-            title: 'Active Loans',
-            value: kpis?.kpi_open_loans ?? '—',
-            icon: TrendingUp,
-            color: 'text-indigo-600',
-            bg: 'bg-indigo-50',
-            href: '/loans',
-          },
-          {
-            title: 'Attendance %',
-            value: kpis?.kpi_attendance_rate != null ? `${kpis.kpi_attendance_rate}%` : '—',
-            icon: BarChart3,
-            color: 'text-purple-600',
-            bg: 'bg-purple-50',
-            href: '/attendance',
-          },
-        ].map((card) => (
-          <StatCard key={card.title} card={card} isLoading={kpisLoading} />
-        ))}
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base">Employees by Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}>
-                  {statusData.map((entry) => (
-                    <Cell key={entry.name} fill={STATUS_COLORS[entry.name] ?? '#94a3b8'} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+      {/* Role-aware widget grid — driven entirely by the user's DashboardConfig
+          (personal config, else role-default) from GET /dashboards. */}
+      {configLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-xl" />)}
+        </div>
+      ) : widgets.length === 0 ? (
+        <Card className="shadow-sm border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center gap-2">
+            <p className="text-sm font-medium text-foreground">No dashboard configured yet</p>
+            <p className="text-xs text-muted-foreground">Your organization hasn't set up a dashboard for your role.</p>
           </CardContent>
         </Card>
-
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base">Employees by Type</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={typeData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                  {typeData.map((_entry, index) => (
-                    <Cell key={index} fill={EMPLOYMENT_COLORS[index % EMPLOYMENT_COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+          {widgets.map((widget) => (
+            <div key={widget.id ?? `${widget.widgetType}-${widget.position}`} className={`col-span-1 ${COL_SPAN_CLASS[widget.colSpan] ?? ''}`}>
+              {renderWidget(widget, kpis, kpisLoading)}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

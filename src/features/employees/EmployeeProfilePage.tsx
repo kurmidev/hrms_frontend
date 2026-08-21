@@ -1,18 +1,21 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, Briefcase, Users, Wallet } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, Briefcase, Users, Wallet, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { employeesApi } from '@/api/employees.api'
+import { rolesApi } from '@/api/roles.api'
 import { EMPLOYMENT_TYPE_LABELS } from '@/lib/constants'
 import { formatDate, getInitials } from '@/lib/utils'
 import { usePermission } from '@/hooks/usePermission'
 import { ChangePayrollStructureDialog } from './ChangePayrollStructureDialog'
+import { ManageAccessDialog } from './ManageAccessDialog'
 
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -27,12 +30,24 @@ export function EmployeeProfilePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const canUpdate = usePermission('employee:update')
+  const canAssignRole = usePermission('role:assign')
   const [changePayrollOpen, setChangePayrollOpen] = useState(false)
+  const [manageAccessOpen, setManageAccessOpen] = useState(false)
+
+  const employeeQueryKey = ['employee', id]
 
   const { data: emp, isLoading } = useQuery({
-    queryKey: ['employee', id],
+    queryKey: employeeQueryKey,
     queryFn: () => employeesApi.get(id!),
     enabled: !!id,
+  })
+
+  const userId = emp?.user?.id
+
+  const { data: userRoles, isLoading: rolesLoading } = useQuery({
+    queryKey: ['user-roles', userId],
+    queryFn: () => rolesApi.userRoles(userId!),
+    enabled: !!userId,
   })
 
   if (isLoading) {
@@ -216,11 +231,49 @@ export function EmployeeProfilePage() {
         </Card>
       )}
 
+      {userId && (
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-primary" /> Roles &amp; Access
+            </CardTitle>
+            {canAssignRole && (
+              <Button variant="outline" size="sm" onClick={() => setManageAccessOpen(true)}>
+                Manage Access
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent>
+            {rolesLoading ? (
+              <Skeleton className="h-6 w-40" />
+            ) : userRoles && userRoles.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {userRoles.map((r) => (
+                  <Badge key={r.id} variant="secondary">{r.name}</Badge>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No roles assigned.</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {canUpdate && (
         <ChangePayrollStructureDialog
           open={changePayrollOpen}
           onOpenChange={setChangePayrollOpen}
           employee={emp}
+        />
+      )}
+
+      {canAssignRole && userId && (
+        <ManageAccessDialog
+          open={manageAccessOpen}
+          onOpenChange={setManageAccessOpen}
+          userId={userId}
+          employeeQueryKey={['user-roles', userId]}
+          currentRoleIds={(userRoles ?? []).map((r) => r.id)}
         />
       )}
     </div>

@@ -63,7 +63,7 @@ export interface ApproveOnboardingDto {
   designationId: string
   roleIds: string[]
   payrollStructureId: string
-  leavePolicyId: string
+  leavePolicyIds: string[]
   employmentType: string
   joiningDate: string
   reportingManagerId?: string

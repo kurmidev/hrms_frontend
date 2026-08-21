@@ -1,6 +1,6 @@
 export type LeaveType = 'CASUAL' | 'SICK' | 'EARNED' | 'LOSS_OF_PAY' | 'MATERNITY' | 'PATERNITY' | 'COMPENSATORY'
 export type PayrollCalculationType = 'PERCENTAGE' | 'FIXED' | 'SLAB_BASED'
-export type PayrollApplicableOn = 'GROSS' | 'NET'
+export type PayrollApplicableOn = 'GROSS' | 'BASIC' | 'NET' | 'CUSTOM'
 
 export interface Organization {
   id: string
@@ -123,6 +123,20 @@ export interface LeavePolicyRule {
   isActive: boolean
 }
 
+export interface TaxSlab {
+  fromAmount: number
+  toAmount?: number
+  rate?: number
+  fixedAmount?: number
+}
+
+export interface TaxRuleApplicabilityRules {
+  employmentTypes?: string[]
+  designationLevelMin?: number
+  designationLevelMax?: number
+  salaryCeiling?: number
+}
+
 export interface TaxRule {
   id: string
   organizationId: string
@@ -133,12 +147,26 @@ export interface TaxRule {
   applicableOn: PayrollApplicableOn
   isStatutory: boolean
   config: Record<string, unknown>
-  applicabilityRules: Record<string, unknown> | null
+  applicabilityRules: TaxRuleApplicabilityRules | null
   effectiveFrom: string
   effectiveTo: string | null
   isActive: boolean
   createdAt: string
   updatedAt: string
+}
+
+export interface CreateTaxRuleDto {
+  name: string
+  code?: string
+  type: string
+  calculationType: PayrollCalculationType
+  applicableOn: PayrollApplicableOn
+  isStatutory?: boolean
+  config: Record<string, unknown>
+  applicabilityRules?: TaxRuleApplicabilityRules
+  effectiveFrom: string
+  effectiveTo?: string
+  isActive?: boolean
 }
 
 export interface Currency {

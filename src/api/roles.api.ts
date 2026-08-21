@@ -21,5 +21,5 @@ export const rolesApi = {
     apiClient.delete(`/roles/assign/${userId}/${roleId}`).then(unwrap),
 
   userRoles: (userId: string) =>
-    apiClient.get(`/roles/users/${userId}`).then(unwrap),
+    apiClient.get<{ data: Role[] }>(`/roles/users/${userId}`).then(unwrap<Role[]>),
 }
