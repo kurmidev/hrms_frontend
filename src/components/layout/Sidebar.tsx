@@ -39,6 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
       { label: 'Designations', href: '/organization/designations', permission: 'employee:read' },
       { label: 'Leave Policies', href: '/organization/leave-policies', permission: 'org:read' },
       { label: 'Work Locations', href: '/organization/work-locations', permission: 'org:read' },
+      { label: 'Zones', href: '/organization/zones', permission: 'org:read' },
       { label: 'Payroll Structures', href: '/organization/payroll-structures', permission: 'payroll:read' },
       { label: 'Tax Rules', href: '/organization/tax-rules', permission: 'payroll:read' },
     ],
@@ -70,6 +71,7 @@ export const NAV_ITEMS: NavItem[] = [
       { label: 'My Leave', href: '/leave', permission: 'leave:apply' },
       { label: 'Approvals', href: '/leave/approvals', permission: 'leave:approve' },
       { label: 'Holidays', href: '/leave/holidays', permission: 'leave:read' },
+      { label: 'Global Leave', href: '/leave/global-leaves', permission: 'leave:read' },
     ],
   },
   {

@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
+import { useForm, useFieldArray, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import type { Resolver } from 'react-hook-form'
-import { CalendarDays, Plus, Pencil, Loader2 } from 'lucide-react'
+import { CalendarDays, Plus, Pencil, Trash2, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -36,9 +35,10 @@ const optionalInt = (min: number) =>
     z.number({ message: 'Must be a number' }).int().min(min).optional(),
   )
 
-const schema = z.object({
-  name: z.string().min(2, 'Name is required'),
+const typeSchema = z.object({
+  id: z.string().optional(),
   leaveType: z.string().min(1, 'Leave type is required'),
+  name: z.string().optional(),
   daysPerYear: z.preprocess(
     (v) => (v === '' ? undefined : Number(v)),
     z.number({ message: 'Days per year is required' }).min(0).max(365),
@@ -50,9 +50,27 @@ const schema = z.object({
   isEncashable: z.boolean().optional(),
   isLopEligible: z.boolean().optional(),
   allowedInProbation: z.boolean().optional(),
+})
+
+const schema = z.object({
+  name: z.string().min(2, 'Name is required'),
   isActive: z.boolean().optional(),
+  types: z.array(typeSchema).min(1, 'Add at least one leave type'),
 })
 type FormValues = z.infer<typeof schema>
+
+const emptyType = {
+  leaveType: 'CASUAL',
+  name: '',
+  daysPerYear: 0,
+  carryForwardMax: 0,
+  minAdvanceDays: 0,
+  maxConsecutiveDays: undefined,
+  accrualType: 'monthly',
+  isEncashable: false,
+  isLopEligible: true,
+  allowedInProbation: false,
+}
 
 export function LeavePoliciesPage() {
   const qc = useQueryClient()
@@ -69,27 +87,13 @@ export function LeavePoliciesPage() {
 
   const policies: LeavePolicy[] = (data as { data?: LeavePolicy[] })?.data ?? []
 
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormValues>({
+  const { register, control, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
   })
-
-  const leaveTypeValue = watch('leaveType')
-  const accrualValue = watch('accrualType')
+  const { fields, append, remove } = useFieldArray({ control, name: 'types' })
 
   const openCreate = () => {
-    reset({
-      name: '',
-      leaveType: 'CASUAL',
-      daysPerYear: undefined,
-      carryForwardMax: 0,
-      minAdvanceDays: 0,
-      maxConsecutiveDays: undefined,
-      accrualType: 'monthly',
-      isEncashable: false,
-      isLopEligible: true,
-      allowedInProbation: false,
-      isActive: true,
-    })
+    reset({ name: '', isActive: true, types: [{ ...emptyType }] })
     setEditItem(null)
     setOpen(true)
   }
@@ -97,16 +101,20 @@ export function LeavePoliciesPage() {
   const openEdit = (policy: LeavePolicy) => {
     reset({
       name: policy.name,
-      leaveType: policy.leaveType,
-      daysPerYear: policy.daysPerYear,
-      carryForwardMax: policy.carryForwardMax ?? 0,
-      minAdvanceDays: policy.minAdvanceDays ?? 0,
-      maxConsecutiveDays: policy.maxConsecutiveDays ?? undefined,
-      accrualType: policy.accrualType ?? 'monthly',
-      isEncashable: policy.isEncashable,
-      isLopEligible: policy.isLopEligible,
-      allowedInProbation: policy.allowedInProbation,
       isActive: policy.isActive,
+      types: policy.types.map((t) => ({
+        id: t.id,
+        leaveType: t.leaveType,
+        name: t.name ?? '',
+        daysPerYear: t.daysPerYear,
+        carryForwardMax: t.carryForwardMax ?? 0,
+        minAdvanceDays: t.minAdvanceDays ?? 0,
+        maxConsecutiveDays: t.maxConsecutiveDays ?? undefined,
+        accrualType: t.accrualType ?? 'monthly',
+        isEncashable: t.isEncashable ?? false,
+        isLopEligible: t.isLopEligible ?? true,
+        allowedInProbation: t.allowedInProbation ?? false,
+      })),
     })
     setEditItem(policy)
     setOpen(true)
@@ -114,18 +122,22 @@ export function LeavePoliciesPage() {
 
   const { mutate: save, isPending } = useMutation({
     mutationFn: (values: FormValues) => {
-      const payload: Partial<LeavePolicy> = {
+      const payload = {
         name: values.name,
-        leaveType: values.leaveType as LeaveType,
-        daysPerYear: values.daysPerYear,
-        carryForwardMax: values.carryForwardMax,
-        minAdvanceDays: values.minAdvanceDays,
-        maxConsecutiveDays: values.maxConsecutiveDays ?? null,
-        accrualType: values.accrualType,
-        isEncashable: values.isEncashable,
-        isLopEligible: values.isLopEligible,
-        allowedInProbation: values.allowedInProbation,
         isActive: values.isActive,
+        types: values.types.map((t) => ({
+          ...(t.id ? { id: t.id } : {}),
+          leaveType: t.leaveType as LeaveType,
+          name: t.name || undefined,
+          daysPerYear: t.daysPerYear,
+          carryForwardMax: t.carryForwardMax,
+          minAdvanceDays: t.minAdvanceDays,
+          maxConsecutiveDays: t.maxConsecutiveDays ?? undefined,
+          accrualType: t.accrualType,
+          isEncashable: t.isEncashable,
+          isLopEligible: t.isLopEligible,
+          allowedInProbation: t.allowedInProbation,
+        })),
       }
       return editItem
         ? leavePoliciesApi.update(editItem.id, payload)
@@ -136,8 +148,13 @@ export function LeavePoliciesPage() {
       setOpen(false)
       toast.success(editItem ? 'Leave policy updated.' : 'Leave policy created.')
     },
+    // Backend 400s naming the blocking type when a `types` entry is removed
+    // from an update but still referenced by existing balances/applications
+    // — surface that message verbatim via toast rather than a generic one.
     onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save leave policy.')),
   })
+
+  const isActive = watch('isActive')
 
   return (
     <div className="space-y-6">
@@ -148,7 +165,7 @@ export function LeavePoliciesPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Leave Policies</h1>
-            <p className="text-sm text-muted-foreground">Manage leave types and rules</p>
+            <p className="text-sm text-muted-foreground">Manage leave policy bundles and their leave types</p>
           </div>
         </div>
         {canManage && (
@@ -170,25 +187,31 @@ export function LeavePoliciesPage() {
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-sm font-semibold">{policy.name}</CardTitle>
-                  <div className="flex items-center gap-1">
-                    <Badge variant="secondary" className="text-[10px] bg-amber-100 text-amber-700 border-0">
-                      {LEAVE_TYPE_LABELS[policy.leaveType] ?? policy.leaveType}
+                  {canManage && (
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEdit(policy)}>
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {policy.types.map((t) => (
+                    <Badge
+                      key={t.id ?? t.leaveType}
+                      variant="secondary"
+                      className="text-[10px] bg-amber-100 text-amber-700 border-0"
+                    >
+                      {t.name || LEAVE_TYPE_LABELS[t.leaveType] || t.leaveType} · {t.daysPerYear}d
                     </Badge>
-                    {canManage && (
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEdit(policy)}>
-                        <Pencil className="h-3 w-3" />
-                      </Button>
-                    )}
-                  </div>
+                  ))}
+                  {policy.types.length === 0 && (
+                    <span className="text-xs text-muted-foreground">No leave types</span>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                  <div><span className="font-medium text-foreground">{policy.daysPerYear}</span> days/year</div>
-                  <div><span className="font-medium text-foreground">{policy.carryForwardMax}</span> carry forward</div>
-                  <div><span className="font-medium text-foreground">{policy.maxConsecutiveDays ?? '∞'}</span> max consecutive</div>
-                  <div><span className="font-medium text-foreground">{policy.minAdvanceDays ?? 0}</span> min advance days</div>
-                  <div>{policy.isEncashable ? '✓ Encashable' : '✗ Not encashable'}</div>
+                  <div><span className="font-medium text-foreground">{policy.types.length}</span> leave type{policy.types.length === 1 ? '' : 's'}</div>
+                  <div><span className="font-medium text-foreground">{policy.employeeCount ?? 0}</span> employees</div>
                   <div>{policy.isActive ? <span className="text-emerald-600">Active</span> : <span className="text-muted-foreground">Inactive</span>}</div>
                 </div>
               </CardContent>
@@ -198,95 +221,132 @@ export function LeavePoliciesPage() {
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editItem ? 'Edit Leave Policy' : 'New Leave Policy'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit((v) => save(v))} className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="lp-name">Name *</Label>
-              <Input id="lp-name" placeholder="e.g. Annual Casual Leave" {...register('name')} />
-              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 sm:items-end">
               <div className="space-y-1.5">
-                <Label>Leave Type *</Label>
-                <Select
-                  items={Object.fromEntries(LEAVE_TYPES.map((t) => [t, LEAVE_TYPE_LABELS[t] ?? t]))}
-                  value={leaveTypeValue ?? ''}
-                  onValueChange={(v) => setValue('leaveType', v ?? '')}
-                >
-                  <SelectTrigger className="w-full"><SelectValue placeholder="Select type" /></SelectTrigger>
-                  <SelectContent>
-                    {LEAVE_TYPES.map((t) => (
-                      <SelectItem key={t} value={t}>{LEAVE_TYPE_LABELS[t] ?? t}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.leaveType && <p className="text-xs text-destructive">{errors.leaveType.message}</p>}
+                <Label htmlFor="lp-name">Policy Name *</Label>
+                <Input id="lp-name" placeholder="e.g. Standard Policy" {...register('name')} />
+                {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
               </div>
-              <div className="space-y-1.5">
-                <Label>Accrual</Label>
-                <Select
-                  items={Object.fromEntries(ACCRUAL_TYPES.map((a) => [a, a]))}
-                  value={accrualValue ?? ''}
-                  onValueChange={(v) => setValue('accrualType', v ?? '')}
-                >
-                  <SelectTrigger className="w-full"><SelectValue placeholder="Accrual" /></SelectTrigger>
-                  <SelectContent>
-                    {ACCRUAL_TYPES.map((a) => (
-                      <SelectItem key={a} value={a}>{a}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="lp-days">Days / Year *</Label>
-                <Input id="lp-days" type="number" step="any" placeholder="12" {...register('daysPerYear')} />
-                {errors.daysPerYear && <p className="text-xs text-destructive">{errors.daysPerYear.message}</p>}
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="lp-carry">Carry Forward Max</Label>
-                <Input id="lp-carry" type="number" placeholder="0" {...register('carryForwardMax')} />
-                {errors.carryForwardMax && <p className="text-xs text-destructive">{errors.carryForwardMax.message}</p>}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="lp-min">Min Advance Days</Label>
-                <Input id="lp-min" type="number" placeholder="0" {...register('minAdvanceDays')} />
-                {errors.minAdvanceDays && <p className="text-xs text-destructive">{errors.minAdvanceDays.message}</p>}
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="lp-max">Max Consecutive Days</Label>
-                <Input id="lp-max" type="number" placeholder="Unlimited" {...register('maxConsecutiveDays')} />
-                {errors.maxConsecutiveDays && <p className="text-xs text-destructive">{errors.maxConsecutiveDays.message}</p>}
-                <p className="text-[11px] text-muted-foreground">Blank = no per-application limit</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" className="h-4 w-4" {...register('isEncashable')} />
-                Encashable
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" className="h-4 w-4" {...register('isLopEligible')} />
-                LOP eligible
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" className="h-4 w-4" {...register('allowedInProbation')} />
-                Allowed in probation
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" className="h-4 w-4" {...register('isActive')} />
+              <label className="flex items-center gap-2 text-sm pb-2">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={isActive ?? true}
+                  onChange={(e) => setValue('isActive', e.target.checked)}
+                />
                 Active
               </label>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Leave Types</Label>
+                <Button type="button" variant="outline" size="sm" onClick={() => append({ ...emptyType })}>
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Add Type
+                </Button>
+              </div>
+              {errors.types?.message && (
+                <p className="text-xs text-destructive">{errors.types.message}</p>
+              )}
+              {fields.map((field, index) => {
+                const leaveTypeValue = watch(`types.${index}.leaveType`)
+                const accrualValue = watch(`types.${index}.accrualType`)
+                return (
+                  <div key={field.id} className="rounded-lg border border-border p-3 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-muted-foreground">Type {index + 1}</span>
+                      {fields.length > 1 && (
+                        <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => remove(index)}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Leave Type *</Label>
+                        <Select
+                          items={Object.fromEntries(LEAVE_TYPES.map((t) => [t, LEAVE_TYPE_LABELS[t] ?? t]))}
+                          value={leaveTypeValue ?? ''}
+                          onValueChange={(v) => setValue(`types.${index}.leaveType`, v ?? '')}
+                        >
+                          <SelectTrigger className="w-full"><SelectValue placeholder="Select type" /></SelectTrigger>
+                          <SelectContent>
+                            {LEAVE_TYPES.map((t) => (
+                              <SelectItem key={t} value={t}>{LEAVE_TYPE_LABELS[t] ?? t}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {errors.types?.[index]?.leaveType && (
+                          <p className="text-xs text-destructive">{errors.types[index]?.leaveType?.message}</p>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Display Name</Label>
+                        <Input placeholder="e.g. Casual Leave" {...register(`types.${index}.name`)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Accrual</Label>
+                        <Select
+                          items={Object.fromEntries(ACCRUAL_TYPES.map((a) => [a, a]))}
+                          value={accrualValue ?? ''}
+                          onValueChange={(v) => setValue(`types.${index}.accrualType`, v ?? '')}
+                        >
+                          <SelectTrigger className="w-full"><SelectValue placeholder="Accrual" /></SelectTrigger>
+                          <SelectContent>
+                            {ACCRUAL_TYPES.map((a) => (
+                              <SelectItem key={a} value={a}>{a}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Days / Year *</Label>
+                        <Input type="number" step="any" placeholder="12" {...register(`types.${index}.daysPerYear`)} />
+                        {errors.types?.[index]?.daysPerYear && (
+                          <p className="text-xs text-destructive">{errors.types[index]?.daysPerYear?.message}</p>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Carry Forward Max</Label>
+                        <Input type="number" placeholder="0" {...register(`types.${index}.carryForwardMax`)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Min Advance Days</Label>
+                        <Input type="number" placeholder="0" {...register(`types.${index}.minAdvanceDays`)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Max Consecutive Days</Label>
+                        <Input type="number" placeholder="Unlimited" {...register(`types.${index}.maxConsecutiveDays`)} />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <label className="flex items-center gap-2 text-sm">
+                        <input type="checkbox" className="h-4 w-4" {...register(`types.${index}.isEncashable`)} />
+                        Encashable
+                      </label>
+                      <label className="flex items-center gap-2 text-sm">
+                        <input type="checkbox" className="h-4 w-4" {...register(`types.${index}.isLopEligible`)} />
+                        LOP eligible
+                      </label>
+                      <label className="flex items-center gap-2 text-sm">
+                        <input type="checkbox" className="h-4 w-4" {...register(`types.${index}.allowedInProbation`)} />
+                        Allowed in probation
+                      </label>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
 
             <DialogFooter>

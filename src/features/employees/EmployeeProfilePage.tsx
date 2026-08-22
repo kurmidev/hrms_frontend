@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, Briefcase, Users, Wallet, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, Briefcase, Users, Wallet, ShieldCheck, Pencil, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -14,8 +14,14 @@ import { rolesApi } from '@/api/roles.api'
 import { EMPLOYMENT_TYPE_LABELS } from '@/lib/constants'
 import { formatDate, getInitials } from '@/lib/utils'
 import { usePermission } from '@/hooks/usePermission'
+import { useAuthStore } from '@/store/auth.store'
 import { ChangePayrollStructureDialog } from './ChangePayrollStructureDialog'
 import { ManageAccessDialog } from './ManageAccessDialog'
+import { EditEmployeeDialog } from './EditEmployeeDialog'
+import { EditPersonalDialog } from './EditPersonalDialog'
+import { EditBankDetailsDialog } from './EditBankDetailsDialog'
+import { EditEmergencyContactDialog } from './EditEmergencyContactDialog'
+import { UploadDocumentDialog } from './UploadDocumentDialog'
 
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -31,8 +37,14 @@ export function EmployeeProfilePage() {
   const navigate = useNavigate()
   const canUpdate = usePermission('employee:update')
   const canAssignRole = usePermission('role:assign')
+  const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
   const [changePayrollOpen, setChangePayrollOpen] = useState(false)
   const [manageAccessOpen, setManageAccessOpen] = useState(false)
+  const [editEmployeeOpen, setEditEmployeeOpen] = useState(false)
+  const [editPersonalOpen, setEditPersonalOpen] = useState(false)
+  const [editBankOpen, setEditBankOpen] = useState(false)
+  const [editEmergencyOpen, setEditEmergencyOpen] = useState(false)
+  const [uploadDocOpen, setUploadDocOpen] = useState(false)
 
   const employeeQueryKey = ['employee', id]
 
@@ -61,6 +73,14 @@ export function EmployeeProfilePage() {
 
   if (!emp) return <div className="text-muted-foreground">Employee not found.</div>
 
+  // Self-service edit affordances (Personal/Bank/Emergency/Documents) are
+  // shown only when the viewer is looking at their own profile — never on
+  // the Employment tab, which stays admin-only via canUpdate regardless of
+  // whose profile is open. A manager viewing a subordinate's profile with
+  // only view permissions (neither canUpdate nor isOwnProfile) sees fully
+  // read-only tabs, same as today.
+  const isOwnProfile = currentEmployeeId != null && currentEmployeeId === emp.id
+
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-3">
@@ -69,10 +89,16 @@ export function EmployeeProfilePage() {
         </Button>
         <h1 className="text-xl font-bold text-foreground flex-1">Employee Profile</h1>
         {canUpdate && (
-          <Button variant="outline" size="sm" onClick={() => setChangePayrollOpen(true)}>
-            <Wallet className="h-4 w-4 mr-1.5" />
-            Change Payroll Structure
-          </Button>
+          <>
+            <Button variant="outline" size="sm" onClick={() => setEditEmployeeOpen(true)}>
+              <Pencil className="h-4 w-4 mr-1.5" />
+              Edit Employee
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setChangePayrollOpen(true)}>
+              <Wallet className="h-4 w-4 mr-1.5" />
+              Change Payroll Structure
+            </Button>
+          </>
         )}
       </div>
 
@@ -118,7 +144,14 @@ export function EmployeeProfilePage() {
 
         <TabsContent value="personal">
           <Card className="shadow-sm">
-            <CardHeader><CardTitle className="text-base">Personal Information</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base">Personal Information</CardTitle>
+              {isOwnProfile && (
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditPersonalOpen(true)}>
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </CardHeader>
             <CardContent>
               <InfoRow label="Date of Birth" value={formatDate(emp.dateOfBirth)} />
               <InfoRow label="Gender" value={emp.gender ?? undefined} />
@@ -150,7 +183,14 @@ export function EmployeeProfilePage() {
 
         <TabsContent value="bank">
           <Card className="shadow-sm">
-            <CardHeader><CardTitle className="text-base">Bank Details</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base">Bank Details</CardTitle>
+              {(isOwnProfile || canUpdate) && (
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditBankOpen(true)}>
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </CardHeader>
             <CardContent>
               {emp.bankDetails ? (
                 <>
@@ -170,7 +210,14 @@ export function EmployeeProfilePage() {
 
         <TabsContent value="emergency">
           <Card className="shadow-sm">
-            <CardHeader><CardTitle className="text-base">Emergency Contact</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base">Emergency Contact</CardTitle>
+              {(isOwnProfile || canUpdate) && (
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditEmergencyOpen(true)}>
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </CardHeader>
             <CardContent>
               {emp.emergencyContact ? (
                 <>
@@ -188,7 +235,15 @@ export function EmployeeProfilePage() {
 
         <TabsContent value="documents">
           <Card className="shadow-sm">
-            <CardHeader><CardTitle className="text-base">Documents</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base">Documents</CardTitle>
+              {(isOwnProfile || canUpdate) && (
+                <Button variant="outline" size="sm" onClick={() => setUploadDocOpen(true)}>
+                  <Upload className="h-3.5 w-3.5 mr-1.5" />
+                  Upload
+                </Button>
+              )}
+            </CardHeader>
             <CardContent>
               {emp.documents && emp.documents.length > 0 ? (
                 <div className="space-y-2">
@@ -264,6 +319,46 @@ export function EmployeeProfilePage() {
           open={changePayrollOpen}
           onOpenChange={setChangePayrollOpen}
           employee={emp}
+        />
+      )}
+
+      {canUpdate && (
+        <EditEmployeeDialog
+          open={editEmployeeOpen}
+          onOpenChange={setEditEmployeeOpen}
+          employee={emp}
+        />
+      )}
+
+      {isOwnProfile && (
+        <EditPersonalDialog
+          open={editPersonalOpen}
+          onOpenChange={setEditPersonalOpen}
+          employee={emp}
+        />
+      )}
+
+      {(isOwnProfile || canUpdate) && (
+        <EditBankDetailsDialog
+          open={editBankOpen}
+          onOpenChange={setEditBankOpen}
+          employee={emp}
+        />
+      )}
+
+      {(isOwnProfile || canUpdate) && (
+        <EditEmergencyContactDialog
+          open={editEmergencyOpen}
+          onOpenChange={setEditEmergencyOpen}
+          employee={emp}
+        />
+      )}
+
+      {(isOwnProfile || canUpdate) && (
+        <UploadDocumentDialog
+          open={uploadDocOpen}
+          onOpenChange={setUploadDocOpen}
+          employeeId={emp.id}
         />
       )}
 

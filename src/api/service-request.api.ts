@@ -6,6 +6,7 @@ import type {
   ResolveServiceRequestDto,
   UpdateServiceRequestStatusDto,
   CreateServiceRequestCommentDto,
+  GrantSpecialLeaveResponse,
 } from '@/types/service-request.types'
 import type { PaginationParams } from '@/types/api.types'
 
@@ -36,6 +37,11 @@ export const serviceRequestApi = {
 
   resolve: (id: string, data: ResolveServiceRequestDto) =>
     apiClient.put<{ data: ServiceRequest }>(`/service-requests/${id}/resolve`, data).then(unwrap<ServiceRequest>),
+
+  grantSpecialLeave: (id: string) =>
+    apiClient
+      .put<{ data: GrantSpecialLeaveResponse }>(`/service-requests/${id}/grant-special-leave`)
+      .then(unwrap<GrantSpecialLeaveResponse>),
 
   updateStatus: (id: string, data: UpdateServiceRequestStatusDto) =>
     apiClient.put<{ data: ServiceRequest }>(`/service-requests/${id}/status`, data).then(unwrap<ServiceRequest>),

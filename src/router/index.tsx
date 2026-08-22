@@ -16,6 +16,7 @@ import { LeavePoliciesPage } from '@/features/organization/leave-policies/LeaveP
 import { PayrollStructuresPage } from '@/features/organization/payroll-structures/PayrollStructuresPage'
 import { TaxRulesPage } from '@/features/organization/tax-rules/TaxRulesPage'
 import { WorkLocationsPage } from '@/features/organization/work-locations/WorkLocationsPage'
+import { ZonesPage } from '@/features/organization/zones/ZonesPage'
 import { EmployeesPage } from '@/features/employees/EmployeesPage'
 import { EmployeeProfilePage } from '@/features/employees/EmployeeProfilePage'
 import { OnboardingHRPage } from '@/features/onboarding/hr/OnboardingHRPage'
@@ -28,6 +29,7 @@ import { OnDutyPage } from '@/features/attendance/OnDutyPage'
 import { LeavePage } from '@/features/leave/LeavePage'
 import { LeaveApprovalsPage } from '@/features/leave/LeaveApprovalsPage'
 import { HolidaysPage } from '@/features/leave/HolidaysPage'
+import { GlobalLeavePage } from '@/features/leave/GlobalLeavePage'
 import { PayrollRunsPage } from '@/features/payroll/PayrollRunsPage'
 import { PayrollRunDetailPage } from '@/features/payroll/PayrollRunDetailPage'
 import { LoansPage } from '@/features/loans/LoansPage'
@@ -119,6 +121,7 @@ export const router = createBrowserRouter([
       { path: 'organization/payroll-structures', element: <PayrollStructuresPage /> },
       { path: 'organization/tax-rules', element: <TaxRulesPage /> },
       { path: 'organization/work-locations', element: <WorkLocationsPage /> },
+      { path: 'organization/zones', element: <ZonesPage /> },
       { path: 'roles', element: <RolesPage /> },
       { path: 'employees', element: <EmployeesPage /> },
       { path: 'employees/:id', element: <EmployeeProfilePage /> },
@@ -131,6 +134,7 @@ export const router = createBrowserRouter([
       { path: 'leave', element: <LeavePage /> },
       { path: 'leave/approvals', element: <LeaveApprovalsPage /> },
       { path: 'leave/holidays', element: <HolidaysPage /> },
+      { path: 'leave/global-leaves', element: <GlobalLeavePage /> },
       { path: 'payroll', element: <PayrollRunsPage /> },
       { path: 'payroll/runs/:id', element: <PayrollRunDetailPage /> },
       { path: 'loans', element: <LoansPage /> },

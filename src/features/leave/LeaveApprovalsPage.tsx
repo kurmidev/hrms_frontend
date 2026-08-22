@@ -91,9 +91,9 @@ export function LeaveApprovalsPage() {
         ),
     },
     {
-      key: 'leavePolicy',
+      key: 'leavePolicyType',
       header: 'Leave Type',
-      render: (row) => row.leavePolicy?.name ?? LEAVE_TYPE_LABELS[row.leavePolicy?.leaveType ?? ''] ?? '—',
+      render: (row) => row.leavePolicyType?.name ?? LEAVE_TYPE_LABELS[row.leavePolicyType?.leaveType ?? ''] ?? '—',
     },
     { key: 'fromDate', header: 'From', render: (row) => formatDate(row.fromDate) },
     { key: 'toDate', header: 'To', render: (row) => formatDate(row.toDate) },

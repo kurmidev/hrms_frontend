@@ -1,10 +1,16 @@
 import { apiClient, unwrap } from './client'
-import type { LeavePolicy } from '@/types/organization.types'
+import type { LeavePolicy, LeavePolicyType } from '@/types/organization.types'
 import type { PaginationParams } from '@/types/api.types'
 
 interface LeavePolicyParams extends PaginationParams {
   leaveType?: string
   isActive?: boolean
+}
+
+export interface LeavePolicyPayload {
+  name: string
+  isActive?: boolean
+  types: LeavePolicyType[]
 }
 
 export const leavePoliciesApi = {
@@ -17,10 +23,10 @@ export const leavePoliciesApi = {
   get: (id: string) =>
     apiClient.get<{ data: LeavePolicy }>(`/leave-policies/${id}`).then(unwrap<LeavePolicy>),
 
-  create: (data: Partial<LeavePolicy>) =>
+  create: (data: LeavePolicyPayload) =>
     apiClient.post<{ data: LeavePolicy }>('/leave-policies', data).then(unwrap<LeavePolicy>),
 
-  update: (id: string, data: Partial<LeavePolicy>) =>
+  update: (id: string, data: LeavePolicyPayload) =>
     apiClient.put<{ data: LeavePolicy }>(`/leave-policies/${id}`, data).then(unwrap<LeavePolicy>),
 
   delete: (id: string) => apiClient.delete(`/leave-policies/${id}`).then(unwrap),

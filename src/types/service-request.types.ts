@@ -5,6 +5,7 @@ export type ServiceRequestCategory =
   | 'COMPLIANCE'
   | 'FINANCE'
   | 'POLICY_CLARIFICATION'
+  | 'SPECIAL_LEAVE'
 
 export type ServiceRequestStatus = 'OPEN' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED'
 
@@ -25,6 +26,12 @@ export interface ServiceRequestComment {
   createdAt: string
 }
 
+export interface ServiceRequestLeavePolicyTypeRef {
+  id: string
+  name: string
+  leaveType: string
+}
+
 export interface ServiceRequest {
   id: string
   organizationId: string
@@ -43,6 +50,12 @@ export interface ServiceRequest {
   createdAt: string
   updatedAt: string
   comments?: ServiceRequestComment[]
+  // SPECIAL_LEAVE category fields — present only when category === 'SPECIAL_LEAVE'.
+  leavePolicyTypeId?: string | null
+  leaveFromDate?: string | null
+  leaveToDate?: string | null
+  leaveDays?: number | null
+  leavePolicyType?: ServiceRequestLeavePolicyTypeRef | null
 }
 
 export interface CreateServiceRequestDto {
@@ -51,6 +64,23 @@ export interface CreateServiceRequestDto {
   description: string
   priority?: ServiceRequestPriority
   isAnonymous?: boolean
+  // Required when category === 'SPECIAL_LEAVE'.
+  employeeId?: string
+  leavePolicyTypeId?: string
+  leaveFromDate?: string
+  leaveToDate?: string
+  leaveDays?: number
+}
+
+export interface GrantSpecialLeaveResponse {
+  serviceRequest: ServiceRequest
+  leaveApplication: {
+    id: string
+    status: string
+    fromDate: string
+    toDate: string
+    days: number
+  }
 }
 
 export interface AssignServiceRequestDto {

@@ -12,9 +12,11 @@ import type { ServiceRequestStatus } from '@/types/service-request.types'
 import { usePermission } from '@/hooks/usePermission'
 import { useAuthStore } from '@/store/auth.store'
 import { formatDateTime, formatDate, getApiErrorMessage } from '@/lib/utils'
+import { SERVICE_REQUEST_CATEGORY_LABELS } from '@/lib/constants'
 import { toast } from 'sonner'
 import { AssignRequestDialog } from './AssignRequestDialog'
 import { ResolveRequestDialog } from './ResolveRequestDialog'
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 
 const STATUS_COLORS: Record<string, string> = {
   OPEN: 'bg-slate-100 text-slate-600',
@@ -40,6 +42,7 @@ export function ServiceRequestDetailPage() {
 
   const [assignOpen, setAssignOpen] = useState(false)
   const [resolveOpen, setResolveOpen] = useState(false)
+  const [grantOpen, setGrantOpen] = useState(false)
   const [comment, setComment] = useState('')
 
   const { data: request, isLoading } = useQuery({
@@ -74,9 +77,36 @@ export function ServiceRequestDetailPage() {
     onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to add comment.')),
   })
 
-  const nextStatuses = request ? NEXT_STATUSES[request.status] ?? [] : []
+  const { mutate: grantLeave, isPending: grantPending } = useMutation({
+    mutationFn: () => {
+      if (!id) return Promise.reject(new Error('No request id'))
+      return serviceRequestApi.grantSpecialLeave(id)
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['service-request', id] })
+      qc.invalidateQueries({ queryKey: ['service-requests'] })
+      // Best-effort — these match the query keys used by LeavePage.tsx and
+      // LeaveApprovalsPage.tsx so a freshly granted leave shows up there too.
+      qc.invalidateQueries({ queryKey: ['my-leave-applications'] })
+      qc.invalidateQueries({ queryKey: ['leave-approvals'] })
+      setGrantOpen(false)
+      toast.success('Leave granted and approved.')
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to grant leave.')),
+  })
+
+  const isSpecialLeave = request?.category === 'SPECIAL_LEAVE'
+  // /resolve now rejects SPECIAL_LEAVE requests server-side — grant-special-leave is the
+  // only supported path to RESOLVED for this category, so exclude it from the generic
+  // "Move to" status transitions to avoid offering an action that will 400.
+  const nextStatuses = request
+    ? (NEXT_STATUSES[request.status] ?? []).filter((s) => !(isSpecialLeave && s === 'RESOLVED'))
+    : []
   const isOwnRecord =
     currentEmployeeId != null && !!request?.employeeId && request.employeeId === currentEmployeeId
+  const canGrantLeave =
+    canManage && isSpecialLeave && !isOwnRecord && !!request &&
+    (request.status === 'OPEN' || request.status === 'ASSIGNED' || request.status === 'IN_PROGRESS')
 
   return (
     <div className="space-y-6">
@@ -102,7 +132,7 @@ export function ServiceRequestDetailPage() {
           )}
           <p className="text-sm text-muted-foreground">
             {request
-              ? `${request.category.replace('_', ' ')} · ${
+              ? `${SERVICE_REQUEST_CATEGORY_LABELS[request.category] ?? request.category.replace('_', ' ')} · ${
                   request.isAnonymous || !request.employee
                     ? 'Anonymous'
                     : `${request.employee.firstName} ${request.employee.lastName} (${request.employee.empCode})`
@@ -110,14 +140,17 @@ export function ServiceRequestDetailPage() {
               : ''}
           </p>
         </div>
-        {canManage && request && request.status === 'OPEN' && !isOwnRecord && (
+        {canManage && request && request.status === 'OPEN' && !isOwnRecord && !isSpecialLeave && (
           <Button onClick={() => setAssignOpen(true)}>Assign</Button>
         )}
-        {canManage && request && (request.status === 'ASSIGNED' || request.status === 'IN_PROGRESS') && !isOwnRecord && (
+        {canManage && request && (request.status === 'ASSIGNED' || request.status === 'IN_PROGRESS') && !isOwnRecord && !isSpecialLeave && (
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => setAssignOpen(true)}>Reassign</Button>
             <Button onClick={() => setResolveOpen(true)}>Resolve</Button>
           </div>
+        )}
+        {canGrantLeave && (
+          <Button onClick={() => setGrantOpen(true)}>Grant Leave</Button>
         )}
       </div>
 
@@ -133,6 +166,14 @@ export function ServiceRequestDetailPage() {
               <p><span className="font-medium text-foreground">Resolved: </span>{request.resolvedAt ? formatDate(request.resolvedAt) : '—'}</p>
               <p><span className="font-medium text-foreground">Closed: </span>{request.closedAt ? formatDate(request.closedAt) : '—'}</p>
             </div>
+            {isSpecialLeave && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-border text-xs text-muted-foreground">
+                <p><span className="font-medium text-foreground">Leave Type: </span>{request.leavePolicyType?.name ?? '—'}</p>
+                <p><span className="font-medium text-foreground">From: </span>{request.leaveFromDate ? formatDate(request.leaveFromDate) : '—'}</p>
+                <p><span className="font-medium text-foreground">To: </span>{request.leaveToDate ? formatDate(request.leaveToDate) : '—'}</p>
+                <p><span className="font-medium text-foreground">Days: </span>{request.leaveDays ?? '—'}</p>
+              </div>
+            )}
             {canManage && !isOwnRecord && nextStatuses.length > 0 && (
               <div className="flex items-center gap-2 pt-3 border-t border-border">
                 <span className="text-xs font-medium text-muted-foreground">Move to:</span>
@@ -187,6 +228,16 @@ export function ServiceRequestDetailPage() {
 
       <AssignRequestDialog open={assignOpen} onOpenChange={setAssignOpen} request={request ?? null} />
       <ResolveRequestDialog open={resolveOpen} onOpenChange={setResolveOpen} request={request ?? null} />
+      <ConfirmDialog
+        open={grantOpen}
+        onOpenChange={setGrantOpen}
+        title="Grant Special Leave"
+        description={`Approve this special leave request for ${
+          request?.employee ? `${request.employee.firstName} ${request.employee.lastName}` : 'this employee'
+        }? This will create an approved leave application immediately.`}
+        confirmLabel={grantPending ? 'Granting…' : 'Grant Leave'}
+        onConfirm={() => grantLeave()}
+      />
     </div>
   )
 }

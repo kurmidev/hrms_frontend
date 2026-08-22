@@ -138,6 +138,16 @@ export const TODO_STATUS_COLORS: Record<string, string> = {
   REJECTED: 'bg-red-100 text-red-700',
 }
 
+export const SERVICE_REQUEST_CATEGORY_LABELS: Record<string, string> = {
+  HR: 'HR',
+  IT: 'IT',
+  ADMIN: 'Admin',
+  COMPLIANCE: 'Compliance',
+  FINANCE: 'Finance',
+  POLICY_CLARIFICATION: 'Policy Clarification',
+  SPECIAL_LEAVE: 'Special Leave',
+}
+
 export const PERMISSION_GROUPS: Record<string, string[]> = {
   'Organization': ['org:read', 'org:update'],
   'Employees': ['employee:read', 'employee:create', 'employee:update', 'employee:delete'],

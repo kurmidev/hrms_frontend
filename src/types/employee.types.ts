@@ -25,11 +25,58 @@ export interface EmergencyContact {
   address?: string
 }
 
+// Matches backend UpdateBankDetailsDto (update-bank-details.dto.ts) exactly.
+// Note: no accountHolderName field — that's not editable via this endpoint.
+export type BankAccountType = 'SAVINGS' | 'CURRENT'
+export interface UpdateBankDetailsDto {
+  bankName: string
+  accountNumber: string
+  ifscCode: string
+  accountType: BankAccountType
+  branchName?: string
+  micrCode?: string
+}
+
+// Matches backend UpdateEmergencyContactDto exactly — note `relation`, not
+// `relationship` (the display-only EmergencyContact type above uses the
+// latter; don't conflate the two).
+export interface UpdateEmergencyContactDto {
+  name: string
+  phone: string
+  relation: string
+  alternatePhone?: string
+  address?: string
+}
+
 export interface EmployeeDocument {
   documentType: string
   fileUrl: string
   notes?: string
   uploadedAt: string
+}
+
+export interface EmployeeAddress {
+  line1?: string
+  line2?: string
+  city?: string
+  state?: string
+  pincode?: string
+}
+
+export interface PreviousEmployment {
+  lastEmployerName?: string
+  jobTitleAtLastEmployer?: string
+  employmentFrom?: string
+  employmentTo?: string
+  lastManagerName?: string
+  lastManagerContact?: string
+  hrContactAtPreviousEmployer?: string
+  reasonForLeaving?: string
+}
+
+export interface ReferenceContact {
+  name: string
+  contact: string
 }
 
 export interface Employee {
@@ -61,7 +108,11 @@ export interface Employee {
   bankDetails: BankDetails | null
   emergencyContact: EmergencyContact | null
   documents: EmployeeDocument[]
-  address: Record<string, string> | null
+  address: EmployeeAddress | null
+  healthInfo: Record<string, unknown> | null
+  previousEmployment: PreviousEmployment[] | null
+  referenceContacts: ReferenceContact[] | null
+  zoneId: string | null
   department?: { id: string; name: string }
   designation?: { id: string; name: string }
   reportingManager?: { id: string; firstName: string; lastName: string; profilePhotoUrl: string | null }
@@ -91,4 +142,37 @@ export interface CreateEmployeeDto {
   pfNumber?: string
   esiNumber?: string
   uanNumber?: string
+}
+
+// Admin-only full update (PUT /employees/:id, requires employee:update).
+// Includes the 5 admin-only fields (department/designation/leavePolicy/
+// employmentType/zone+workLocation) plus profile fields UpdateEmployeeDto
+// now accepts on the backend.
+export interface UpdateEmployeeAdminDto extends Partial<CreateEmployeeDto> {
+  zoneId?: string
+  workLocation?: string
+  nationality?: string
+  bloodGroup?: string
+  address?: EmployeeAddress
+  healthInfo?: Record<string, unknown>
+  previousEmployment?: PreviousEmployment[]
+  referenceContacts?: ReferenceContact[]
+  profilePhotoUrl?: string
+}
+
+// Self-service update (PATCH /employees/:id/self, requires profile:update,
+// backend-enforced to the caller's own employee id). Structurally omits the
+// 5 admin-only fields — never send them here even if present in state.
+export interface UpdateEmployeeSelfDto {
+  dateOfBirth?: string
+  gender?: Gender
+  nationality?: string
+  bloodGroup?: string
+  phone?: string
+  email?: string
+  address?: EmployeeAddress
+  healthInfo?: Record<string, unknown>
+  previousEmployment?: PreviousEmployment[]
+  referenceContacts?: ReferenceContact[]
+  profilePhotoUrl?: string
 }

@@ -90,24 +90,38 @@ export interface PayrollStructure {
   updatedAt: string
 }
 
+export interface LeavePolicyType {
+  id?: string
+  leavePolicyId?: string
+  leaveType: LeaveType
+  name?: string | null
+  daysPerYear: number
+  carryForwardMax?: number
+  accrualType?: string
+  isEncashable?: boolean
+  isLopEligible?: boolean
+  minAdvanceDays?: number
+  maxConsecutiveDays?: number | null
+  allowedInProbation?: boolean
+  genderRestriction?: string | null
+  createdAt?: string
+  updatedAt?: string
+}
+
+// A LeavePolicy is a named bundle of one or more LeavePolicyType rows (e.g.
+// "Standard Policy" = CL 12d + SL 10d + PL 15d). Matches
+// LeavePolicyResponseDto (backend/.../leave-policies/dto/leave-policy-response.dto.ts).
 export interface LeavePolicy {
   id: string
   organizationId: string
   name: string
-  leaveType: LeaveType
-  daysPerYear: number
-  carryForwardMax: number
-  accrualType: string
-  isEncashable: boolean
-  isLopEligible: boolean
-  minAdvanceDays: number | null
-  maxConsecutiveDays: number | null
-  allowedInProbation: boolean
-  genderRestriction: string | null
   isActive: boolean
+  employeeCount?: number
+  types: LeavePolicyType[]
   rules?: LeavePolicyRule[]
   createdAt: string
   updatedAt: string
+  deletedAt?: string | null
 }
 
 export interface LeavePolicyRule {

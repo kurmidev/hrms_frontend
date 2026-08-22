@@ -1,5 +1,13 @@
 import { apiClient, unwrap } from './client'
-import type { Employee, CreateEmployeeDto, EmployeeStats } from '@/types/employee.types'
+import type {
+  Employee,
+  CreateEmployeeDto,
+  EmployeeStats,
+  UpdateEmployeeAdminDto,
+  UpdateEmployeeSelfDto,
+  UpdateBankDetailsDto,
+  UpdateEmergencyContactDto,
+} from '@/types/employee.types'
 import type { PaginationParams } from '@/types/api.types'
 
 interface EmployeeParams extends PaginationParams {
@@ -23,8 +31,13 @@ export const employeesApi = {
   create: (data: CreateEmployeeDto) =>
     apiClient.post<{ data: Employee }>('/employees', data).then(unwrap<Employee>),
 
-  update: (id: string, data: Partial<CreateEmployeeDto>) =>
+  update: (id: string, data: UpdateEmployeeAdminDto) =>
     apiClient.put<{ data: Employee }>(`/employees/${id}`, data).then(unwrap<Employee>),
+
+  // Self-service update — PATCH /employees/:id/self, requires profile:update.
+  // Backend enforces the caller can only target their own employee id.
+  updateSelf: (id: string, data: UpdateEmployeeSelfDto) =>
+    apiClient.patch<{ data: Employee }>(`/employees/${id}/self`, data).then(unwrap<Employee>),
 
   patchStatus: (id: string, data: { status: string; reason?: string }) =>
     apiClient.patch(`/employees/${id}/status`, data).then(unwrap),
@@ -43,10 +56,10 @@ export const employeesApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then(unwrap),
 
-  updateBankDetails: (id: string, data: Record<string, string>) =>
+  updateBankDetails: (id: string, data: UpdateBankDetailsDto) =>
     apiClient.patch(`/employees/${id}/bank-details`, data).then(unwrap),
 
-  updateEmergencyContact: (id: string, data: Record<string, string>) =>
+  updateEmergencyContact: (id: string, data: UpdateEmergencyContactDto) =>
     apiClient.patch(`/employees/${id}/emergency-contact`, data).then(unwrap),
 
   subordinates: (id: string, depth?: number) =>

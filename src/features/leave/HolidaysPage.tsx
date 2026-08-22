@@ -26,7 +26,9 @@ import { DataTable, type Column } from '@/components/shared/DataTable'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { leaveApi } from '@/api/leave.api'
+import { globalLeaveApi } from '@/api/global-leave.api'
 import type { Holiday, HolidayType } from '@/types/leave.types'
+import type { GlobalLeave } from '@/types/global-leave.types'
 import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth.store'
 import { toast } from 'sonner'
@@ -62,6 +64,12 @@ export function HolidaysPage() {
   })
 
   const holidays: Holiday[] = Array.isArray(data) ? data : []
+
+  const { data: globalLeaveData, isLoading: globalLeaveLoading } = useQuery({
+    queryKey: ['global-leaves-my', { year }],
+    queryFn: () => globalLeaveApi.my(year),
+  })
+  const globalLeaves: GlobalLeave[] = globalLeaveData ?? []
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
@@ -138,6 +146,22 @@ export function HolidaysPage() {
       : []),
   ]
 
+  const globalLeaveColumns: Column<GlobalLeave>[] = [
+    { key: 'name', header: 'Name' },
+    { key: 'date', header: 'Date', render: (row) => formatDate(row.date) },
+    {
+      key: 'scope',
+      header: 'Scope',
+      render: (row) => (
+        <StatusBadge
+          status={row.appliesToAll ? 'All Employees' : row.zones.map((z) => z.name).join(', ') || 'Zone'}
+          type="generic"
+          colorClass={row.appliesToAll ? 'bg-violet-100 text-violet-700' : 'bg-sky-100 text-sky-700'}
+        />
+      ),
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -179,6 +203,20 @@ export function HolidaysPage() {
         rowKey={(r) => r.id}
         emptyMessage="No holidays found for this year."
       />
+
+      <div className="space-y-2">
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Global Leave Days</h2>
+          <p className="text-xs text-muted-foreground">Company-wide and zone-specific mandatory leave days that apply to you</p>
+        </div>
+        <DataTable
+          columns={globalLeaveColumns}
+          data={globalLeaves}
+          isLoading={globalLeaveLoading}
+          rowKey={(r) => r.id}
+          emptyMessage="No global leave days apply to you for this year."
+        />
+      </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent>

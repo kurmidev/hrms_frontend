@@ -12,6 +12,7 @@ import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
 import { formatDate } from '@/lib/utils'
+import { SERVICE_REQUEST_CATEGORY_LABELS } from '@/lib/constants'
 import { RaiseServiceRequestDialog } from './RaiseServiceRequestDialog'
 
 const STATUS_COLORS: Record<string, string> = {
@@ -29,7 +30,7 @@ const PRIORITY_COLORS: Record<string, string> = {
   CRITICAL: 'bg-red-100 text-red-700',
 }
 
-const CATEGORIES: ServiceRequestCategory[] = ['HR', 'IT', 'ADMIN', 'COMPLIANCE', 'FINANCE', 'POLICY_CLARIFICATION']
+const CATEGORIES: ServiceRequestCategory[] = ['HR', 'IT', 'ADMIN', 'COMPLIANCE', 'FINANCE', 'POLICY_CLARIFICATION', 'SPECIAL_LEAVE']
 const STATUSES: ServiceRequestStatus[] = ['OPEN', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED']
 
 export function ServiceRequestsPage() {
@@ -72,7 +73,7 @@ export function ServiceRequestsPage() {
         </div>
       ),
     },
-    { key: 'category', header: 'Category', render: (row) => row.category.replace('_', ' ') },
+    { key: 'category', header: 'Category', render: (row) => SERVICE_REQUEST_CATEGORY_LABELS[row.category] ?? row.category.replace('_', ' ') },
     {
       key: 'priority',
       header: 'Priority',
@@ -141,7 +142,7 @@ export function ServiceRequestsPage() {
 
       <div className="flex items-center gap-3">
         <Select
-          items={{ '': 'All categories', ...Object.fromEntries(CATEGORIES.map((c) => [c, c.replace('_', ' ')])) }}
+          items={{ '': 'All categories', ...Object.fromEntries(CATEGORIES.map((c) => [c, SERVICE_REQUEST_CATEGORY_LABELS[c] ?? c])) }}
           value={category}
           onValueChange={(v) => setCategory((v as ServiceRequestCategory) ?? '')}
         >
@@ -149,7 +150,7 @@ export function ServiceRequestsPage() {
           <SelectContent>
             <SelectItem value="">All categories</SelectItem>
             {CATEGORIES.map((c) => (
-              <SelectItem key={c} value={c}>{c.replace('_', ' ')}</SelectItem>
+              <SelectItem key={c} value={c}>{SERVICE_REQUEST_CATEGORY_LABELS[c] ?? c}</SelectItem>
             ))}
           </SelectContent>
         </Select>

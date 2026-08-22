@@ -29,7 +29,7 @@ import { DataTable, type Column } from '@/components/shared/DataTable'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { leaveApi } from '@/api/leave.api'
-import type { LeaveApplication, LeaveBalance, LeavePolicy } from '@/types/leave.types'
+import type { LeaveApplication, LeaveBalance } from '@/types/leave.types'
 import { LEAVE_TYPE_LABELS } from '@/lib/constants'
 import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
@@ -38,7 +38,7 @@ import { toast } from 'sonner'
 
 const schema = z
   .object({
-    leavePolicyId: z.string().min(1, 'Leave type is required'),
+    leavePolicyTypeId: z.string().min(1, 'Leave type is required'),
     fromDate: z.string().min(1, 'From date is required'),
     toDate: z.string().min(1, 'To date is required'),
     days: z.preprocess(
@@ -83,12 +83,6 @@ export function LeavePage() {
     enabled: canApply,
   })
 
-  const { data: policiesData } = useQuery({
-    queryKey: ['leave-policies-active'],
-    queryFn: () => leaveApi.getPolicies(),
-    enabled: canApply,
-  })
-
   const { data, isLoading } = useQuery({
     queryKey: ['my-leave-applications', { page, limit }],
     queryFn: () => leaveApi.myList({ page, limit }),
@@ -97,13 +91,12 @@ export function LeavePage() {
 
   const applications: LeaveApplication[] = (data as { data?: LeaveApplication[] })?.data ?? []
   const meta = (data as { meta?: { total: number; page: number; limit: number; totalPages: number } })?.meta
-  const policies: LeavePolicy[] = Array.isArray(policiesData) ? policiesData : (policiesData as { data?: LeavePolicy[] })?.data ?? []
   const balanceList: LeaveBalance[] = balances ?? []
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
   })
-  const selectedPolicyId = watch('leavePolicyId')
+  const selectedPolicyTypeId = watch('leavePolicyTypeId')
   const watchedFromDate = watch('fromDate')
   const watchedToDate = watch('toDate')
 
@@ -113,14 +106,14 @@ export function LeavePage() {
   }, [watchedFromDate, watchedToDate, setValue])
 
   const openApply = () => {
-    reset({ leavePolicyId: '', fromDate: '', toDate: '', days: undefined, reason: '' })
+    reset({ leavePolicyTypeId: '', fromDate: '', toDate: '', days: undefined, reason: '' })
     setOpen(true)
   }
 
   const { mutate: apply, isPending } = useMutation({
     mutationFn: (values: FormValues) =>
       leaveApi.apply({
-        leavePolicyId: values.leavePolicyId,
+        leavePolicyTypeId: values.leavePolicyTypeId,
         fromDate: values.fromDate,
         toDate: values.toDate,
         days: values.days,
@@ -148,9 +141,9 @@ export function LeavePage() {
 
   const columns: Column<LeaveApplication>[] = [
     {
-      key: 'leavePolicy',
+      key: 'leavePolicyType',
       header: 'Leave Type',
-      render: (row) => row.leavePolicy?.name ?? LEAVE_TYPE_LABELS[row.leavePolicy?.leaveType ?? ''] ?? '—',
+      render: (row) => row.leavePolicyType?.name ?? LEAVE_TYPE_LABELS[row.leavePolicyType?.leaveType ?? ''] ?? '—',
     },
     { key: 'fromDate', header: 'From', render: (row) => formatDate(row.fromDate) },
     { key: 'toDate', header: 'To', render: (row) => formatDate(row.toDate) },
@@ -214,7 +207,7 @@ export function LeavePage() {
             <Card key={b.id} className="shadow-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-semibold">
-                  {b.leavePolicy?.name ?? LEAVE_TYPE_LABELS[b.leavePolicy?.leaveType ?? ''] ?? 'Leave'}
+                  {b.leavePolicyType?.name ?? LEAVE_TYPE_LABELS[b.leavePolicyType?.leaveType ?? ''] ?? 'Leave'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -245,20 +238,29 @@ export function LeavePage() {
           </SheetHeader>
           <form onSubmit={handleSubmit((v) => apply(v))} className="flex flex-col gap-4 px-4 flex-1 overflow-y-auto">
             <div className="space-y-1.5">
-              <Label htmlFor="leavePolicyId">Leave Type *</Label>
+              <Label htmlFor="leavePolicyTypeId">Leave Type *</Label>
               <Select
-                items={Object.fromEntries(policies.map((p) => [p.id, p.name]))}
-                value={selectedPolicyId ?? ''}
-                onValueChange={(v) => setValue('leavePolicyId', v ?? '')}
+                items={Object.fromEntries(
+                  balanceList
+                    .filter((b) => b.leavePolicyType)
+                    .map((b) => [
+                      b.leavePolicyType!.id,
+                      `${b.leavePolicyType!.name ?? LEAVE_TYPE_LABELS[b.leavePolicyType!.leaveType] ?? b.leavePolicyType!.leaveType} (${b.balanceDays} left)`,
+                    ]),
+                )}
+                value={selectedPolicyTypeId ?? ''}
+                onValueChange={(v) => setValue('leavePolicyTypeId', v ?? '')}
               >
                 <SelectTrigger className="w-full"><SelectValue placeholder="Select leave type" /></SelectTrigger>
                 <SelectContent>
-                  {policies.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  {balanceList.filter((b) => b.leavePolicyType).map((b) => (
+                    <SelectItem key={b.leavePolicyType!.id} value={b.leavePolicyType!.id}>
+                      {b.leavePolicyType!.name ?? LEAVE_TYPE_LABELS[b.leavePolicyType!.leaveType] ?? b.leavePolicyType!.leaveType} ({b.balanceDays} left)
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.leavePolicyId && <p className="text-xs text-destructive">{errors.leavePolicyId.message}</p>}
+              {errors.leavePolicyTypeId && <p className="text-xs text-destructive">{errors.leavePolicyTypeId.message}</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="fromDate">From Date *</Label>

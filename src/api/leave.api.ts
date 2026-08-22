@@ -1,6 +1,5 @@
 import { apiClient, unwrap } from './client'
 import type {
-  LeavePolicy,
   LeaveBalance,
   LeaveApplication,
   Holiday,
@@ -59,5 +58,3 @@ export const leaveApi = {
   deleteHoliday: (id: string) =>
     apiClient.delete(`/leave/holidays/${id}`).then(unwrap),
 }
-
-export type { LeavePolicy }

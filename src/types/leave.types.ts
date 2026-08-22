@@ -9,29 +9,25 @@ export type LeaveType =
 
 export type LeaveStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED'
 
-export interface LeavePolicy {
+// A single leave type row within an employee's assigned LeavePolicy bundle
+// (e.g. CL, SL, PL). Applications and balances now reference this, not the
+// bundle itself — see leavePolicyTypeId below.
+export interface LeavePolicyTypeRef {
   id: string
-  name: string
+  name?: string | null
   leaveType: LeaveType
-  daysPerYear: number
-  carryForwardMax: number
-  accrualType: string
-  isActive: boolean
-  minAdvanceDays: number
-  maxConsecutiveDays?: number | null
-  allowedInProbation: boolean
 }
 
 export interface LeaveBalance {
   id: string
   employeeId: string
-  leavePolicyId: string
+  leavePolicyTypeId: string
   year: number
   entitledDays: number
   takenDays: number
   carriedForwardDays: number
   balanceDays: number
-  leavePolicy?: LeavePolicy
+  leavePolicyType?: LeavePolicyTypeRef
 }
 
 export interface LeaveEmployeeRef {
@@ -44,7 +40,7 @@ export interface LeaveEmployeeRef {
 export interface LeaveApplication {
   id: string
   employeeId: string
-  leavePolicyId: string
+  leavePolicyTypeId: string
   fromDate: string
   toDate: string
   days: number
@@ -55,7 +51,7 @@ export interface LeaveApplication {
   appliedAt: string
   decidedAt?: string | null
   employee?: LeaveEmployeeRef
-  leavePolicy?: LeavePolicy
+  leavePolicyType?: LeavePolicyTypeRef
 }
 
 export type HolidayType = 'NATIONAL' | 'OPTIONAL'
@@ -77,7 +73,7 @@ export interface CreateHolidayDto {
 export type UpdateHolidayDto = Partial<CreateHolidayDto>
 
 export interface ApplyLeaveDto {
-  leavePolicyId: string
+  leavePolicyTypeId: string
   fromDate: string
   toDate: string
   days: number
