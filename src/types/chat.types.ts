@@ -1,5 +1,12 @@
 export type ChatRoomType = 'DIRECT' | 'GROUP' | 'DEPARTMENT'
 
+export interface ChatEmployeeRef {
+  id: string
+  empCode: string
+  firstName: string
+  lastName: string
+}
+
 export type ChatMessageType = 'TEXT' | 'FILE' | 'SYSTEM'
 
 export interface ChatMessage {

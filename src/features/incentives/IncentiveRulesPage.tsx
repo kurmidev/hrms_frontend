@@ -30,7 +30,7 @@ type FormValues = z.infer<typeof schema>
 export function IncentiveRulesPage() {
   const qc = useQueryClient()
   const { page, limit, setPage } = usePagination()
-  const canManage = usePermission('todo:approve')
+  const canManage = usePermission('incentive:manage')
   const [open, setOpen] = useState(false)
   const [editItem, setEditItem] = useState<IncentiveRule | null>(null)
 

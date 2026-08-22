@@ -14,10 +14,13 @@ import type { DashboardKpis } from '@/types/reports.types'
 import { formatDate } from '@/lib/utils'
 import { usePermission } from '@/hooks/usePermission'
 import {
-  KpiWidgetCard, EmployeeStatusChartCard, DepartmentHeadcountChartCard, RecentJoinersTableCard,
+  KpiWidgetCard, KpiSolidStrip, EmployeeStatusChartCard, DepartmentHeadcountChartCard, RecentJoinersTableCard,
   PendingLoansTableCard, PendingLeavesTableCard, ActivityPlaceholderCard, ClockCheckinCard,
-  ShieldPlaceholderCard, UnknownWidgetCard,
+  ShieldPlaceholderCard, UnknownWidgetCard, LiveTrackingWidget, LoanLeaveSummaryWidget, NotificationsWidget,
+  MyTodosWidget, GreenThanksWidget,
 } from './DashboardWidgets'
+import { NoticeBoardWidget } from './widgets/NoticeBoardWidget'
+import { HolidaysWidget } from './widgets/HolidaysWidget'
 
 const OPEN_TODO_STATUSES = new Set(['PENDING', 'SUBMITTED'])
 const MAX_DASHBOARD_TODOS = 5
@@ -70,6 +73,18 @@ function renderWidget(widget: DashboardWidget, kpis: DashboardKpis | undefined, 
       return <ClockCheckinCard widget={widget} />
     case 'activity_recent':
       return <ActivityPlaceholderCard widget={widget} />
+    case 'map_live_tracking':
+      return <LiveTrackingWidget widget={widget} />
+    case 'table_loan_leave_summary':
+      return <LoanLeaveSummaryWidget widget={widget} />
+    case 'list_notifications':
+      return <NotificationsWidget widget={widget} />
+    case 'list_my_todos':
+      return <MyTodosWidget widget={widget} />
+    case 'widget_green_thanks':
+      return <GreenThanksWidget widget={widget} />
+    case 'list_notices':
+      return <NoticeBoardWidget />
     case 'chart_payroll_trend':
     case 'table_late_arrivals':
     case 'schedule_upcoming':
@@ -81,11 +96,14 @@ function renderWidget(widget: DashboardWidget, kpis: DashboardKpis | undefined, 
 
 export function DashboardPage() {
   const user = useAuthStore((s) => s.user)
-  // GET /todos requires todo:create server-side (see TodosController) — several
-  // seeded roles (hr_manager, finance_manager, dept_manager, field_supervisor,
-  // it_admin) do NOT hold it, so this widget must self-gate with the exact same
-  // permission string rather than firing a request that always 403s for them.
-  const canSeeTasks = usePermission('todo:create')
+  // GET /todos requires todo:read server-side (see TodosController @Get()) —
+  // several seeded roles (hr_manager, finance_manager, it_admin) do NOT hold
+  // it, so this widget must self-gate with the exact same permission string
+  // rather than firing a request that always 403s for them. Do NOT gate on
+  // todo:create here — dept_manager/field_supervisor hold todo:read (and can
+  // legitimately call this endpoint) but not todo:create, so gating on the
+  // wrong string silently hides a widget they're allowed to see.
+  const canSeeTasks = usePermission('todo:read')
 
   const { data: dashboardConfigs, isLoading: configLoading } = useQuery({
     queryKey: ['dashboards'],
@@ -97,19 +115,27 @@ export function DashboardPage() {
     queryFn: () => dashboardApi.kpis(),
   })
 
+  const roleNames = (user?.roles ?? []).map((r) => r.name)
+  const config = selectDashboardConfig(dashboardConfigs ?? [], user?.id, roleNames)
+  const widgets = (config?.widgets ?? []).slice().sort((a, b) => a.position - b.position)
+
+  // The widget grid can now itself render notices (`list_notices`) and todos
+  // (`list_my_todos`) — avoid showing the hardcoded bottom-row Notice Board
+  // and top "My Tasks" block a second time for roles whose config already
+  // includes them, while still keeping the hardcoded fallbacks for roles
+  // whose dashboard config doesn't.
+  const hasNoticesWidget = widgets.some((w) => w.widgetType === 'list_notices')
+  const hasTodosWidget = widgets.some((w) => w.widgetType === 'list_my_todos')
+
   const { data: todosData, isLoading: todosLoading } = useQuery({
     queryKey: ['dashboard-my-todos'],
     queryFn: () => todosApi.list({ limit: 20 }),
-    enabled: canSeeTasks,
+    enabled: canSeeTasks && !hasTodosWidget,
   })
 
   const myTodos: TodoTask[] = ((todosData as { data?: TodoTask[] })?.data ?? [])
     .filter((t) => OPEN_TODO_STATUSES.has(t.status))
     .slice(0, MAX_DASHBOARD_TODOS)
-
-  const roleNames = (user?.roles ?? []).map((r) => r.name)
-  const config = selectDashboardConfig(dashboardConfigs ?? [], user?.id, roleNames)
-  const widgets = (config?.widgets ?? []).slice().sort((a, b) => a.position - b.position)
 
   return (
     <div className="space-y-6">
@@ -129,9 +155,10 @@ export function DashboardPage() {
         </button>
       </div>
 
-      {/* My Tasks widget — only rendered for roles holding todo:create (matches
-          GET /todos' server-side @RequirePermissions) */}
-      {canSeeTasks && (
+      {/* My Tasks widget — only rendered for roles holding todo:read (matches
+          GET /todos' server-side @RequirePermissions), and only when the
+          widget grid below doesn't already render `list_my_todos`. */}
+      {canSeeTasks && !hasTodosWidget && (
         <Card className="shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -176,6 +203,10 @@ export function DashboardPage() {
         </Card>
       )}
 
+      {/* Tier-2 solid-block KPI strip — see KpiSolidStrip for why this is a
+          dedicated strip rather than classifying individual widget types. */}
+      <KpiSolidStrip kpis={kpis} isLoading={kpisLoading} />
+
       {/* Role-aware widget grid — driven entirely by the user's DashboardConfig
           (personal config, else role-default) from GET /dashboards. */}
       {configLoading ? (
@@ -198,6 +229,14 @@ export function DashboardPage() {
           ))}
         </div>
       )}
+
+      {/* Notice Board + Holidays — bottom row, reusing existing APIs only.
+          Notice Board is skipped here when the widget grid above already
+          renders it via a `list_notices` widget, to avoid showing it twice. */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {!hasNoticesWidget && <NoticeBoardWidget />}
+        <HolidaysWidget />
+      </div>
     </div>
   )
 }

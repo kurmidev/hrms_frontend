@@ -64,7 +64,7 @@ export function ExitDetailPage() {
       })
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['exit', id] })
+      qc.invalidateQueries({ queryKey: ['exit'] })
       toast.success('Clearance updated.')
     },
     onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to update clearance.')),
@@ -78,7 +78,7 @@ export function ExitDetailPage() {
     },
     onSuccess: (summary) => {
       setSettlementSummary(summary)
-      qc.invalidateQueries({ queryKey: ['exit', id] })
+      qc.invalidateQueries({ queryKey: ['exit'] })
       toast.success('Settlement processed. Employee marked as exited.')
     },
     onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to process settlement.')),

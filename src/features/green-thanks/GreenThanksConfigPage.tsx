@@ -29,7 +29,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>
 
 export function GreenThanksConfigPage() {
-  const canManage = usePermission('payroll:run')
+  const canManage = usePermission('green_thanks:manage')
   const qc = useQueryClient()
 
   const { data: config, isLoading } = useQuery({

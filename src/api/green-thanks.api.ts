@@ -7,6 +7,7 @@ import type {
   UpdateGreenThanksConfigInput,
   GreenThanksDirection,
   GreenThanksStatus,
+  GreenThanksEmployeeRef,
 } from '@/types/green-thanks.types'
 import type { PaginationParams } from '@/types/api.types'
 
@@ -19,6 +20,9 @@ interface GreenThanksParams extends PaginationParams {
 export const greenThanksApi = {
   list: (params?: GreenThanksParams) =>
     apiClient.get('/green-thanks', { params }).then(unwrap),
+
+  listRecipients: () =>
+    apiClient.get<{ data: GreenThanksEmployeeRef[] }>('/green-thanks/recipients').then(unwrap<GreenThanksEmployeeRef[]>),
 
   send: (data: CreateGreenThanksInput) =>
     apiClient.post<{ data: GreenThanks }>('/green-thanks', data).then(unwrap<GreenThanks>),

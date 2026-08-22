@@ -26,6 +26,13 @@ export interface GreenThanks {
   createdAt: string
 }
 
+export interface GreenThanksEmployeeRef {
+  id: string
+  empCode: string
+  firstName: string
+  lastName: string
+}
+
 export interface CreateGreenThanksInput {
   toEmployeeId: string
   points: number

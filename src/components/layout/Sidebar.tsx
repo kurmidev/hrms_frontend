@@ -1,17 +1,19 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Building2, Shield, GitBranch,
   Briefcase, CalendarDays, CreditCard, Receipt, UserCheck,
   ChevronDown, ChevronRight, X, Ticket, BarChart3, Settings,
   ClipboardCheck, HeartHandshake, Megaphone, MessageSquareText, Target,
-  AlertOctagon, DoorOpen, HeartPulse,
+  AlertOctagon, DoorOpen, HeartPulse, Power,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, getInitials, getFullName } from '@/lib/utils'
 import { useUiStore } from '@/store/ui.store'
 import { useAuthStore } from '@/store/auth.store'
+import { authApi } from '@/api/auth.api'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useState } from 'react'
 
-interface NavItem {
+export interface NavItem {
   label: string
   href: string
   icon: React.ElementType
@@ -19,7 +21,7 @@ interface NavItem {
   children?: { label: string; href: string; permission?: string }[]
 }
 
-const NAV_ITEMS: NavItem[] = [
+export const NAV_ITEMS: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/',
@@ -112,7 +114,7 @@ const NAV_ITEMS: NavItem[] = [
     permission: 'profile:read',
     children: [
       { label: 'Green Thanks', href: '/green-thanks', permission: 'profile:read' },
-      { label: 'Config', href: '/green-thanks/config', permission: 'payroll:run' },
+      { label: 'Config', href: '/green-thanks/config', permission: 'green_thanks:manage' },
     ],
   },
   {
@@ -194,11 +196,23 @@ const NAV_ITEMS: NavItem[] = [
 
 export function Sidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { sidebarOpen, setSidebarOpen } = useUiStore()
-  const { hasPermission, user } = useAuthStore()
+  const { hasPermission, user, logout } = useAuthStore()
   const organizationLogoUrl = user?.organizationLogoUrl
   const organizationName = user?.organizationName
   const [expanded, setExpanded] = useState<string[]>(['/organization'])
+
+  const userName = user?.employee
+    ? getFullName(user.employee.firstName, user.employee.lastName)
+    : user?.email ?? 'User'
+  const userRole = user?.roles?.[0]?.name ?? 'User'
+
+  const handleLogout = async () => {
+    try { await authApi.logout() } catch { /* ignore */ }
+    logout()
+    navigate('/login')
+  }
 
   const toggleExpanded = (href: string) => {
     setExpanded((prev) =>
@@ -279,6 +293,38 @@ export function Sidebar() {
             </button>
           )}
         </div>
+
+        {/* User mini-profile */}
+        {sidebarOpen && (
+          <div className="flex items-center gap-2.5 px-3 py-3 border-b border-sidebar-border flex-shrink-0">
+            <Avatar className="h-9 w-9 flex-shrink-0">
+              <AvatarImage src={user?.employee?.profilePhotoUrl ?? undefined} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+                {getInitials(userName.split(' ')[0] ?? '', userName.split(' ')[1])}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-sidebar-foreground truncate">{userName}</p>
+              <p className="text-xs text-sidebar-foreground/50 truncate">{userRole}</p>
+            </div>
+            <div className="flex items-center gap-0.5 flex-shrink-0">
+              <button
+                onClick={() => navigate('/settings/sessions')}
+                title="Settings"
+                className="h-7 w-7 flex items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+              >
+                <Settings className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={handleLogout}
+                title="Log out"
+                className="h-7 w-7 flex items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-accent-red transition-colors"
+              >
+                <Power className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-3 scrollbar-thin">

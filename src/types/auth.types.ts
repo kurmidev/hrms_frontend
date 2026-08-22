@@ -17,6 +17,7 @@ export interface AuthUser {
     empCode: string
     department: string | null
     designation: string | null
+    status: 'PRE_BOARDING' | 'ACTIVE' | 'ON_LEAVE' | 'SUSPENDED' | 'EXITED'
   } | null
   roles: Array<{ id: string; name: string }>
   permissions: string[]

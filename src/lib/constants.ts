@@ -78,6 +78,7 @@ export const ATTENDANCE_STATUS_LABELS: Record<string, string> = {
   ON_LEAVE: 'On Leave',
   HOLIDAY: 'Holiday',
   WEEK_OFF: 'Week Off',
+  ON_DUTY: 'On Duty',
 }
 
 export const ATTENDANCE_STATUS_COLORS: Record<string, string> = {
@@ -88,6 +89,7 @@ export const ATTENDANCE_STATUS_COLORS: Record<string, string> = {
   ON_LEAVE: 'bg-blue-100 text-blue-700',
   HOLIDAY: 'bg-violet-100 text-violet-700',
   WEEK_OFF: 'bg-slate-100 text-slate-600',
+  ON_DUTY: 'bg-cyan-100 text-cyan-700',
 }
 
 export const PAYROLL_RUN_STATUS_LABELS: Record<string, string> = {

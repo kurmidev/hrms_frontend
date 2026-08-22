@@ -26,7 +26,7 @@ export function PerformanceCyclesPage() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const { page, limit, setPage } = usePagination()
-  const canApprove = usePermission('payroll:approve')
+  const canApprove = usePermission('performance:manage')
 
   const [status, setStatus] = useState<PerformanceCycleStatus | ''>('')
   const [createOpen, setCreateOpen] = useState(false)

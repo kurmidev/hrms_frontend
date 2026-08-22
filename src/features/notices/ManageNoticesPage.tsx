@@ -25,7 +25,7 @@ const STATUS_COLORS: Record<string, string> = {
 export function ManageNoticesPage() {
   const qc = useQueryClient()
   const { page, limit, setPage } = usePagination()
-  const canManage = usePermission('onboarding:manage')
+  const canManage = usePermission('notice:manage')
   const [status, setStatus] = useState<NoticeStatus | ''>('')
   const [formOpen, setFormOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Notice | null>(null)

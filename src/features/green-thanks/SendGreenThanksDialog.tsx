@@ -10,8 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { greenThanksApi } from '@/api/green-thanks.api'
-import { employeesApi } from '@/api/employees.api'
-import type { Employee } from '@/types/employee.types'
+import type { GreenThanksEmployeeRef } from '@/types/green-thanks.types'
 import { toast } from 'sonner'
 import { getApiErrorMessage } from '@/lib/utils'
 
@@ -33,12 +32,11 @@ interface Props {
 export function SendGreenThanksDialog({ open, onOpenChange }: Props) {
   const qc = useQueryClient()
 
-  const { data: employeesData } = useQuery({
-    queryKey: ['employees', { forSelect: true }],
-    queryFn: () => employeesApi.list({ limit: 100 }),
+  const { data: employees = [] } = useQuery<GreenThanksEmployeeRef[]>({
+    queryKey: ['green-thanks-recipients'],
+    queryFn: () => greenThanksApi.listRecipients(),
     enabled: open,
   })
-  const employees = (employeesData as { data?: Employee[] })?.data ?? []
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,

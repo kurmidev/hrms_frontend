@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
   Users, UserCheck, Shield, CreditCard, Clock, TrendingUp, BarChart3, ArrowRight,
-  Wallet2, Ticket, Package, Star, CalendarClock, Activity, Radar,
+  Wallet2, Ticket, Package, Star, CalendarClock, Activity, Radar, ListTodo, Sparkles,
+  HandCoins,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -11,12 +12,16 @@ import { employeesApi } from '@/api/employees.api'
 import { loanApi } from '@/api/loan.api'
 import { leaveApi } from '@/api/leave.api'
 import { attendanceApi } from '@/api/attendance.api'
-import type { AttendanceLog } from '@/types/attendance.types'
+import { todosApi } from '@/api/incentives.api'
+import { greenThanksApi } from '@/api/green-thanks.api'
+import type { AttendanceLog, LiveLocation } from '@/types/attendance.types'
 import type { DashboardWidget } from '@/types/dashboard.types'
 import type { DashboardKpis } from '@/types/reports.types'
 import type { Employee, EmployeeStats } from '@/types/employee.types'
 import type { Loan } from '@/types/loan.types'
 import type { LeaveApplication } from '@/types/leave.types'
+import type { TodoTask } from '@/types/incentives.types'
+import type { GreenThanks } from '@/types/green-thanks.types'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
@@ -42,49 +47,56 @@ interface KpiCardConfig {
   format: (kpis: DashboardKpis) => string | number
 }
 
+// Recolored to the brand family (primary green / charcoal-neutral / accent
+// orange / accent red) instead of the reference's blue/teal/indigo/purple
+// defaults — grouped so related KPIs read as a coherent set:
+//   - primary green  → headcount/people metrics (total, active, on-leave)
+//   - charcoal/neutral → operational/financial metrics (attendance, payroll, loans)
+//   - accent orange  → approvals/attention metrics (pending approvals, tickets, assets)
+//   - accent red     → "my" personal metrics that need the user's attention (leave balance, performance)
 const KPI_WIDGET_CONFIG: Record<string, KpiCardConfig> = {
   kpi_total_employees: {
-    title: 'Total Employees', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50', href: '/employees',
+    title: 'Total Employees', icon: Users, color: 'text-primary', bg: 'bg-primary/10', href: '/employees',
     format: (k) => k.kpi_total_employees ?? 0,
   },
   kpi_active_employees: {
-    title: 'Active Employees', icon: UserCheck, color: 'text-emerald-600', bg: 'bg-emerald-50', href: '/employees?status=active',
+    title: 'Active Employees', icon: UserCheck, color: 'text-primary', bg: 'bg-primary/10', href: '/employees?status=active',
     format: (k) => k.kpi_active_employees ?? 0,
   },
   kpi_on_leave: {
-    title: 'On Leave Today', icon: CalendarClock, color: 'text-amber-600', bg: 'bg-amber-50', href: '/leave',
+    title: 'On Leave Today', icon: CalendarClock, color: 'text-primary', bg: 'bg-primary/10', href: '/leave',
     format: (k) => k.kpi_on_leave ?? 0,
   },
   kpi_attendance_rate: {
-    title: 'Attendance %', icon: BarChart3, color: 'text-purple-600', bg: 'bg-purple-50', href: '/attendance',
+    title: 'Attendance %', icon: BarChart3, color: 'text-foreground', bg: 'bg-foreground/10', href: '/attendance',
     format: (k) => (k.kpi_attendance_rate != null ? `${k.kpi_attendance_rate}%` : '—'),
   },
   kpi_pending_approvals: {
-    title: 'Pending Approvals', icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', href: '/performance/kpis',
+    title: 'Pending Approvals', icon: Clock, color: 'text-accent-orange', bg: 'bg-accent-orange/10', href: '/performance/kpis',
     format: (k) => k.kpi_pending_approvals ?? 0,
   },
   kpi_payroll_total: {
-    title: 'Payroll Cost', icon: CreditCard, color: 'text-emerald-600', bg: 'bg-emerald-50',
+    title: 'Payroll Cost', icon: CreditCard, color: 'text-foreground', bg: 'bg-foreground/10',
     format: (k) => (k.kpi_payroll_total != null ? formatCurrency(k.kpi_payroll_total) : '—'),
   },
   kpi_open_loans: {
-    title: 'Active Loans', icon: TrendingUp, color: 'text-indigo-600', bg: 'bg-indigo-50', href: '/loans',
+    title: 'Active Loans', icon: TrendingUp, color: 'text-foreground', bg: 'bg-foreground/10', href: '/loans',
     format: (k) => k.kpi_open_loans ?? 0,
   },
   kpi_open_assets: {
-    title: 'Open Assets', icon: Package, color: 'text-cyan-600', bg: 'bg-cyan-50', href: '/assets',
+    title: 'Open Assets', icon: Package, color: 'text-accent-orange', bg: 'bg-accent-orange/10', href: '/assets',
     format: (k) => k.kpi_open_assets ?? 0,
   },
   kpi_open_tickets: {
-    title: 'Open Tickets', icon: Ticket, color: 'text-rose-600', bg: 'bg-rose-50', href: '/service-requests',
+    title: 'Open Tickets', icon: Ticket, color: 'text-accent-orange', bg: 'bg-accent-orange/10', href: '/service-requests',
     format: (k) => k.kpi_open_tickets ?? 0,
   },
   kpi_my_leave_balance: {
-    title: 'My Leave Balance', icon: Wallet2, color: 'text-teal-600', bg: 'bg-teal-50', href: '/leave/my',
+    title: 'My Leave Balance', icon: Wallet2, color: 'text-accent-red', bg: 'bg-accent-red/10', href: '/leave/my',
     format: (k) => (k.kpi_my_leave_balance != null ? k.kpi_my_leave_balance : '—'),
   },
   kpi_my_performance: {
-    title: 'My Performance', icon: Star, color: 'text-orange-600', bg: 'bg-orange-50', href: '/performance/kpis',
+    title: 'My Performance', icon: Star, color: 'text-accent-red', bg: 'bg-accent-red/10', href: '/performance/kpis',
     format: (k) => (k.kpi_my_performance != null ? k.kpi_my_performance : '—'),
   },
 }
@@ -103,26 +115,25 @@ export function KpiWidgetCard({ widget, kpis, isLoading }: KpiCardProps) {
   const numericValue = typeof rawValue === 'number' ? rawValue : parseFloat(String(rawValue))
   const isLinkable = !!cfg.href && !Number.isNaN(numericValue) && numericValue > 0
 
+  // Tier-1 compact treatment: icon in a filled circular badge, a big number,
+  // a label, and a small "View X" link underneath — matching the reference
+  // layout's top KPI row structure while using our recolored brand palette.
   const content = (
     <CardContent className="p-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{widget.title || cfg.title}</p>
-          {isLoading ? (
-            <Skeleton className="h-8 w-16 mt-1" />
-          ) : (
-            <p className="text-3xl font-bold text-foreground mt-1">{rawValue ?? '—'}</p>
-          )}
-          {isLinkable && !isLoading && (
-            <span className="flex items-center gap-1 text-xs font-medium text-primary mt-1.5">
-              View details <ArrowRight className="h-3 w-3" />
-            </span>
-          )}
-        </div>
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${cfg.bg}`}>
-          <cfg.icon className={`h-6 w-6 ${cfg.color}`} />
-        </div>
+      <div className={`w-11 h-11 rounded-full flex items-center justify-center ${cfg.bg} mb-3`}>
+        <cfg.icon className={`h-5 w-5 ${cfg.color}`} />
       </div>
+      {isLoading ? (
+        <Skeleton className="h-8 w-16" />
+      ) : (
+        <p className="text-2xl font-bold text-foreground">{rawValue ?? '—'}</p>
+      )}
+      <p className="text-sm text-muted-foreground mt-0.5">{widget.title || cfg.title}</p>
+      {isLinkable && !isLoading && (
+        <span className="flex items-center gap-1 text-xs font-medium text-primary mt-1.5">
+          View {cfg.title.toLowerCase()} <ArrowRight className="h-3 w-3" />
+        </span>
+      )}
     </CardContent>
   )
 
@@ -134,6 +145,47 @@ export function KpiWidgetCard({ widget, kpis, isLoading }: KpiCardProps) {
     )
   }
   return <Card className="shadow-sm">{content}</Card>
+}
+
+interface SolidKpiBlock {
+  label: string
+  value: string | number
+  bg: string
+}
+
+interface KpiSolidStripProps {
+  kpis?: DashboardKpis
+  isLoading: boolean
+}
+
+// Tier-2 treatment: reference has a second row of larger SOLID-COLOR blocks
+// (big centered number + label, no icon). Rather than trying to classify
+// which `kpi_*` widget types are "tier 2" (adds real complexity for no real
+// benefit, since the widget grid is role-driven and varies per config), we
+// render a dedicated 3-block strip here derived from the same `kpis` values
+// already fetched for the tier-1 cards — three brand-colored solid blocks:
+// primary green, charcoal, accent orange.
+export function KpiSolidStrip({ kpis, isLoading }: KpiSolidStripProps) {
+  const blocks: SolidKpiBlock[] = [
+    { label: 'Total Employees', value: kpis?.kpi_total_employees ?? 0, bg: 'bg-primary' },
+    { label: 'On Leave Today', value: kpis?.kpi_on_leave ?? 0, bg: 'bg-foreground' },
+    { label: 'Pending Approvals', value: kpis?.kpi_pending_approvals ?? 0, bg: 'bg-accent-orange' },
+  ]
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {blocks.map((block) => (
+        <div key={block.label} className={`rounded-xl ${block.bg} px-6 py-7 flex flex-col items-center justify-center text-center shadow-sm`}>
+          {isLoading ? (
+            <Skeleton className="h-9 w-16 bg-white/30" />
+          ) : (
+            <p className="text-4xl font-bold text-white">{block.value}</p>
+          )}
+          <p className="text-sm font-medium text-white/90 mt-1.5">{block.label}</p>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export function EmployeeStatusChartCard({ widget }: { widget: DashboardWidget }) {
@@ -374,6 +426,254 @@ export function ClockCheckinCard({ widget }: { widget: DashboardWidget }) {
         <Link to="/attendance/my" className="flex items-center justify-center gap-1 text-xs font-medium text-primary hover:text-primary/80 mt-4">
           Go to Attendance <ArrowRight className="h-3.5 w-3.5" />
         </Link>
+      </CardContent>
+    </Card>
+  )
+}
+
+const OPEN_TODO_STATUSES = new Set(['PENDING', 'SUBMITTED'])
+const MAX_WIDGET_ROWS = 5
+
+// NOTE: this is a compact list, not a literal map. No map library (Leaflet,
+// Mapbox, Google Maps, etc.) is installed and none is being added just for
+// this single dashboard widget — `map_live_tracking` renders the same
+// `LiveLocation[]` data the /attendance/live page returns, as a table.
+export function LiveTrackingWidget({ widget }: { widget: DashboardWidget }) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['dashboard-live-tracking'],
+    queryFn: () => attendanceApi.getLive(),
+  })
+  const locations = ((data as { data?: LiveLocation[] })?.data ?? [])
+    .slice()
+    .sort((a, b) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime())
+    .slice(0, MAX_WIDGET_ROWS)
+
+  return (
+    <Card className="shadow-sm h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Radar className="h-4 w-4 text-primary" />
+          {widget.title || 'Live Tracking'}
+        </CardTitle>
+        <Link to="/attendance/live" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
+          View All <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+        ) : isError ? (
+          <p className="text-sm text-destructive py-4 text-center">Failed to load live locations.</p>
+        ) : locations.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4 text-center">No field staff currently checked in.</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {locations.map((loc) => (
+              <li key={loc.id} className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {loc.employee ? `${loc.employee.firstName} ${loc.employee.lastName}` : 'Unknown employee'}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {loc.locationName || `${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)}`}
+                  </p>
+                </div>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {new Date(loc.recordedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+export function LoanLeaveSummaryWidget({ widget }: { widget: DashboardWidget }) {
+  const { data: loanData, isLoading: loansLoading, isError: loansError } = useQuery({
+    queryKey: ['dashboard-pending-loans'],
+    queryFn: () => loanApi.list({ status: 'PENDING', limit: 5 }),
+  })
+  const { data: leaveData, isLoading: leavesLoading, isError: leavesError } = useQuery({
+    queryKey: ['dashboard-pending-leaves'],
+    queryFn: () => leaveApi.list({ status: 'PENDING', limit: 5 }),
+  })
+  const loans = (loanData as { data?: Loan[] })?.data ?? []
+  const applications = (leaveData as { data?: LeaveApplication[] })?.data ?? []
+
+  return (
+    <Card className="shadow-sm h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardTitle className="text-base flex items-center gap-2">
+          <HandCoins className="h-4 w-4 text-primary" />
+          {widget.title || 'Loan & Leave Summaries'}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pending Loans</p>
+            <Link to="/loans" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
+              View All <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          {loansLoading ? (
+            <div className="space-y-2">{Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-9 w-full" />)}</div>
+          ) : loansError ? (
+            <p className="text-xs text-destructive py-2 text-center">Failed to load pending loans.</p>
+          ) : loans.length === 0 ? (
+            <p className="text-xs text-muted-foreground py-2 text-center">No pending loan requests.</p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {loans.map((l) => (
+                <li key={l.id} className="flex items-center justify-between gap-3 py-1.5 first:pt-0 last:pb-0">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{l.employee?.firstName} {l.employee?.lastName}</p>
+                    <p className="text-xs text-muted-foreground">{formatCurrency(l.amountRequested)}</p>
+                  </div>
+                  <StatusBadge status={l.status} type="loan" />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pending Leaves</p>
+            <Link to="/leave" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
+              View All <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          {leavesLoading ? (
+            <div className="space-y-2">{Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-9 w-full" />)}</div>
+          ) : leavesError ? (
+            <p className="text-xs text-destructive py-2 text-center">Failed to load pending leaves.</p>
+          ) : applications.length === 0 ? (
+            <p className="text-xs text-muted-foreground py-2 text-center">No pending leave requests.</p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {applications.map((a) => (
+                <li key={a.id} className="flex items-center justify-between gap-3 py-1.5 first:pt-0 last:pb-0">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{a.employee?.firstName} {a.employee?.lastName}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(a.fromDate)} – {formatDate(a.toDate)}</p>
+                  </div>
+                  <StatusBadge status={a.status} type="leave" />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+// `list_notifications` reuses the recent-activity data source. A dedicated
+// in-app notification/reminder feed is a separate future feature — today the
+// notifications module is outbound email/SMS only, so recent activity is the
+// closest existing data source and this widget only relabels that card.
+export function NotificationsWidget({ widget }: { widget: DashboardWidget }) {
+  return (
+    <Card className="shadow-sm h-full">
+      <CardHeader><CardTitle className="text-base flex items-center gap-2"><Activity className="h-4 w-4 text-primary" />{widget.title || 'Notifications & Reminders'}</CardTitle></CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground py-4 text-center">Activity feed coming soon.</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+export function MyTodosWidget({ widget }: { widget: DashboardWidget }) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['dashboard-my-todos'],
+    queryFn: () => todosApi.list({ limit: 20 }),
+  })
+  const todos = ((data as { data?: TodoTask[] })?.data ?? [])
+    .filter((t) => OPEN_TODO_STATUSES.has(t.status))
+    .slice(0, MAX_WIDGET_ROWS)
+
+  return (
+    <Card className="shadow-sm h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardTitle className="text-base flex items-center gap-2">
+          <ListTodo className="h-4 w-4 text-primary" />
+          {widget.title || 'Todo List'}
+        </CardTitle>
+        <Link to="/incentives/todos" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
+          View All <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+        ) : isError ? (
+          <p className="text-sm text-destructive py-4 text-center">Failed to load your tasks.</p>
+        ) : todos.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4 text-center">No pending tasks.</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {todos.map((todo) => (
+              <li key={todo.id} className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{todo.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {todo.dueDate ? `Due ${formatDate(todo.dueDate)}` : 'No due date'}
+                  </p>
+                </div>
+                <StatusBadge status={todo.status} type="todo" />
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+export function GreenThanksWidget({ widget }: { widget: DashboardWidget }) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['dashboard-green-thanks'],
+    queryFn: () => greenThanksApi.list({ limit: 5 }),
+  })
+  const items = (data as { data?: GreenThanks[] })?.data ?? []
+
+  return (
+    <Card className="shadow-sm h-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-primary" />
+          {widget.title || 'Green Thanks'}
+        </CardTitle>
+        <Link to="/green-thanks" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
+          View All <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+        ) : isError ? (
+          <p className="text-sm text-destructive py-4 text-center">Failed to load Green Thanks.</p>
+        ) : items.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4 text-center">No Green Thanks yet.</p>
+        ) : (
+          <ul className="divide-y divide-border">
+            {items.map((gt) => (
+              <li key={gt.id} className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {gt.fromEmployee ? `${gt.fromEmployee.firstName} ${gt.fromEmployee.lastName}` : 'Someone'}
+                    {' → '}
+                    {gt.toEmployee ? `${gt.toEmployee.firstName} ${gt.toEmployee.lastName}` : 'Someone'}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">{gt.reason}</p>
+                </div>
+                <span className="text-xs font-semibold text-primary shrink-0">+{gt.points} pts</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </CardContent>
     </Card>
   )

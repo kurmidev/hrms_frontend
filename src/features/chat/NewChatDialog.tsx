@@ -8,11 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cn, getApiErrorMessage } from '@/lib/utils'
 import { chatApi } from '@/api/chat.api'
-import { employeesApi } from '@/api/employees.api'
 import { departmentsApi } from '@/api/departments.api'
-import type { Employee } from '@/types/employee.types'
 import type { Department } from '@/types/organization.types'
-import type { ChatRoom, ChatRoomType } from '@/types/chat.types'
+import type { ChatRoom, ChatRoomType, ChatEmployeeRef } from '@/types/chat.types'
 import { toast } from 'sonner'
 
 interface Props {
@@ -34,12 +32,11 @@ export function NewChatDialog({ open, onOpenChange, onCreated }: Props) {
   const [departmentId, setDepartmentId] = useState('')
   const [memberIds, setMemberIds] = useState<string[]>([])
 
-  const { data: employeesData } = useQuery({
-    queryKey: ['employees', { forSelect: true }],
-    queryFn: () => employeesApi.list({ limit: 100 }),
+  const { data: employees = [] } = useQuery<ChatEmployeeRef[]>({
+    queryKey: ['chat-employees'],
+    queryFn: () => chatApi.listEmployees(),
     enabled: open,
   })
-  const employees = (employeesData as { data?: Employee[] })?.data ?? []
 
   const { data: deptsData } = useQuery({
     queryKey: ['departments', { forSelect: true }],

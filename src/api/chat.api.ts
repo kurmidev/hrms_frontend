@@ -1,5 +1,5 @@
 import { apiClient, unwrap } from './client'
-import type { ChatRoom, ChatMessage, CreateRoomDto, SendMessageDto } from '@/types/chat.types'
+import type { ChatRoom, ChatMessage, ChatEmployeeRef, CreateRoomDto, SendMessageDto } from '@/types/chat.types'
 import type { PaginationParams } from '@/types/api.types'
 
 export const chatApi = {
@@ -8,6 +8,9 @@ export const chatApi = {
 
   listRooms: () =>
     apiClient.get<{ data: ChatRoom[] }>('/chat/rooms').then(unwrap<ChatRoom[]>),
+
+  listEmployees: () =>
+    apiClient.get<{ data: ChatEmployeeRef[] }>('/chat/employees').then(unwrap<ChatEmployeeRef[]>),
 
   getMessages: (roomId: string, params?: PaginationParams) =>
     apiClient.get(`/chat/rooms/${roomId}/messages`, { params }).then(unwrap),

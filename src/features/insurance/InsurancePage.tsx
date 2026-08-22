@@ -25,7 +25,7 @@ const APPROVAL_COLORS: Record<string, string> = {
 
 export function InsurancePage() {
   const qc = useQueryClient()
-  const canManage = usePermission('employee:update')
+  const canManage = usePermission('insurance:manage')
   const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
 
   const policyPagination = usePagination()
