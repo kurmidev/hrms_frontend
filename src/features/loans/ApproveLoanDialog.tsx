@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { loanApi } from '@/api/loan.api'
 import type { Loan } from '@/types/loan.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   interestRate: z.preprocess(
@@ -57,7 +58,7 @@ export function ApproveLoanDialog({ open, onOpenChange, loan }: Props) {
       reset()
       toast.success('Loan approved.')
     },
-    onError: () => toast.error('Failed to approve loan.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to approve loan.')),
   })
 
   return (

@@ -34,34 +34,34 @@ export function PlatformLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-slate-900 rounded-2xl p-8 border border-slate-800 shadow-2xl">
+    <div className="platform-shell min-h-screen bg-[var(--platform-bg)] flex items-center justify-center p-4">
+      <div className="w-full max-w-sm bg-[var(--platform-surface)] rounded-2xl p-8 border border-[var(--platform-border)] shadow-2xl">
         <div className="flex flex-col items-center gap-4 mb-8">
-          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-[var(--platform-accent)] rounded-xl flex items-center justify-center">
             <span className="text-white text-xl font-bold">H</span>
           </div>
           <div className="text-center">
             <h1 className="text-xl font-bold text-white">Platform Admin</h1>
-            <p className="text-slate-400 text-sm mt-1">HRMS Administration Portal</p>
+            <p className="text-[var(--platform-muted)] text-sm mt-1">HRMS Administration Portal</p>
           </div>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm text-slate-300 mb-1.5">Email</label>
+            <label className="block text-sm text-[var(--platform-text-soft)] mb-1.5">Email</label>
             <input
               {...register('email')}
               type="email"
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 placeholder:text-slate-500"
+              className="w-full bg-[var(--platform-raised)] border border-[var(--platform-input-border)] rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-[var(--platform-accent)] placeholder:text-[var(--platform-muted)]"
               placeholder="admin@platform.com"
             />
             {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
           </div>
           <div>
-            <label className="block text-sm text-slate-300 mb-1.5">Password</label>
+            <label className="block text-sm text-[var(--platform-text-soft)] mb-1.5">Password</label>
             <input
               {...register('password')}
               type="password"
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 placeholder:text-slate-500"
+              className="w-full bg-[var(--platform-raised)] border border-[var(--platform-input-border)] rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-[var(--platform-accent)] placeholder:text-[var(--platform-muted)]"
               placeholder="••••••••"
             />
             {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>}
@@ -69,7 +69,7 @@ export function PlatformLoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
+            className="w-full bg-[var(--platform-accent)] hover:bg-[var(--platform-accent-hover)] disabled:opacity-50 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
           >
             {isSubmitting ? 'Signing in...' : 'Sign In'}
           </button>

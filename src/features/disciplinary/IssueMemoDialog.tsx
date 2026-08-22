@@ -14,6 +14,7 @@ import { employeesApi } from '@/api/employees.api'
 import type { Employee } from '@/types/employee.types'
 import type { DisciplinaryActionType } from '@/types/disciplinary.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const MEMO_TYPES: DisciplinaryActionType[] = ['VERBAL_WARNING', 'WRITTEN_WARNING', 'DEMOTION', 'SUSPENSION']
 
@@ -75,7 +76,7 @@ export function IssueMemoDialog({ open, onOpenChange }: Props) {
         toast.success('Memo issued.')
       }
     },
-    onError: () => toast.error('Failed to issue memo.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to issue memo.')),
   })
 
   return (

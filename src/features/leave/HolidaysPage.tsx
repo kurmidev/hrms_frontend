@@ -27,7 +27,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { leaveApi } from '@/api/leave.api'
 import type { Holiday, HolidayType } from '@/types/leave.types'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { useAuthStore } from '@/store/auth.store'
 import { toast } from 'sonner'
 
@@ -35,7 +35,7 @@ const CURRENT_YEAR = 2026
 const YEAR_OPTIONS = [2024, 2025, 2026, 2027, 2028]
 
 const HOLIDAY_TYPE_COLORS: Record<HolidayType, string> = {
-  NATIONAL: 'bg-blue-100 text-blue-700',
+  NATIONAL: 'bg-green-100 text-green-700',
   OPTIONAL: 'bg-orange-100 text-orange-700',
 }
 
@@ -90,7 +90,7 @@ export function HolidaysPage() {
       setOpen(false)
       toast.success(editHoliday ? 'Holiday updated.' : 'Holiday created.')
     },
-    onError: () => toast.error('Failed to save holiday.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save holiday.')),
   })
 
   const { mutate: del, isPending: deleting } = useMutation({
@@ -100,7 +100,7 @@ export function HolidaysPage() {
       setDeleteHoliday(null)
       toast.success('Holiday deleted.')
     },
-    onError: () => toast.error('Failed to delete holiday.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to delete holiday.')),
   })
 
   const columns: Column<Holiday>[] = [

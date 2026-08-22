@@ -10,6 +10,7 @@ import type { GreenThanks, GreenThanksDirection, GreenThanksStatus } from '@/typ
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
+import { useAuthStore } from '@/store/auth.store'
 import { formatDate } from '@/lib/utils'
 import { SendGreenThanksDialog } from './SendGreenThanksDialog'
 import { ApproveGreenThanksDialog } from './ApproveGreenThanksDialog'
@@ -23,6 +24,7 @@ const STATUS_COLORS: Record<string, string> = {
 export function GreenThanksPage() {
   const { page, limit, setPage } = usePagination()
   const canApprove = usePermission('leave:approve')
+  const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
 
   const [direction, setDirection] = useState<GreenThanksDirection | ''>('')
   const [status, setStatus] = useState<GreenThanksStatus | ''>('')
@@ -103,9 +105,13 @@ export function GreenThanksPage() {
     {
       key: 'actions',
       header: '',
-      render: (row) => (
+      render: (row) => {
+        const isOwnRecord =
+          currentEmployeeId != null &&
+          (row.fromEmployeeId === currentEmployeeId || row.toEmployeeId === currentEmployeeId)
+        return (
         <div className="flex items-center gap-1">
-          {canApprove && row.status === 'pending' && (
+          {canApprove && row.status === 'pending' && !isOwnRecord && (
             <Button
               size="sm"
               variant="outline"
@@ -119,7 +125,8 @@ export function GreenThanksPage() {
             </Button>
           )}
         </div>
-      ),
+        )
+      },
     },
   ]
 

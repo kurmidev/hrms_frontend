@@ -41,8 +41,8 @@ export function NoticeBoardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-          <Megaphone className="h-5 w-5 text-blue-600" />
+        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+          <Megaphone className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">Notice Board</h1>
@@ -67,14 +67,14 @@ export function NoticeBoardPage() {
               key={notice.id}
               onClick={() => openNotice(notice)}
               className={cn(
-                'w-full text-left rounded-lg border bg-card p-4 transition-colors hover:border-blue-300 hover:bg-blue-50/40',
-                notice.hasRead ? 'border-border' : 'border-blue-300 bg-blue-50/30'
+                'w-full text-left rounded-lg border bg-card p-4 transition-colors hover:border-primary/30 hover:bg-primary/5',
+                notice.hasRead ? 'border-border' : 'border-primary/30 bg-primary/5'
               )}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-2 min-w-0">
                   {!notice.hasRead && (
-                    <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
+                    <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
                   )}
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">{notice.title}</p>
@@ -135,7 +135,7 @@ export function NoticeBoardPage() {
                 href={selected.attachmentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline"
+                className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
               >
                 <Paperclip className="h-3.5 w-3.5" />
                 {selected.attachmentName ?? 'View attachment'}

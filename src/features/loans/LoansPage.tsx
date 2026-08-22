@@ -11,7 +11,8 @@ import type { Loan } from '@/types/loan.types'
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { useAuthStore } from '@/store/auth.store'
+import { formatCurrency, formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 import { ApplyLoanDialog } from './ApplyLoanDialog'
 import { ApproveLoanDialog } from './ApproveLoanDialog'
@@ -21,6 +22,7 @@ export function LoansPage() {
   const qc = useQueryClient()
   const { page, limit, setPage } = usePagination()
   const canApprove = usePermission('loan:approve')
+  const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
 
   const [applyOpen, setApplyOpen] = useState(false)
   const [approveTarget, setApproveTarget] = useState<Loan | null>(null)
@@ -41,7 +43,7 @@ export function LoansPage() {
       setRejectTarget(null)
       toast.success('Loan application rejected.')
     },
-    onError: () => toast.error('Failed to reject loan application.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to reject loan application.')),
   })
 
   const columns: Column<Loan>[] = [
@@ -70,8 +72,9 @@ export function LoansPage() {
     {
       key: 'actions',
       header: '',
-      render: (row) =>
-        canApprove && row.status === 'PENDING' ? (
+      render: (row) => {
+        const isOwnRecord = currentEmployeeId != null && row.employeeId === currentEmployeeId
+        return canApprove && row.status === 'PENDING' && !isOwnRecord ? (
           <div className="flex items-center gap-1">
             <Button
               size="sm"
@@ -97,7 +100,8 @@ export function LoansPage() {
               Reject
             </Button>
           </div>
-        ) : null,
+        ) : null
+      },
     },
   ]
 

@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { sessionsApi } from '@/api/sessions.api'
 import type { Session } from '@/types/session.types'
-import { formatDateTime } from '@/lib/utils'
+import { formatDateTime, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 
 export function SessionsPage() {
@@ -36,7 +36,7 @@ export function SessionsPage() {
       setRevokeTarget(null)
       toast.success('Session revoked.')
     },
-    onError: () => toast.error('Failed to revoke session.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to revoke session.')),
   })
 
   const { mutate: revokeAll, isPending: revokingAll } = useMutation({
@@ -46,7 +46,7 @@ export function SessionsPage() {
       setRevokeAllOpen(false)
       toast.success('All other sessions revoked.')
     },
-    onError: () => toast.error('Failed to revoke sessions.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to revoke sessions.')),
   })
 
   return (

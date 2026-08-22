@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { todosApi, incentiveRulesApi } from '@/api/incentives.api'
 import type { IncentiveRule } from '@/types/incentives.types'
+import { getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 
 const schema = z.object({
@@ -62,7 +63,7 @@ export function CreateTodoDialog({ open, onOpenChange }: Props) {
       reset()
       toast.success('Todo created.')
     },
-    onError: () => toast.error('Failed to create todo.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to create todo.')),
   })
 
   return (

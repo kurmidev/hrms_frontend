@@ -18,6 +18,7 @@ import { RoleCard } from '@/features/roles/RoleCard'
 import type { Role } from '@/types/organization.types'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -108,7 +109,7 @@ export function RolesPage() {
       setOpen(false)
       toast.success(editRole ? 'Role updated.' : 'Role created.')
     },
-    onError: () => toast.error('Failed to save role.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save role.')),
   })
 
   const { mutate: del, isPending: deleting } = useMutation({
@@ -118,7 +119,7 @@ export function RolesPage() {
       setDeleteRole(null)
       toast.success('Role deleted.')
     },
-    onError: () => toast.error('Cannot delete role — it may still be assigned to users.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Cannot delete role — it may still be assigned to users.')),
   })
 
   const togglePermission = (perm: string) => {

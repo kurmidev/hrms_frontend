@@ -11,7 +11,7 @@ import type { Notice, NoticeStatus } from '@/types/notices.types'
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 import { NoticeFormDialog } from './NoticeFormDialog'
 import { ReadReceiptsDialog } from './ReadReceiptsDialog'
@@ -47,7 +47,7 @@ export function ManageNoticesPage() {
       qc.invalidateQueries({ queryKey: ['notices'] })
       toast.success('Notice published.')
     },
-    onError: () => toast.error('Failed to publish notice.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to publish notice.')),
   })
 
   const { mutate: remove, isPending: isDeleting } = useMutation({
@@ -57,7 +57,7 @@ export function ManageNoticesPage() {
       setDeleteTarget(null)
       toast.success('Notice deleted.')
     },
-    onError: () => toast.error('Failed to delete notice.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to delete notice.')),
   })
 
   const columns: Column<Notice>[] = [
@@ -83,7 +83,7 @@ export function ManageNoticesPage() {
       header: 'Read Count',
       render: (row) => (
         <button
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-primary hover:underline"
           onClick={(e) => {
             e.stopPropagation()
             setReceiptsTarget(row)
@@ -167,8 +167,8 @@ export function ManageNoticesPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-            <Megaphone className="h-5 w-5 text-blue-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <Megaphone className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Manage Notices</h1>
@@ -185,8 +185,8 @@ export function ManageNoticesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-            <Megaphone className="h-5 w-5 text-blue-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <Megaphone className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Manage Notices</h1>

@@ -16,7 +16,7 @@ export function SuspendedPage() {
           <p className="font-medium text-slate-800 mb-1">Need help?</p>
           <p>
             Contact support at{' '}
-            <a href="mailto:support@hrms.com" className="text-blue-600 hover:underline">
+            <a href="mailto:support@hrms.com" className="text-primary hover:underline">
               support@hrms.com
             </a>
           </p>

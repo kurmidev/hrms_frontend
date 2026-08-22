@@ -11,6 +11,7 @@ import { MessageBubble } from './MessageBubble'
 import { MessageComposer } from './MessageComposer'
 import { NewChatDialog } from './NewChatDialog'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 function roomDisplayName(room: ChatRoom | null, currentEmployeeId: string | null): string {
   if (!room) return ''
@@ -84,7 +85,7 @@ export function ChatPage() {
       qc.invalidateQueries({ queryKey: ['chat-messages', activeRoom?.id] })
       qc.invalidateQueries({ queryKey: ['chat-rooms'] })
     },
-    onError: () => toast.error('Failed to send attachment.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to send attachment.')),
     onSettled: () => setIsUploading(false),
   })
 

@@ -11,7 +11,8 @@ import type { InsurancePolicy, EmployeeInsurance } from '@/types/insurance.types
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { useAuthStore } from '@/store/auth.store'
+import { formatCurrency, formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 import { PolicyFormDialog } from './PolicyFormDialog'
 import { EnrollDialog } from './EnrollDialog'
@@ -25,6 +26,7 @@ const APPROVAL_COLORS: Record<string, string> = {
 export function InsurancePage() {
   const qc = useQueryClient()
   const canManage = usePermission('employee:update')
+  const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
 
   const policyPagination = usePagination()
   const enrollmentPagination = usePagination()
@@ -54,7 +56,7 @@ export function InsurancePage() {
       qc.invalidateQueries({ queryKey: ['insurance-enrollments'] })
       toast.success('Enrollment approved.')
     },
-    onError: () => toast.error('Failed to approve enrollment.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to approve enrollment.')),
   })
 
   const { mutate: reject, isPending: rejecting } = useMutation({
@@ -64,7 +66,7 @@ export function InsurancePage() {
       setRejectTarget(null)
       toast.success('Enrollment rejected.')
     },
-    onError: () => toast.error('Failed to reject enrollment.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to reject enrollment.')),
   })
 
   const policyColumns: Column<InsurancePolicy>[] = [
@@ -158,7 +160,9 @@ export function InsurancePage() {
       key: 'actions',
       header: '',
       render: (row) =>
-        canManage && row.approvalStatus === 'PENDING' ? (
+        canManage &&
+        row.approvalStatus === 'PENDING' &&
+        !(currentEmployeeId != null && row.employeeId === currentEmployeeId) ? (
           <div className="flex items-center gap-1">
             <Button
               size="sm"

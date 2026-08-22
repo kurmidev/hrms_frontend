@@ -9,6 +9,7 @@ import type { TodoTask } from '@/types/incentives.types'
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
+import { useAuthStore } from '@/store/auth.store'
 import { formatDate } from '@/lib/utils'
 import { CreateTodoDialog } from './CreateTodoDialog'
 import { SubmitTodoDialog } from './SubmitTodoDialog'
@@ -17,6 +18,7 @@ import { ApproveTodoDialog } from './ApproveTodoDialog'
 export function TodosPage() {
   const { page, limit, setPage } = usePagination()
   const canApprove = usePermission('todo:approve')
+  const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
 
   const [createOpen, setCreateOpen] = useState(false)
   const [submitTarget, setSubmitTarget] = useState<TodoTask | null>(null)
@@ -73,7 +75,9 @@ export function TodosPage() {
               Submit
             </Button>
           )}
-          {canApprove && row.status === 'SUBMITTED' && (
+          {canApprove &&
+            row.status === 'SUBMITTED' &&
+            !(currentEmployeeId != null && row.employeeId === currentEmployeeId) && (
             <Button
               size="sm"
               variant="outline"

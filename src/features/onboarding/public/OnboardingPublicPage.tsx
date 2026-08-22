@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select'
 import { onboardingApi } from '@/api/onboarding.api'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const step1Schema = z.object({
   firstName: z.string().min(1),
@@ -137,7 +138,7 @@ export function OnboardingPublicPage() {
       setStep('documents')
       toast.success('Details saved. Please upload your documents.')
     },
-    onError: () => toast.error('Failed to save details. Please try again.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save details. Please try again.')),
   })
 
   const validRows = documentRows.filter((r) => r.file && !r.error && r.documentType)
@@ -153,7 +154,7 @@ export function OnboardingPublicPage() {
       return onboardingApi.submitDocuments(token!, fd)
     },
     onSuccess: () => setStep('done'),
-    onError: () => toast.error('Submission failed. Please try again.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Submission failed. Please try again.')),
   })
 
   const updateRow = (id: string, patch: Partial<DocumentRow>) => {

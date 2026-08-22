@@ -18,7 +18,7 @@ import { designationsApi } from '@/api/designations.api'
 import type { OnboardingLink } from '@/types/onboarding.types'
 import type { Designation } from '@/types/organization.types'
 import { ONBOARDING_STATUS_LABELS } from '@/lib/constants'
-import { formatDateTime } from '@/lib/utils'
+import { formatDateTime, getApiErrorMessage } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
@@ -115,7 +115,7 @@ export function OnboardingHRPage() {
       if (link.token) setCreatedLink(buildOnboardingLink(link.token))
       toast.success('Invite link generated and sent.')
     },
-    onError: () => toast.error('Failed to create onboarding link.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to create onboarding link.')),
   })
 
   const { mutate: resend } = useMutation({
@@ -124,7 +124,7 @@ export function OnboardingHRPage() {
       qc.invalidateQueries({ queryKey: ['onboarding-links'] })
       toast.success('Invite resent.')
     },
-    onError: () => toast.error('Failed to resend invite.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to resend invite.')),
   })
 
   const links: OnboardingLink[] = (data as { data?: OnboardingLink[] })?.data ?? []

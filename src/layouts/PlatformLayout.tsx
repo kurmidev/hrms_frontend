@@ -17,16 +17,16 @@ export function PlatformLayout() {
   if (!isAuthenticated) return <Navigate to="/platform/login" replace />
 
   return (
-    <div className="flex h-screen bg-slate-950 text-white">
-      <aside className="w-60 flex-shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col">
-        <div className="px-5 py-4 border-b border-slate-800">
+    <div className="platform-shell flex h-screen bg-[var(--platform-bg)] text-white">
+      <aside className="w-60 flex-shrink-0 bg-[var(--platform-surface)] border-r border-[var(--platform-border)] flex flex-col">
+        <div className="px-5 py-4 border-b border-[var(--platform-border)]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-[var(--platform-accent)] rounded-lg flex items-center justify-center flex-shrink-0">
               <span className="text-white text-sm font-bold">H</span>
             </div>
             <div>
               <p className="text-sm font-semibold text-white">HRMS Platform</p>
-              <p className="text-xs text-slate-400">Admin Console</p>
+              <p className="text-xs text-[var(--platform-muted)]">Admin Console</p>
             </div>
           </div>
         </div>
@@ -41,8 +41,8 @@ export function PlatformLayout() {
                 className={cn(
                   'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                   active
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    ? 'bg-[var(--platform-accent)] text-white'
+                    : 'text-[var(--platform-muted)] hover:text-white hover:bg-[var(--platform-raised)]'
                 )}
               >
                 <Icon className="h-4 w-4 flex-shrink-0" />
@@ -51,13 +51,13 @@ export function PlatformLayout() {
             )
           })}
         </nav>
-        <div className="p-3 border-t border-slate-800">
+        <div className="p-3 border-t border-[var(--platform-border)]">
           <div className="px-3 py-2">
-            <p className="text-xs text-slate-400 truncate">{admin?.email}</p>
+            <p className="text-xs text-[var(--platform-muted)] truncate">{admin?.email}</p>
           </div>
           <button
             onClick={logout}
-            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-colors w-full"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[var(--platform-muted)] hover:text-white hover:bg-[var(--platform-raised)] transition-colors w-full"
           >
             <LogOut className="h-4 w-4" />
             Sign Out

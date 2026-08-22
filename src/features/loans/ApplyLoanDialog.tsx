@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { loanApi } from '@/api/loan.api'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   amountRequested: z.preprocess(
@@ -50,7 +51,7 @@ export function ApplyLoanDialog({ open, onOpenChange }: Props) {
       reset()
       toast.success('Loan application submitted.')
     },
-    onError: () => toast.error('Failed to submit loan application.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to submit loan application.')),
   })
 
   return (

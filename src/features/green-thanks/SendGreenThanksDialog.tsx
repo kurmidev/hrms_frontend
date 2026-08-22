@@ -13,6 +13,7 @@ import { greenThanksApi } from '@/api/green-thanks.api'
 import { employeesApi } from '@/api/employees.api'
 import type { Employee } from '@/types/employee.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   toEmployeeId: z.string().min(1, 'Recipient is required'),
@@ -57,7 +58,7 @@ export function SendGreenThanksDialog({ open, onOpenChange }: Props) {
       reset()
       toast.success('Green Thanks sent.')
     },
-    onError: () => toast.error('Failed to send Green Thanks.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to send Green Thanks.')),
   })
 
   return (

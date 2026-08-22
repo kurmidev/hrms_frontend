@@ -4,6 +4,7 @@ import { platformPlansApi } from '@/api/platform-plans.api'
 import { toast } from 'sonner'
 import { Check, Plus, Pencil } from 'lucide-react'
 import type { SubscriptionPlan } from '@/types/platform.types'
+import { getApiErrorMessage } from '@/lib/utils'
 
 interface PlanForm {
   name: string
@@ -77,7 +78,7 @@ export function PlansPage() {
       setForm(INITIAL_FORM)
       toast.success('Plan created')
     },
-    onError: () => toast.error('Failed to create plan'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to create plan')),
   })
 
   const updateMutation = useMutation({
@@ -101,7 +102,7 @@ export function PlansPage() {
       setEditingPlan(null)
       toast.success('Plan updated')
     },
-    onError: () => toast.error('Failed to update plan'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to update plan')),
   })
 
   function setField<K extends keyof PlanForm>(key: K, value: PlanForm[K]) {
@@ -153,11 +154,11 @@ export function PlansPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Subscription Plans</h1>
-          <p className="text-slate-400 text-sm mt-1">{plans.length} plans configured</p>
+          <p className="text-[var(--platform-muted)] text-sm mt-1">{plans.length} plans configured</p>
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-[var(--platform-accent)] hover:bg-[var(--platform-accent-hover)] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
           <Plus className="h-4 w-4" />
           Create Plan
@@ -165,47 +166,47 @@ export function PlansPage() {
       </div>
 
       {isLoading && (
-        <div className="text-center py-12 text-slate-400">Loading plans...</div>
+        <div className="text-center py-12 text-[var(--platform-muted)]">Loading plans...</div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {plans.map((plan) => (
           <div
             key={plan.id}
-            className={`bg-slate-900 border rounded-xl p-5 space-y-4 ${plan.isActive ? 'border-slate-800' : 'border-slate-800 opacity-60'}`}
+            className={`bg-[var(--platform-surface)] border rounded-xl p-5 space-y-4 ${plan.isActive ? 'border-[var(--platform-border)]' : 'border-[var(--platform-border)] opacity-60'}`}
           >
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="font-semibold text-white text-base">{plan.name}</h3>
                 {plan.description && (
-                  <p className="text-slate-400 text-xs mt-1">{plan.description}</p>
+                  <p className="text-[var(--platform-muted)] text-xs mt-1">{plan.description}</p>
                 )}
-                <p className="text-xs text-slate-500 mt-1">Up to {plan.maxEmployees} employees</p>
+                <p className="text-xs text-[var(--platform-muted)] mt-1">Up to {plan.maxEmployees} employees</p>
                 {!plan.isActive && (
-                  <span className="inline-block mt-1 px-2 py-0.5 bg-slate-700 text-slate-400 text-xs rounded-full">
+                  <span className="inline-block mt-1 px-2 py-0.5 bg-[var(--platform-raised)] text-[var(--platform-muted)] text-xs rounded-full">
                     Inactive
                   </span>
                 )}
               </div>
               <button
                 onClick={() => openEdit(plan)}
-                className="text-slate-400 hover:text-white transition-colors p-1"
+                className="text-[var(--platform-muted)] hover:text-white transition-colors p-1"
               >
                 <Pencil className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="bg-slate-800 rounded-lg p-3 space-y-1.5">
+            <div className="bg-[var(--platform-raised)] rounded-lg p-3 space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Monthly</span>
+                <span className="text-[var(--platform-muted)]">Monthly</span>
                 <span className="text-white font-medium">₹{plan.priceMonthly.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Quarterly</span>
+                <span className="text-[var(--platform-muted)]">Quarterly</span>
                 <span className="text-white font-medium">₹{plan.priceQuarterly.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-xs">
-                <span className="text-slate-400">Yearly</span>
+                <span className="text-[var(--platform-muted)]">Yearly</span>
                 <span className="text-white font-medium">₹{plan.priceYearly.toLocaleString('en-IN')}</span>
               </div>
             </div>
@@ -213,7 +214,7 @@ export function PlansPage() {
             {plan.features.length > 0 && (
               <ul className="space-y-1.5">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-xs text-slate-300">
+                  <li key={f} className="flex items-center gap-2 text-xs text-[var(--platform-text-soft)]">
                     <Check className="h-3 w-3 text-green-400 flex-shrink-0" />
                     {f}
                   </li>
@@ -228,35 +229,35 @@ export function PlansPage() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6">
-            <h3 className="text-lg font-bold text-slate-900 mb-5">
+            <h3 className="text-lg font-bold text-[var(--platform-panel-heading)] mb-5">
               {editingPlan ? 'Edit Plan' : 'Create Plan'}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                   Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => setField('name', e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                  className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                   placeholder="Starter"
                 />
                 {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setField('description', e.target.value)}
                   rows={2}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 resize-none"
+                  className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)] resize-none"
                   placeholder="Ideal for small teams"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                   Max Employees <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -264,7 +265,7 @@ export function PlansPage() {
                   min={1}
                   value={form.maxEmployees}
                   onChange={(e) => setField('maxEmployees', Number(e.target.value))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                  className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                 />
                 {errors.maxEmployees && (
                   <p className="text-red-500 text-xs mt-1">{errors.maxEmployees}</p>
@@ -272,17 +273,17 @@ export function PlansPage() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Monthly ₹</label>
+                  <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">Monthly ₹</label>
                   <input
                     type="number"
                     min={0}
                     value={form.priceMonthly}
                     onChange={(e) => setField('priceMonthly', Number(e.target.value))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                    className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                     Quarterly ₹
                   </label>
                   <input
@@ -290,39 +291,39 @@ export function PlansPage() {
                     min={0}
                     value={form.priceQuarterly}
                     onChange={(e) => setField('priceQuarterly', Number(e.target.value))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                    className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Yearly ₹</label>
+                  <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">Yearly ₹</label>
                   <input
                     type="number"
                     min={0}
                     value={form.priceYearly}
                     onChange={(e) => setField('priceYearly', Number(e.target.value))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                    className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                   Features (comma-separated)
                 </label>
                 <input
                   type="text"
                   value={form.features}
                   onChange={(e) => setField('features', e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                  className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                   placeholder="Payroll, Leave Management, Attendance"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Sort Order</label>
+                <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">Sort Order</label>
                 <input
                   type="number"
                   value={form.sortOrder}
                   onChange={(e) => setField('sortOrder', Number(e.target.value))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                  className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                 />
               </div>
               <div className="flex items-center gap-3">
@@ -331,9 +332,9 @@ export function PlansPage() {
                   id="isActive"
                   checked={form.isActive}
                   onChange={(e) => setField('isActive', e.target.checked)}
-                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  className="w-4 h-4 rounded border-[var(--platform-panel-border)] text-[var(--platform-accent)] focus:ring-[var(--platform-accent)]"
                 />
-                <label htmlFor="isActive" className="text-sm font-medium text-slate-700">
+                <label htmlFor="isActive" className="text-sm font-medium text-[var(--platform-panel-label)]">
                   Active
                 </label>
               </div>
@@ -341,14 +342,14 @@ export function PlansPage() {
             <div className="flex items-center justify-end gap-3 mt-6">
               <button
                 onClick={closeModal}
-                className="text-sm text-slate-600 hover:text-slate-800"
+                className="text-sm text-[var(--platform-panel-muted)] hover:text-[var(--platform-panel-heading)]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors"
+                className="bg-[var(--platform-accent)] hover:bg-[var(--platform-accent-hover)] disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors"
               >
                 {isSaving ? 'Saving...' : editingPlan ? 'Update' : 'Create'}
               </button>

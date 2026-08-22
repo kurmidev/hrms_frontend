@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { greenThanksApi } from '@/api/green-thanks.api'
 import type { GreenThanks } from '@/types/green-thanks.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const MONTH_OPTIONS = [
   { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
@@ -55,7 +56,7 @@ export function ApproveGreenThanksDialog({ open, onOpenChange, greenThanks }: Pr
       resetForm()
       toast.success(decision === 'approve' ? 'Green Thanks approved.' : 'Green Thanks rejected.')
     },
-    onError: () => toast.error('Failed to review Green Thanks.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to review Green Thanks.')),
   })
 
   return (

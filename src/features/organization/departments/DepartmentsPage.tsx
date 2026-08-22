@@ -16,7 +16,7 @@ import { DepartmentEmployeesDialog } from './DepartmentEmployeesDialog'
 import type { DepartmentTreeNode } from '@/types/organization.types'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { cn, getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -44,7 +44,7 @@ function TreeNode({ node, depth, onEdit, onDelete, onCountClick, canEdit, canDel
         </button>
 
         <div className="flex-1 flex items-center gap-2 min-w-0">
-          <GitBranch className="h-4 w-4 text-blue-500 flex-shrink-0" />
+          <GitBranch className="h-4 w-4 text-primary flex-shrink-0" />
           <span className="text-sm font-medium text-foreground truncate">{node.name}</span>
           {node.employeeCount !== undefined && node.employeeCount > 0 && (
             <button
@@ -127,7 +127,7 @@ export function DepartmentsPage() {
       setOpen(false)
       toast.success(editNode ? 'Department updated.' : 'Department created.')
     },
-    onError: () => toast.error('Failed to save department.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save department.')),
   })
 
   const { mutate: del, isPending: deleting } = useMutation({
@@ -137,7 +137,7 @@ export function DepartmentsPage() {
       setDeleteNode(null)
       toast.success('Department deleted.')
     },
-    onError: () => toast.error('Cannot delete — it may have employees or sub-departments.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Cannot delete — it may have employees or sub-departments.')),
   })
 
   const filterTree = (nodes: DepartmentTreeNode[], q: string): DepartmentTreeNode[] => {
@@ -157,8 +157,8 @@ export function DepartmentsPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-            <GitBranch className="h-5 w-5 text-blue-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <GitBranch className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Departments</h1>
@@ -175,8 +175,8 @@ export function DepartmentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-            <GitBranch className="h-5 w-5 text-blue-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <GitBranch className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Departments</h1>

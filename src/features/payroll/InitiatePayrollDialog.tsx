@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select'
 import { payrollApi } from '@/api/payroll.api'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const MONTH_OPTIONS = [
   { value: 1, label: 'January' },
@@ -64,7 +65,7 @@ export function InitiatePayrollDialog({ open, onOpenChange }: Props) {
       reset()
       toast.success('Payroll run initiated.')
     },
-    onError: () => toast.error('Failed to initiate payroll run.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to initiate payroll run.')),
   })
 
   return (

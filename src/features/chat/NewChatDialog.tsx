@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { cn } from '@/lib/utils'
+import { cn, getApiErrorMessage } from '@/lib/utils'
 import { chatApi } from '@/api/chat.api'
 import { employeesApi } from '@/api/employees.api'
 import { departmentsApi } from '@/api/departments.api'
@@ -77,7 +77,7 @@ export function NewChatDialog({ open, onOpenChange, onCreated }: Props) {
       resetForm()
       toast.success('Chat ready.')
     },
-    onError: () => toast.error('Failed to start chat.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to start chat.')),
   })
 
   const canSubmit =

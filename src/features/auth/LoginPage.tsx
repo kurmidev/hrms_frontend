@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { authApi } from '@/api/auth.api'
 import { useAuthStore } from '@/store/auth.store'
+import { getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 
 const schema = z.object({
@@ -38,8 +39,7 @@ export function LoginPage() {
         navigate('/')
       }
     } catch (err: unknown) {
-      const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Login failed. Please try again.'
-      toast.error(message)
+      toast.error(getApiErrorMessage(err, 'Login failed. Please try again.'))
     } finally {
       setLoading(false)
     }

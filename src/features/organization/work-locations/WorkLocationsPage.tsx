@@ -18,6 +18,7 @@ import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -80,7 +81,7 @@ export function WorkLocationsPage() {
       setOpen(false)
       toast.success(editItem ? 'Work location updated.' : 'Work location created.')
     },
-    onError: () => toast.error('Failed to save work location.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save work location.')),
   })
 
   const { mutate: del, isPending: deleting } = useMutation({
@@ -90,7 +91,7 @@ export function WorkLocationsPage() {
       setDeleteItem(null)
       toast.success('Work location deleted.')
     },
-    onError: () => toast.error('Failed to delete work location.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to delete work location.')),
   })
 
   const columns: Column<WorkLocation>[] = [

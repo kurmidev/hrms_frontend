@@ -135,12 +135,12 @@ export function DashboardPage() {
         <Card className="shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <ListTodo className="h-4 w-4 text-blue-600" />
+              <ListTodo className="h-4 w-4 text-primary" />
               My Tasks
             </CardTitle>
             <Link
               to="/incentives/todos"
-              className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+              className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
             >
               View All
               <ArrowRight className="h-3.5 w-3.5" />

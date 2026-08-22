@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { assetApi } from '@/api/asset.api'
 import type { Asset, AssetType } from '@/types/asset.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const ASSET_TYPES: AssetType[] = ['LAPTOP', 'ID_CARD', 'SIM', 'VEHICLE', 'OTHER']
 
@@ -75,7 +76,7 @@ export function AssetFormDialog({ open, onOpenChange, asset }: Props) {
       onOpenChange(false)
       toast.success(asset ? 'Asset updated.' : 'Asset created.')
     },
-    onError: () => toast.error(asset ? 'Failed to update asset.' : 'Failed to create asset.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, asset ? 'Failed to update asset.' : 'Failed to create asset.')),
   })
 
   return (

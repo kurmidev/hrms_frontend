@@ -22,7 +22,7 @@ import type { PayrollEntry } from '@/types/payroll.types'
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 
 const MONTH_NAMES = [
@@ -70,7 +70,7 @@ export function PayrollRunDetailPage() {
       setApproveOpen(false)
       toast.success('Payroll run approved.')
     },
-    onError: () => toast.error('Failed to approve payroll run.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to approve payroll run.')),
   })
 
   const { mutate: disburse, isPending: disbursing } = useMutation({
@@ -81,7 +81,7 @@ export function PayrollRunDetailPage() {
       setDisburseOpen(false)
       toast.success('Payroll run disbursed.')
     },
-    onError: () => toast.error('Failed to disburse payroll run.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to disburse payroll run.')),
   })
 
   const { mutate: updateEntry, isPending: savingEntry } = useMutation({
@@ -94,7 +94,7 @@ export function PayrollRunDetailPage() {
       setSelectedEntry(null)
       toast.success('Entry updated.')
     },
-    onError: () => toast.error('Failed to update entry.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to update entry.')),
   })
 
   const openEntry = (entry: PayrollEntry) => {

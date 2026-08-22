@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { attendanceApi } from '@/api/attendance.api'
 import type { AttendanceLog } from '@/types/attendance.types'
 import { ATTENDANCE_STATUS_COLORS, ATTENDANCE_STATUS_LABELS } from '@/lib/constants'
-import { formatDateTime, cn } from '@/lib/utils'
+import { formatDateTime, cn, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 
 interface Coords {
@@ -70,7 +70,7 @@ export function MyAttendancePage() {
       qc.invalidateQueries({ queryKey: ['my-attendance'] })
       toast.success('Checked in successfully.')
     },
-    onError: () => toast.error('Check-in failed. You may already have an open check-in today.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Check-in failed. You may already have an open check-in today.')),
   })
 
   const { mutate: checkOut, isPending: checkingOut } = useMutation({
@@ -85,7 +85,7 @@ export function MyAttendancePage() {
       qc.invalidateQueries({ queryKey: ['my-attendance'] })
       toast.success('Checked out successfully.')
     },
-    onError: () => toast.error('Check-out failed.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Check-out failed.')),
   })
 
   const handleLocateAndAct = async (action: 'in' | 'out') => {
@@ -118,8 +118,8 @@ export function MyAttendancePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-          <CalendarClock className="h-5 w-5 text-blue-600" />
+        <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+          <CalendarClock className="h-5 w-5 text-green-600" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">My Attendance</h1>

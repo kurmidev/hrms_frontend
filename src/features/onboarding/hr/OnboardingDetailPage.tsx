@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { onboardingApi } from '@/api/onboarding.api'
 import { ApproveOnboardingDialog } from './ApproveOnboardingDialog'
-import { formatDateTime } from '@/lib/utils'
+import { formatDateTime, getApiErrorMessage } from '@/lib/utils'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
@@ -126,7 +126,7 @@ export function OnboardingDetailPage() {
   const { mutate: resend, isPending: resending } = useMutation({
     mutationFn: () => onboardingApi.resend(id!),
     onSuccess: () => { invalidate(); toast.success('Invite resent.') },
-    onError: () => toast.error('Failed to resend invite.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to resend invite.')),
   })
 
   if (!canManage) {

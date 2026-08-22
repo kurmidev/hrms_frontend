@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { todosApi } from '@/api/incentives.api'
 import type { TodoTask } from '@/types/incentives.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   quantity: z.preprocess(
@@ -47,7 +48,7 @@ export function SubmitTodoDialog({ open, onOpenChange, todo }: Props) {
       reset()
       toast.success('Todo submitted for review.')
     },
-    onError: () => toast.error('Failed to submit todo.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to submit todo.')),
   })
 
   return (

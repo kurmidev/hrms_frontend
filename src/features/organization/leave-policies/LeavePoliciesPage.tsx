@@ -25,6 +25,7 @@ import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
 import type { LeavePolicy, LeaveType } from '@/types/organization.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const LEAVE_TYPES: LeaveType[] = ['CASUAL', 'SICK', 'EARNED', 'LOSS_OF_PAY', 'MATERNITY', 'PATERNITY', 'COMPENSATORY']
 const ACCRUAL_TYPES = ['monthly', 'quarterly', 'yearly', 'upfront']
@@ -135,7 +136,7 @@ export function LeavePoliciesPage() {
       setOpen(false)
       toast.success(editItem ? 'Leave policy updated.' : 'Leave policy created.')
     },
-    onError: () => toast.error('Failed to save leave policy.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save leave policy.')),
   })
 
   return (

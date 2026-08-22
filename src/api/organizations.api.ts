@@ -8,4 +8,14 @@ export const organizationsApi = {
     apiClient.put<{ data: Organization }>('/organization', data).then(unwrap<Organization>),
 
   currencies: () => apiClient.get<{ data: Currency[] }>('/currencies').then(unwrap<Currency[]>),
+
+  uploadLogo: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return apiClient
+      .post<{ data: Organization }>('/organization/logo', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then(unwrap<Organization>)
+  },
 }

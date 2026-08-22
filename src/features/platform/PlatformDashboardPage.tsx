@@ -24,8 +24,8 @@ export function PlatformDashboardPage() {
       label: 'Total Organizations',
       value: total,
       icon: Building2,
-      color: 'text-blue-600',
-      bg: 'bg-blue-100',
+      color: 'text-[var(--platform-accent)]',
+      bg: 'bg-[var(--platform-accent-tint)]',
     },
     {
       label: 'Active Organizations',
@@ -54,16 +54,16 @@ export function PlatformDashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">Platform Dashboard</h1>
-        <p className="text-slate-400 text-sm mt-1">Overview of all organizations and subscriptions</p>
+        <p className="text-[var(--platform-muted)] text-sm mt-1">Overview of all organizations and subscriptions</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => {
           const Icon = s.icon
           return (
-            <div key={s.label} className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+            <div key={s.label} className="bg-[var(--platform-surface)] border border-[var(--platform-border)] rounded-xl p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-400">{s.label}</p>
+                  <p className="text-sm text-[var(--platform-muted)]">{s.label}</p>
                   <p className="text-3xl font-bold text-white mt-1">{s.value}</p>
                 </div>
                 <div
@@ -76,26 +76,26 @@ export function PlatformDashboardPage() {
           )
         })}
       </div>
-      <div className="bg-slate-900 border border-slate-800 rounded-xl">
-        <div className="px-5 py-4 border-b border-slate-800">
+      <div className="bg-[var(--platform-surface)] border border-[var(--platform-border)] rounded-xl">
+        <div className="px-5 py-4 border-b border-[var(--platform-border)]">
           <h2 className="text-sm font-semibold text-white">Recent Organizations</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-800">
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Name</th>
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Email</th>
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Plan</th>
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Status</th>
+              <tr className="border-b border-[var(--platform-border)]">
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Name</th>
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Email</th>
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Plan</th>
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
               {orgs.slice(0, 10).map((org) => (
-                <tr key={org.id} className="border-b border-slate-800/50 hover:bg-slate-800/30">
+                <tr key={org.id} className="border-b border-[var(--platform-border)] hover:bg-[var(--platform-raised)]">
                   <td className="px-5 py-3 text-white font-medium">{org.name}</td>
-                  <td className="px-5 py-3 text-slate-400">{org.email ?? '—'}</td>
-                  <td className="px-5 py-3 text-slate-400">
+                  <td className="px-5 py-3 text-[var(--platform-muted)]">{org.email ?? '—'}</td>
+                  <td className="px-5 py-3 text-[var(--platform-muted)]">
                     {org.subscription?.plan?.name ?? '—'}
                   </td>
                   <td className="px-5 py-3">
@@ -109,7 +109,7 @@ export function PlatformDashboardPage() {
               ))}
               {orgs.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-5 py-8 text-center text-slate-500">
+                  <td colSpan={4} className="px-5 py-8 text-center text-[var(--platform-muted)]">
                     No organizations yet
                   </td>
                 </tr>

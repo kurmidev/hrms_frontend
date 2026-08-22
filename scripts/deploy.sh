@@ -22,7 +22,7 @@ if ! command -v pm2 >/dev/null 2>&1; then
 fi
 
 echo "==> [frontend] Installing dependencies (npm ci)"
-npm ci
+npm install
 
 echo "==> [frontend] Building production bundle"
 npm run build

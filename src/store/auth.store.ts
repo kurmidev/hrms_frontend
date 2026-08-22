@@ -11,6 +11,7 @@ interface AuthState {
   setAccessToken: (token: string) => void
   logout: () => void
   hasPermission: (permission: string) => boolean
+  setOrganizationLogoUrl: (url: string | null) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -25,6 +26,13 @@ export const useAuthStore = create<AuthState>()(
         set({ user, accessToken, refreshToken, isAuthenticated: true }),
 
       setAccessToken: (accessToken) => set({ accessToken }),
+
+      setOrganizationLogoUrl: (url) =>
+        set((state) =>
+          state.user
+            ? { user: { ...state.user, organizationLogoUrl: url } }
+            : state
+        ),
 
       logout: () =>
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false }),

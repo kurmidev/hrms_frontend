@@ -6,19 +6,27 @@ import { toast } from 'sonner'
 import { Link } from 'react-router-dom'
 import { Check, Copy, Plus, ExternalLink } from 'lucide-react'
 import type { PlatformOrg, SubscriptionPlan } from '@/types/platform.types'
+import { getApiErrorMessage } from '@/lib/utils'
 
 type SubscriptionStatusType = 'ACTIVE' | 'PAST_DUE' | 'SUSPENDED' | 'CANCELLED'
 
 function statusBadge(status: SubscriptionStatusType | undefined) {
-  if (!status) return <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">—</span>
+  if (!status)
+    return (
+      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--platform-panel-bg)] text-[var(--platform-panel-muted)]">
+        —
+      </span>
+    )
   const map: Record<SubscriptionStatusType, string> = {
     ACTIVE: 'bg-green-100 text-green-700',
     PAST_DUE: 'bg-yellow-100 text-yellow-700',
     SUSPENDED: 'bg-red-100 text-red-700',
-    CANCELLED: 'bg-slate-100 text-slate-500',
+    CANCELLED: 'bg-[var(--platform-panel-bg)] text-[var(--platform-panel-muted)]',
   }
   return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${map[status] ?? 'bg-slate-100 text-slate-500'}`}>
+    <span
+      className={`px-2 py-0.5 rounded-full text-xs font-medium ${map[status] ?? 'bg-[var(--platform-panel-bg)] text-[var(--platform-panel-muted)]'}`}
+    >
       {status.replace(/_/g, ' ')}
     </span>
   )
@@ -81,7 +89,7 @@ export function OrganizationsListPage() {
       void queryClient.invalidateQueries({ queryKey: ['platform', 'orgs'] })
       toast.success('Organization suspended')
     },
-    onError: () => toast.error('Failed to suspend organization'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to suspend organization')),
   })
 
   const activateMutation = useMutation({
@@ -90,7 +98,7 @@ export function OrganizationsListPage() {
       void queryClient.invalidateQueries({ queryKey: ['platform', 'orgs'] })
       toast.success('Organization activated')
     },
-    onError: () => toast.error('Failed to activate organization'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to activate organization')),
   })
 
   const registerMutation = useMutation({
@@ -115,7 +123,7 @@ export function OrganizationsListPage() {
       setForm(INITIAL_FORM)
       setSuccessResult({ tempPassword: data.tempPassword, orgName: data.organization.name })
     },
-    onError: () => toast.error('Failed to register organization'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to register organization')),
   })
 
   function setField<K extends keyof RegisterFormData>(key: K, value: RegisterFormData[K]) {
@@ -192,11 +200,11 @@ export function OrganizationsListPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Organizations</h1>
-          <p className="text-slate-400 text-sm mt-1">{orgsData?.meta.total ?? 0} registered companies</p>
+          <p className="text-[var(--platform-muted)] text-sm mt-1">{orgsData?.meta.total ?? 0} registered companies</p>
         </div>
         <button
           onClick={openRegister}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-[var(--platform-accent)] hover:bg-[var(--platform-accent-hover)] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
           <Plus className="h-4 w-4" />
           Register Company
@@ -204,42 +212,42 @@ export function OrganizationsListPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+      <div className="bg-[var(--platform-surface)] border border-[var(--platform-border)] rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-800">
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Name</th>
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Email</th>
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Plan</th>
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Billing</th>
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Status</th>
-                <th className="text-left px-5 py-3 text-slate-400 font-medium">Actions</th>
+              <tr className="border-b border-[var(--platform-border)]">
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Name</th>
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Email</th>
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Plan</th>
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Billing</th>
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Status</th>
+                <th className="text-left px-5 py-3 text-[var(--platform-muted)] font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-slate-500">
+                  <td colSpan={6} className="px-5 py-8 text-center text-[var(--platform-muted)]">
                     Loading...
                   </td>
                 </tr>
               )}
               {!isLoading && orgs.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-8 text-center text-slate-500">
+                  <td colSpan={6} className="px-5 py-8 text-center text-[var(--platform-muted)]">
                     No organizations yet
                   </td>
                 </tr>
               )}
               {orgs.map((org) => (
-                <tr key={org.id} className="border-b border-slate-800/50 hover:bg-slate-800/30">
+                <tr key={org.id} className="border-b border-[var(--platform-border)] hover:bg-[var(--platform-raised)]">
                   <td className="px-5 py-3 text-white font-medium">{org.name}</td>
-                  <td className="px-5 py-3 text-slate-400">{org.email ?? '—'}</td>
-                  <td className="px-5 py-3 text-slate-400">
+                  <td className="px-5 py-3 text-[var(--platform-muted)]">{org.email ?? '—'}</td>
+                  <td className="px-5 py-3 text-[var(--platform-muted)]">
                     {org.subscription?.plan?.name ?? '—'}
                   </td>
-                  <td className="px-5 py-3 text-slate-400">
+                  <td className="px-5 py-3 text-[var(--platform-muted)]">
                     {org.subscription?.billingCycle ?? '—'}
                   </td>
                   <td className="px-5 py-3">
@@ -249,7 +257,7 @@ export function OrganizationsListPage() {
                     <div className="flex items-center gap-2">
                       <Link
                         to={`/platform/organizations/${org.id}`}
-                        className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                        className="flex items-center gap-1 text-xs text-[var(--platform-accent-link)] hover:text-[var(--platform-accent-link-hover)] transition-colors"
                       >
                         <ExternalLink className="h-3 w-3" />
                         View
@@ -283,9 +291,9 @@ export function OrganizationsListPage() {
       {/* Register Modal */}
       {showRegister && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto text-slate-900">
-            <div className="px-6 py-5 border-b border-slate-200">
-              <h2 className="text-lg font-bold text-slate-900">Register Company</h2>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto text-[var(--platform-panel-heading)]">
+            <div className="px-6 py-5 border-b border-[var(--platform-panel-border-soft)]">
+              <h2 className="text-lg font-bold text-[var(--platform-panel-heading)]">Register Company</h2>
               {/* Step tracker */}
               <div className="flex items-center gap-0 mt-4">
                 {stepLabels.map((label, i) => {
@@ -296,19 +304,19 @@ export function OrganizationsListPage() {
                     <div key={label} className="flex items-center flex-1 last:flex-none">
                       <div className="flex flex-col items-center">
                         <div
-                          className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${done ? 'bg-blue-600 text-white' : active ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}
+                          className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${done ? 'bg-[var(--platform-accent)] text-white' : active ? 'bg-[var(--platform-accent)] text-white' : 'bg-[var(--platform-panel-bg)] text-[var(--platform-panel-faint)]'}`}
                         >
                           {done ? <Check className="h-3.5 w-3.5" /> : n}
                         </div>
                         <span
-                          className={`text-[10px] mt-1 font-medium whitespace-nowrap ${active ? 'text-blue-600' : 'text-slate-400'}`}
+                          className={`text-[10px] mt-1 font-medium whitespace-nowrap ${active ? 'text-[var(--platform-accent)]' : 'text-[var(--platform-panel-faint)]'}`}
                         >
                           {label}
                         </span>
                       </div>
                       {i < stepLabels.length - 1 && (
                         <div
-                          className={`flex-1 h-0.5 mx-1 mb-4 ${done ? 'bg-blue-600' : 'bg-slate-200'}`}
+                          className={`flex-1 h-0.5 mx-1 mb-4 ${done ? 'bg-[var(--platform-accent)]' : 'bg-[var(--platform-panel-border-soft)]'}`}
                         />
                       )}
                     </div>
@@ -322,49 +330,49 @@ export function OrganizationsListPage() {
               {step === 1 && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                       Company Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={form.name}
                       onChange={(e) => setField('name', e.target.value)}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                       placeholder="Acme Corp"
                     />
                     {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                       Email <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
                       value={form.email}
                       onChange={(e) => setField('email', e.target.value)}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                       placeholder="contact@acme.com"
                     />
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">Phone</label>
                     <input
                       type="tel"
                       value={form.phone}
                       maxLength={10}
                       onChange={(e) => setField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                       placeholder="10-digit mobile number"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">Address</label>
                     <textarea
                       rows={3}
                       value={form.address}
                       onChange={(e) => setField('address', e.target.value)}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 resize-none"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)] resize-none"
                       placeholder="Full address"
                     />
                   </div>
@@ -374,12 +382,12 @@ export function OrganizationsListPage() {
               {/* Step 2: Plan */}
               {step === 2 && (
                 <div className="space-y-3">
-                  <p className="text-sm font-medium text-slate-700">Select a plan</p>
+                  <p className="text-sm font-medium text-[var(--platform-panel-label)]">Select a plan</p>
                   {errors.planId && <p className="text-red-500 text-xs">{errors.planId}</p>}
                   {plans.filter((p) => p.isActive).map((plan) => (
                     <label
                       key={plan.id}
-                      className={`block border-2 rounded-xl p-4 cursor-pointer transition-colors ${form.planId === plan.id ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
+                      className={`block border-2 rounded-xl p-4 cursor-pointer transition-colors ${form.planId === plan.id ? 'border-[var(--platform-accent)] bg-[var(--platform-accent-tint)]' : 'border-[var(--platform-panel-border-soft)] hover:border-[var(--platform-panel-border)]'}`}
                     >
                       <input
                         type="radio"
@@ -391,14 +399,14 @@ export function OrganizationsListPage() {
                       />
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="font-semibold text-slate-900">{plan.name}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">
+                          <p className="font-semibold text-[var(--platform-panel-heading)]">{plan.name}</p>
+                          <p className="text-xs text-[var(--platform-panel-muted)] mt-0.5">
                             Up to {plan.maxEmployees} employees
                           </p>
                           {plan.features.length > 0 && (
                             <ul className="mt-2 space-y-0.5">
                               {plan.features.slice(0, 4).map((f) => (
-                                <li key={f} className="text-xs text-slate-600 flex items-center gap-1">
+                                <li key={f} className="text-xs text-[var(--platform-panel-muted)] flex items-center gap-1">
                                   <Check className="h-3 w-3 text-green-500 flex-shrink-0" />
                                   {f}
                                 </li>
@@ -406,16 +414,16 @@ export function OrganizationsListPage() {
                             </ul>
                           )}
                         </div>
-                        <div className="text-right text-xs text-slate-500 space-y-0.5 flex-shrink-0 ml-3">
-                          <p>Monthly: <span className="font-medium text-slate-800">₹{plan.priceMonthly.toLocaleString('en-IN')}</span></p>
-                          <p>Quarterly: <span className="font-medium text-slate-800">₹{plan.priceQuarterly.toLocaleString('en-IN')}</span></p>
-                          <p>Yearly: <span className="font-medium text-slate-800">₹{plan.priceYearly.toLocaleString('en-IN')}</span></p>
+                        <div className="text-right text-xs text-[var(--platform-panel-muted)] space-y-0.5 flex-shrink-0 ml-3">
+                          <p>Monthly: <span className="font-medium text-[var(--platform-panel-label)]">₹{plan.priceMonthly.toLocaleString('en-IN')}</span></p>
+                          <p>Quarterly: <span className="font-medium text-[var(--platform-panel-label)]">₹{plan.priceQuarterly.toLocaleString('en-IN')}</span></p>
+                          <p>Yearly: <span className="font-medium text-[var(--platform-panel-label)]">₹{plan.priceYearly.toLocaleString('en-IN')}</span></p>
                         </div>
                       </div>
                     </label>
                   ))}
                   {plans.filter((p) => p.isActive).length === 0 && (
-                    <p className="text-sm text-slate-500 text-center py-4">No active plans available</p>
+                    <p className="text-sm text-[var(--platform-panel-muted)] text-center py-4">No active plans available</p>
                   )}
                 </div>
               )}
@@ -424,13 +432,13 @@ export function OrganizationsListPage() {
               {step === 3 && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                       Billing Cycle
                     </label>
                     <select
                       value={form.billingCycle}
                       onChange={(e) => setField('billingCycle', e.target.value)}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                     >
                       <option value="MONTHLY">Monthly</option>
                       <option value="QUARTERLY">Quarterly</option>
@@ -438,7 +446,7 @@ export function OrganizationsListPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                       Grace Period Days
                     </label>
                     <input
@@ -446,11 +454,11 @@ export function OrganizationsListPage() {
                       min={0}
                       value={form.gracePeriodDays}
                       onChange={(e) => setField('gracePeriodDays', Number(e.target.value))}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                       Tax Percent (%)
                     </label>
                     <input
@@ -459,11 +467,11 @@ export function OrganizationsListPage() {
                       max={100}
                       value={form.taxPercent}
                       onChange={(e) => setField('taxPercent', Number(e.target.value))}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                       Due After Days
                     </label>
                     <input
@@ -471,7 +479,7 @@ export function OrganizationsListPage() {
                       min={0}
                       value={form.dueAfterDays}
                       onChange={(e) => setField('dueAfterDays', Number(e.target.value))}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                     />
                   </div>
                 </>
@@ -481,14 +489,14 @@ export function OrganizationsListPage() {
               {step === 4 && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                       Admin Email <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
                       value={form.adminEmail}
                       onChange={(e) => setField('adminEmail', e.target.value)}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                       placeholder="admin@company.com"
                     />
                     {errors.adminEmail && (
@@ -496,57 +504,57 @@ export function OrganizationsListPage() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                    <label className="block text-sm font-medium text-[var(--platform-panel-label)] mb-1">
                       Admin Name
                     </label>
                     <input
                       type="text"
                       value={form.adminName}
                       onChange={(e) => setField('adminName', e.target.value)}
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500"
+                      className="w-full border border-[var(--platform-panel-border)] rounded-lg px-3 py-2 text-sm text-[var(--platform-panel-heading)] placeholder:text-[var(--platform-panel-faint)] focus:outline-none focus:border-[var(--platform-accent)]"
                       placeholder="John Doe"
                     />
                   </div>
 
                   {/* Summary */}
-                  <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
-                    <p className="font-semibold text-slate-700 mb-2">Summary</p>
+                  <div className="bg-[var(--platform-panel-bg)] rounded-xl p-4 space-y-2 text-sm">
+                    <p className="font-semibold text-[var(--platform-panel-label)] mb-2">Summary</p>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Company</span>
-                      <span className="text-slate-800 font-medium">{form.name}</span>
+                      <span className="text-[var(--platform-panel-muted)]">Company</span>
+                      <span className="text-[var(--platform-panel-label)] font-medium">{form.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Email</span>
-                      <span className="text-slate-800">{form.email}</span>
+                      <span className="text-[var(--platform-panel-muted)]">Email</span>
+                      <span className="text-[var(--platform-panel-label)]">{form.email}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Plan</span>
-                      <span className="text-slate-800">{selectedPlan?.name ?? '—'}</span>
+                      <span className="text-[var(--platform-panel-muted)]">Plan</span>
+                      <span className="text-[var(--platform-panel-label)]">{selectedPlan?.name ?? '—'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Billing</span>
-                      <span className="text-slate-800">{form.billingCycle}</span>
+                      <span className="text-[var(--platform-panel-muted)]">Billing</span>
+                      <span className="text-[var(--platform-panel-label)]">{form.billingCycle}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Tax</span>
-                      <span className="text-slate-800">{form.taxPercent}%</span>
+                      <span className="text-[var(--platform-panel-muted)]">Tax</span>
+                      <span className="text-[var(--platform-panel-label)]">{form.taxPercent}%</span>
                     </div>
                   </div>
                 </>
               )}
             </div>
 
-            <div className="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-[var(--platform-panel-border-soft)] flex items-center justify-between">
               <button
                 onClick={step === 1 ? closeRegister : () => setStep((s) => s - 1)}
-                className="text-sm text-slate-600 hover:text-slate-800 transition-colors"
+                className="text-sm text-[var(--platform-panel-muted)] hover:text-[var(--platform-panel-heading)] transition-colors"
               >
                 {step === 1 ? 'Cancel' : 'Back'}
               </button>
               {step < 4 ? (
                 <button
                   onClick={handleNext}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="bg-[var(--platform-accent)] hover:bg-[var(--platform-accent-hover)] text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   Next
                 </button>
@@ -554,7 +562,7 @@ export function OrganizationsListPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={registerMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="bg-[var(--platform-accent)] hover:bg-[var(--platform-accent-hover)] disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   {registerMutation.isPending ? 'Registering...' : 'Register'}
                 </button>
@@ -573,21 +581,21 @@ export function OrganizationsListPage() {
                 <Check className="h-6 w-6 text-green-600" />
               </div>
               <div className="text-center">
-                <h3 className="text-lg font-bold text-slate-900">Organization Registered</h3>
-                <p className="text-sm text-slate-500 mt-1">
+                <h3 className="text-lg font-bold text-[var(--platform-panel-heading)]">Organization Registered</h3>
+                <p className="text-sm text-[var(--platform-panel-muted)] mt-1">
                   {successResult.orgName} has been successfully created.
                 </p>
               </div>
             </div>
-            <div className="bg-slate-50 rounded-xl p-4">
-              <p className="text-xs text-slate-500 mb-2 font-medium">Temporary Admin Password</p>
+            <div className="bg-[var(--platform-panel-bg)] rounded-xl p-4">
+              <p className="text-xs text-[var(--platform-panel-muted)] mb-2 font-medium">Temporary Admin Password</p>
               <div className="flex items-center gap-2">
-                <code className="flex-1 text-sm font-mono text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-2 break-all">
+                <code className="flex-1 text-sm font-mono text-[var(--platform-panel-label)] bg-white border border-[var(--platform-panel-border-soft)] rounded-lg px-3 py-2 break-all">
                   {successResult.tempPassword}
                 </code>
                 <button
                   onClick={copyPassword}
-                  className="flex-shrink-0 p-2 text-slate-500 hover:text-slate-800 transition-colors"
+                  className="flex-shrink-0 p-2 text-[var(--platform-panel-muted)] hover:text-[var(--platform-panel-heading)] transition-colors"
                 >
                   {copied ? (
                     <Check className="h-4 w-4 text-green-600" />
@@ -599,7 +607,7 @@ export function OrganizationsListPage() {
             </div>
             <button
               onClick={() => setSuccessResult(null)}
-              className="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
+              className="mt-4 w-full bg-[var(--platform-surface)] hover:bg-[var(--platform-raised)] text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
             >
               Done
             </button>

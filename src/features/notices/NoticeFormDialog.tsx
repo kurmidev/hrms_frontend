@@ -17,6 +17,7 @@ import { departmentsApi } from '@/api/departments.api'
 import type { Notice, NoticeTargetType } from '@/types/notices.types'
 import type { Role, Department } from '@/types/organization.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   title: z.string().min(1, 'Required'),
@@ -109,7 +110,7 @@ export function NoticeFormDialog({ open, onOpenChange, notice }: Props) {
       onOpenChange(false)
       toast.success(isEdit ? 'Notice updated.' : 'Notice created.')
     },
-    onError: () => toast.error(isEdit ? 'Failed to update notice.' : 'Failed to create notice.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, isEdit ? 'Failed to update notice.' : 'Failed to create notice.')),
   })
 
   return (

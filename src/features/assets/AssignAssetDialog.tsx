@@ -13,6 +13,7 @@ import { employeesApi } from '@/api/employees.api'
 import type { Employee } from '@/types/employee.types'
 import type { Asset } from '@/types/asset.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   employeeId: z.string().min(1, 'Employee is required'),
@@ -58,7 +59,7 @@ export function AssignAssetDialog({ open, onOpenChange, asset }: Props) {
       reset()
       toast.success('Asset assigned.')
     },
-    onError: () => toast.error('Failed to assign asset.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to assign asset.')),
   })
 
   return (

@@ -13,7 +13,7 @@ import { exitApi } from '@/api/exit.api'
 import { employeesApi } from '@/api/employees.api'
 import type { ExitDepartmentClearance, ExitSettlementSummary } from '@/types/exit.types'
 import { usePermission } from '@/hooks/usePermission'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 
 const STATUS_COLORS: Record<string, string> = {
@@ -67,7 +67,7 @@ export function ExitDetailPage() {
       qc.invalidateQueries({ queryKey: ['exit', id] })
       toast.success('Clearance updated.')
     },
-    onError: () => toast.error('Failed to update clearance.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to update clearance.')),
   })
 
   const { mutate: settle, isPending: settling } = useMutation({
@@ -81,7 +81,7 @@ export function ExitDetailPage() {
       qc.invalidateQueries({ queryKey: ['exit', id] })
       toast.success('Settlement processed. Employee marked as exited.')
     },
-    onError: () => toast.error('Failed to process settlement.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to process settlement.')),
   })
 
   if (!canManage) {

@@ -17,6 +17,7 @@ import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Required'),
@@ -68,7 +69,7 @@ export function IncentiveRulesPage() {
       setOpen(false)
       toast.success(editItem ? 'Incentive rule updated.' : 'Incentive rule created.')
     },
-    onError: () => toast.error('Failed to save incentive rule.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save incentive rule.')),
   })
 
   const columns: Column<IncentiveRule>[] = [

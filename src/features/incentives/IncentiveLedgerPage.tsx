@@ -9,12 +9,14 @@ import type { IncentiveLedgerEntry } from '@/types/incentives.types'
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
+import { useAuthStore } from '@/store/auth.store'
 import { formatCurrency } from '@/lib/utils'
 import { ReleaseIncentiveDialog } from './ReleaseIncentiveDialog'
 
 export function IncentiveLedgerPage() {
   const { page, limit, setPage } = usePagination()
   const canApprove = usePermission('todo:approve')
+  const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
   const [releaseTarget, setReleaseTarget] = useState<IncentiveLedgerEntry | null>(null)
 
   const { data, isLoading } = useQuery({
@@ -76,7 +78,10 @@ export function IncentiveLedgerPage() {
       key: 'actions',
       header: '',
       render: (row) =>
-        canApprove && row.isHeld && !row.isDeducted ? (
+        canApprove &&
+        row.isHeld &&
+        !row.isDeducted &&
+        !(currentEmployeeId != null && row.employeeId === currentEmployeeId) ? (
           <Button
             size="sm"
             variant="outline"

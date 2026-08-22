@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { todosApi } from '@/api/incentives.api'
 import type { TodoTask } from '@/types/incentives.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const MONTH_OPTIONS = [
   { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
@@ -60,7 +61,7 @@ export function ApproveTodoDialog({ open, onOpenChange, todo }: Props) {
       resetForm()
       toast.success(decision === 'approve' ? 'Todo approved.' : 'Todo rejected.')
     },
-    onError: () => toast.error('Failed to review todo.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to review todo.')),
   })
 
   return (

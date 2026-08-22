@@ -21,6 +21,8 @@ export interface AuthUser {
   roles: Array<{ id: string; name: string }>
   permissions: string[]
   organizationId: string
+  organizationName?: string | null
+  organizationLogoUrl?: string | null
 }
 
 export interface AuthTokens {

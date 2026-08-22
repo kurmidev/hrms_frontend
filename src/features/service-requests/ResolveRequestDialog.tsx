@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { serviceRequestApi } from '@/api/service-request.api'
 import type { ServiceRequest } from '@/types/service-request.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   resolutionNote: z.string().optional(),
@@ -41,7 +42,7 @@ export function ResolveRequestDialog({ open, onOpenChange, request }: Props) {
       reset()
       toast.success('Request resolved.')
     },
-    onError: () => toast.error('Failed to resolve request.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to resolve request.')),
   })
 
   return (

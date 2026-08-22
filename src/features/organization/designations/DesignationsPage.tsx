@@ -17,6 +17,7 @@ import type { Designation } from '@/types/organization.types'
 import { toast } from 'sonner'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -72,7 +73,7 @@ export function DesignationsPage() {
       setOpen(false)
       toast.success(editItem ? 'Designation updated.' : 'Designation created.')
     },
-    onError: () => toast.error('Failed to save designation.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save designation.')),
   })
 
   const { mutate: del, isPending: deleting } = useMutation({
@@ -82,7 +83,7 @@ export function DesignationsPage() {
       setDeleteItem(null)
       toast.success('Designation deleted.')
     },
-    onError: () => toast.error('Cannot delete — employees may be assigned to it.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Cannot delete — employees may be assigned to it.')),
   })
 
   const flatDepts = (nodes: typeof deptTree): { id: string; name: string }[] =>

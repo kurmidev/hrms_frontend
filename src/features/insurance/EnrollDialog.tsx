@@ -13,6 +13,7 @@ import { employeesApi } from '@/api/employees.api'
 import type { Employee } from '@/types/employee.types'
 import type { InsurancePolicy } from '@/types/insurance.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   employeeId: z.string().min(1, 'Employee is required'),
@@ -70,7 +71,7 @@ export function EnrollDialog({ open, onOpenChange }: Props) {
       reset({ familyMembers: [] })
       toast.success('Employee enrolled.')
     },
-    onError: () => toast.error('Failed to enroll employee.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to enroll employee.')),
   })
 
   return (

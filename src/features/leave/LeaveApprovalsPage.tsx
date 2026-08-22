@@ -25,9 +25,10 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { leaveApi } from '@/api/leave.api'
 import type { LeaveApplication } from '@/types/leave.types'
 import { LEAVE_TYPE_LABELS, LEAVE_STATUS_LABELS } from '@/lib/constants'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
+import { useAuthStore } from '@/store/auth.store'
 import { toast } from 'sonner'
 
 type DecisionMode = 'approve' | 'reject'
@@ -36,6 +37,7 @@ export function LeaveApprovalsPage() {
   const qc = useQueryClient()
   const { page, limit, setPage, reset } = usePagination()
   const canApprove = usePermission('leave:approve')
+  const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
   const [status, setStatus] = useState('PENDING')
   const [decisionTarget, setDecisionTarget] = useState<LeaveApplication | null>(null)
   const [decisionMode, setDecisionMode] = useState<DecisionMode>('approve')
@@ -63,7 +65,7 @@ export function LeaveApprovalsPage() {
       setNote('')
       toast.success(decisionMode === 'approve' ? 'Leave approved.' : 'Leave rejected.')
     },
-    onError: () => toast.error('Failed to record decision.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to record decision.')),
   })
 
   const openDecision = (row: LeaveApplication, mode: DecisionMode) => {
@@ -100,13 +102,15 @@ export function LeaveApprovalsPage() {
     {
       key: 'actions',
       header: 'Actions',
-      render: (row) =>
-        row.status === 'PENDING' ? (
+      render: (row) => {
+        const isOwnRecord = currentEmployeeId != null && row.employeeId === currentEmployeeId
+        return row.status === 'PENDING' && !isOwnRecord ? (
           <div className="flex gap-2">
             <Button size="sm" onClick={() => openDecision(row, 'approve')}>Approve</Button>
             <Button size="sm" variant="outline" onClick={() => openDecision(row, 'reject')}>Reject</Button>
           </div>
-        ) : null,
+        ) : null
+      },
     },
   ]
 

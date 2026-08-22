@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { odApi } from '@/api/od.api'
 import type { OdRecord, OdLocationEntry } from '@/types/od.types'
-import { formatDateTime } from '@/lib/utils'
+import { formatDateTime, getApiErrorMessage } from '@/lib/utils'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
@@ -103,7 +103,7 @@ export function OnDutyPage() {
       markForm.reset({ hours: undefined, reason: '' })
       toast.success('On-duty recorded for today.')
     },
-    onError: () => toast.error('Failed to record on-duty.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to record on-duty.')),
   })
 
   const { mutate: addLocation, isPending: adding } = useMutation({
@@ -118,7 +118,7 @@ export function OnDutyPage() {
       addForm.reset({ hours: undefined })
       toast.success('Location entry added.')
     },
-    onError: () => toast.error('Failed to add location entry.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to add location entry.')),
   })
 
   const submitMark = async (values: MarkValues) => {

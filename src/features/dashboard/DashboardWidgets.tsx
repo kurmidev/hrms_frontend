@@ -114,7 +114,7 @@ export function KpiWidgetCard({ widget, kpis, isLoading }: KpiCardProps) {
             <p className="text-3xl font-bold text-foreground mt-1">{rawValue ?? '—'}</p>
           )}
           {isLinkable && !isLoading && (
-            <span className="flex items-center gap-1 text-xs font-medium text-blue-600 mt-1.5">
+            <span className="flex items-center gap-1 text-xs font-medium text-primary mt-1.5">
               View details <ArrowRight className="h-3 w-3" />
             </span>
           )}
@@ -210,7 +210,7 @@ export function RecentJoinersTableCard({ widget }: { widget: DashboardWidget }) 
     <Card className="shadow-sm h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base">{widget.title || 'Recent Joiners'}</CardTitle>
-        <Link to="/employees" className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700">
+        <Link to="/employees" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
           View All <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </CardHeader>
@@ -248,7 +248,7 @@ export function PendingLoansTableCard({ widget }: { widget: DashboardWidget }) {
     <Card className="shadow-sm h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base">{widget.title || 'Pending Loan Approvals'}</CardTitle>
-        <Link to="/loans" className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700">
+        <Link to="/loans" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
           View All <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </CardHeader>
@@ -288,7 +288,7 @@ export function PendingLeavesTableCard({ widget }: { widget: DashboardWidget }) 
     <Card className="shadow-sm h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-base">{widget.title || 'Pending Leave Requests'}</CardTitle>
-        <Link to="/leave" className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700">
+        <Link to="/leave" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
           View All <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </CardHeader>
@@ -332,7 +332,7 @@ export function UnknownWidgetCard({ widget }: { widget: DashboardWidget }) {
 export function ActivityPlaceholderCard({ widget }: { widget: DashboardWidget }) {
   return (
     <Card className="shadow-sm h-full">
-      <CardHeader><CardTitle className="text-base flex items-center gap-2"><Activity className="h-4 w-4 text-blue-600" />{widget.title || 'Recent Activity'}</CardTitle></CardHeader>
+      <CardHeader><CardTitle className="text-base flex items-center gap-2"><Activity className="h-4 w-4 text-primary" />{widget.title || 'Recent Activity'}</CardTitle></CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground py-4 text-center">Activity feed coming soon.</p>
       </CardContent>
@@ -353,7 +353,7 @@ export function ClockCheckinCard({ widget }: { widget: DashboardWidget }) {
 
   return (
     <Card className="shadow-sm h-full">
-      <CardHeader><CardTitle className="text-base flex items-center gap-2"><Clock className="h-4 w-4 text-blue-600" />{widget.title || "Today's Attendance"}</CardTitle></CardHeader>
+      <CardHeader><CardTitle className="text-base flex items-center gap-2"><Clock className="h-4 w-4 text-primary" />{widget.title || "Today's Attendance"}</CardTitle></CardHeader>
       <CardContent>
         {isLoading ? <Skeleton className="h-16 w-full" /> : (
           <div className="flex items-center justify-between">
@@ -371,7 +371,7 @@ export function ClockCheckinCard({ widget }: { widget: DashboardWidget }) {
             </div>
           </div>
         )}
-        <Link to="/attendance/my" className="flex items-center justify-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 mt-4">
+        <Link to="/attendance/my" className="flex items-center justify-center gap-1 text-xs font-medium text-primary hover:text-primary/80 mt-4">
           Go to Attendance <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </CardContent>

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { performanceApi } from '@/api/performance.api'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z
   .object({
@@ -47,7 +48,7 @@ export function CreateCycleDialog({ open, onOpenChange }: Props) {
       reset()
       toast.success('Performance cycle created.')
     },
-    onError: () => toast.error('Failed to create performance cycle.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to create performance cycle.')),
   })
 
   return (

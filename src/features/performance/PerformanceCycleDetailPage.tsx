@@ -23,7 +23,7 @@ import type { Employee } from '@/types/employee.types'
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 
 const STATUS_COLORS: Record<string, string> = {
@@ -95,7 +95,7 @@ export function PerformanceCycleDetailPage() {
       reset({ isEligibleForIncrement: false })
       toast.success('Rating submitted.')
     },
-    onError: () => toast.error('Failed to submit rating. You can only rate your reporting-chain subordinates.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to submit rating. You can only rate your reporting-chain subordinates.')),
   })
 
   const { mutate: activate, isPending: activating } = useMutation({
@@ -106,7 +106,7 @@ export function PerformanceCycleDetailPage() {
       setActivateOpen(false)
       toast.success('Performance cycle activated.')
     },
-    onError: () => toast.error('Failed to activate performance cycle.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to activate performance cycle.')),
   })
 
   const { mutate: close, isPending: closing } = useMutation({
@@ -117,7 +117,7 @@ export function PerformanceCycleDetailPage() {
       setCloseOpen(false)
       toast.success('Performance cycle closed.')
     },
-    onError: () => toast.error('Failed to close performance cycle.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to close performance cycle.')),
   })
 
   const ratingColumns: Column<PerformanceRating>[] = [
@@ -171,8 +171,8 @@ export function PerformanceCycleDetailPage() {
         <Button variant="ghost" size="icon" onClick={() => navigate('/performance')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-          <Target className="h-5 w-5 text-blue-600" />
+        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+          <Target className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">

@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { assetApi } from '@/api/asset.api'
 import type { Asset, AssetStatus } from '@/types/asset.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const RETURN_STATUSES: AssetStatus[] = ['AVAILABLE', 'UNDER_MAINTENANCE', 'DAMAGED']
 
@@ -52,7 +53,7 @@ export function ReturnAssetDialog({ open, onOpenChange, asset }: Props) {
       reset()
       toast.success('Asset returned.')
     },
-    onError: () => toast.error('Failed to return asset.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to return asset.')),
   })
 
   return (

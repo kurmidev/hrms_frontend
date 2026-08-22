@@ -28,7 +28,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { attendanceApi } from '@/api/attendance.api'
 import type { AttendanceLog } from '@/types/attendance.types'
 import { ATTENDANCE_STATUS_LABELS } from '@/lib/constants'
-import { formatDate, formatDateTime } from '@/lib/utils'
+import { formatDate, formatDateTime, getApiErrorMessage } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
 import { toast } from 'sonner'
 
@@ -82,7 +82,7 @@ export function AttendancePage() {
       setOpen(false)
       toast.success('Attendance entry saved.')
     },
-    onError: () => toast.error('Failed to save attendance entry.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save attendance entry.')),
   })
 
   const openCreate = () => {
@@ -146,8 +146,8 @@ export function AttendancePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-            <Clock className="h-5 w-5 text-blue-600" />
+          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+            <Clock className="h-5 w-5 text-green-600" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Attendance</h1>

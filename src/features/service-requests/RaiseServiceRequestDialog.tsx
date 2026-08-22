@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { serviceRequestApi } from '@/api/service-request.api'
 import type { ServiceRequestCategory, ServiceRequestPriority } from '@/types/service-request.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const CATEGORIES: ServiceRequestCategory[] = ['HR', 'IT', 'ADMIN', 'COMPLIANCE', 'FINANCE', 'POLICY_CLARIFICATION']
 const PRIORITIES: ServiceRequestPriority[] = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
@@ -67,7 +68,7 @@ export function RaiseServiceRequestDialog({ open, onOpenChange }: Props) {
       reset()
       toast.success('Request submitted.')
     },
-    onError: () => toast.error('Failed to submit request.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to submit request.')),
   })
 
   return (

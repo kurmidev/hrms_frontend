@@ -195,7 +195,9 @@ const NAV_ITEMS: NavItem[] = [
 export function Sidebar() {
   const location = useLocation()
   const { sidebarOpen, setSidebarOpen } = useUiStore()
-  const { hasPermission } = useAuthStore()
+  const { hasPermission, user } = useAuthStore()
+  const organizationLogoUrl = user?.organizationLogoUrl
+  const organizationName = user?.organizationName
   const [expanded, setExpanded] = useState<string[]>(['/organization'])
 
   const toggleExpanded = (href: string) => {
@@ -238,24 +240,39 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          'fixed left-0 top-0 bottom-0 z-40 flex flex-col bg-slate-900 text-white transition-all duration-300 ease-in-out',
+          'fixed left-0 top-0 bottom-0 z-40 flex flex-col bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out',
           sidebarOpen ? 'w-[260px]' : 'w-0 md:w-16 overflow-hidden'
         )}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-700 flex-shrink-0">
-          <div className="w-8 h-8 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-sm font-bold">H</span>
-          </div>
-          {sidebarOpen && (
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-white truncate">HRMS Portal</p>
-              <p className="text-xs text-slate-400">Management</p>
+        <div className="flex items-center gap-3 px-3 py-4 border-b border-sidebar-border flex-shrink-0">
+          {sidebarOpen ? (
+            organizationLogoUrl ? (
+              <div className="flex-1 min-w-0 bg-white rounded-lg px-3 py-2">
+                <img
+                  src={organizationLogoUrl}
+                  alt={organizationName ?? 'Organization'}
+                  className="h-8 w-auto object-contain"
+                />
+              </div>
+            ) : (
+              <div className="flex-1 min-w-0 bg-white rounded-lg px-3 py-2 flex items-center gap-2">
+                <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center flex-shrink-0">
+                  <Building2 className="h-3.5 w-3.5 text-primary-foreground" />
+                </div>
+                <span className="text-sm font-semibold text-foreground truncate">
+                  {organizationName ?? 'Organization'}
+                </span>
+              </div>
+            )
+          ) : (
+            <div className="w-9 h-9 mx-auto bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
+              <Building2 className="h-4 w-4 text-primary-foreground" />
             </div>
           )}
           {sidebarOpen && (
             <button
-              className="ml-auto md:hidden text-slate-400 hover:text-white"
+              className="ml-auto md:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground"
               onClick={() => setSidebarOpen(false)}
             >
               <X className="h-4 w-4" />
@@ -281,8 +298,8 @@ export function Sidebar() {
                         className={cn(
                           'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                           active
-                            ? 'bg-blue-600 text-white'
-                            : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                         )}
                       >
                         <Icon className="h-4 w-4 flex-shrink-0" />
@@ -290,15 +307,15 @@ export function Sidebar() {
                           <>
                             <span className="flex-1 text-left truncate">{item.label}</span>
                             {isExpanded ? (
-                              <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+                              <ChevronDown className="h-3.5 w-3.5 text-sidebar-foreground/50" />
                             ) : (
-                              <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+                              <ChevronRight className="h-3.5 w-3.5 text-sidebar-foreground/50" />
                             )}
                           </>
                         )}
                       </button>
                       {sidebarOpen && isExpanded && (
-                        <ul className="mt-0.5 ml-4 space-y-0.5 border-l border-slate-700 pl-3">
+                        <ul className="mt-0.5 ml-4 space-y-0.5 border-l border-sidebar-border pl-3">
                           {item.children
                             ?.filter((c) => !c.permission || hasPermission(c.permission))
                             .map((child) => (
@@ -308,8 +325,8 @@ export function Sidebar() {
                                   className={cn(
                                     'block px-3 py-1.5 rounded-md text-xs transition-colors',
                                     location.pathname === child.href
-                                      ? 'text-blue-400 font-medium'
-                                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                                      ? 'text-primary font-medium'
+                                      : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent'
                                   )}
                                 >
                                   {child.label}
@@ -325,8 +342,8 @@ export function Sidebar() {
                       className={cn(
                         'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                         active
-                          ? 'bg-blue-600 text-white'
-                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                       )}
                     >
                       <Icon className="h-4 w-4 flex-shrink-0" />

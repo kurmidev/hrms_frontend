@@ -14,6 +14,7 @@ import { employeesApi } from '@/api/employees.api'
 import type { Employee } from '@/types/employee.types'
 import type { ExitType, ExitInitiator } from '@/types/exit.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const EXIT_TYPES: ExitType[] = ['RESIGNATION', 'TERMINATION', 'ABSCONDING', 'RETIREMENT']
 const INITIATORS: ExitInitiator[] = ['SELF', 'MANAGEMENT']
@@ -66,7 +67,7 @@ export function InitiateExitDialog({ open, onOpenChange }: Props) {
       reset()
       toast.success('Exit initiated.')
     },
-    onError: () => toast.error('Failed to initiate exit.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to initiate exit.')),
   })
 
   return (

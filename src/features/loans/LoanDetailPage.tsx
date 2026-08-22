@@ -12,7 +12,8 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { loanApi } from '@/api/loan.api'
 import type { LoanEmiSchedule } from '@/types/loan.types'
 import { usePermission } from '@/hooks/usePermission'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { useAuthStore } from '@/store/auth.store'
+import { formatCurrency, formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 import { ApproveLoanDialog } from './ApproveLoanDialog'
 
@@ -30,6 +31,7 @@ export function LoanDetailPage() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const canApprove = usePermission('loan:approve')
+  const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
 
   const [approveOpen, setApproveOpen] = useState(false)
   const [rejectOpen, setRejectOpen] = useState(false)
@@ -57,7 +59,7 @@ export function LoanDetailPage() {
       setRejectOpen(false)
       toast.success('Loan application rejected.')
     },
-    onError: () => toast.error('Failed to reject loan application.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to reject loan application.')),
   })
 
   const emiColumns: Column<LoanEmiSchedule>[] = [
@@ -107,7 +109,9 @@ export function LoanDetailPage() {
             {loan ? `${loan.employee.empCode} · ${loan.employee.departmentName ?? '—'}` : ''}
           </p>
         </div>
-        {canApprove && loan?.status === 'PENDING' && (
+        {canApprove &&
+          loan?.status === 'PENDING' &&
+          !(currentEmployeeId != null && loan.employeeId === currentEmployeeId) && (
           <div className="flex items-center gap-2">
             <Button variant="outline" className="text-destructive hover:text-destructive" onClick={() => setRejectOpen(true)}>
               Reject

@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { greenThanksApi } from '@/api/green-thanks.api'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const schema = z.object({
   inrPerPoint: z.preprocess(
@@ -58,7 +59,7 @@ export function GreenThanksConfigPage() {
       qc.invalidateQueries({ queryKey: ['green-thanks-config'] })
       toast.success('Green Thanks configuration updated.')
     },
-    onError: () => toast.error('Failed to update configuration.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to update configuration.')),
   })
 
   if (!canManage) {

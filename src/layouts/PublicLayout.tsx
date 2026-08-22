@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom'
 
 export function PublicLayout() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-green-50">
       <header className="bg-white border-b border-border/50 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">

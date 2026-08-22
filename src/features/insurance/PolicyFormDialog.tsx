@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { insuranceApi } from '@/api/insurance.api'
 import type { InsurancePolicy, InsuranceType } from '@/types/insurance.types'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const POLICY_TYPES: InsuranceType[] = ['HEALTH', 'ACCIDENTAL']
 
@@ -82,7 +83,7 @@ export function PolicyFormDialog({ open, onOpenChange, policy }: Props) {
       onOpenChange(false)
       toast.success(policy ? 'Policy updated.' : 'Policy created.')
     },
-    onError: () => toast.error('Failed to save policy.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to save policy.')),
   })
 
   return (

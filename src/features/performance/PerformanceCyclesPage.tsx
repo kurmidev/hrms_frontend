@@ -12,7 +12,7 @@ import type { PerformanceCycle, PerformanceCycleStatus } from '@/types/performan
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 import { CreateCycleDialog } from './CreateCycleDialog'
 
@@ -48,7 +48,7 @@ export function PerformanceCyclesPage() {
       setActivateTarget(null)
       toast.success('Performance cycle activated.')
     },
-    onError: () => toast.error('Failed to activate performance cycle.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to activate performance cycle.')),
   })
 
   const { mutate: close, isPending: closing } = useMutation({
@@ -58,7 +58,7 @@ export function PerformanceCyclesPage() {
       setCloseTarget(null)
       toast.success('Performance cycle closed.')
     },
-    onError: () => toast.error('Failed to close performance cycle.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to close performance cycle.')),
   })
 
   const columns: Column<PerformanceCycle>[] = [
@@ -113,8 +113,8 @@ export function PerformanceCyclesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-            <Target className="h-5 w-5 text-blue-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <Target className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Performance Cycles</h1>

@@ -10,7 +10,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { serviceRequestApi } from '@/api/service-request.api'
 import type { ServiceRequestStatus } from '@/types/service-request.types'
 import { usePermission } from '@/hooks/usePermission'
-import { formatDateTime, formatDate } from '@/lib/utils'
+import { useAuthStore } from '@/store/auth.store'
+import { formatDateTime, formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 import { AssignRequestDialog } from './AssignRequestDialog'
 import { ResolveRequestDialog } from './ResolveRequestDialog'
@@ -35,6 +36,7 @@ export function ServiceRequestDetailPage() {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const canManage = usePermission('service_request:manage')
+  const currentEmployeeId = useAuthStore((s) => s.user?.employee?.id) ?? null
 
   const [assignOpen, setAssignOpen] = useState(false)
   const [resolveOpen, setResolveOpen] = useState(false)
@@ -56,7 +58,7 @@ export function ServiceRequestDetailPage() {
       qc.invalidateQueries({ queryKey: ['service-requests'] })
       toast.success('Status updated.')
     },
-    onError: () => toast.error('Failed to update status.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to update status.')),
   })
 
   const { mutate: addComment, isPending: commentPending } = useMutation({
@@ -69,10 +71,12 @@ export function ServiceRequestDetailPage() {
       setComment('')
       toast.success('Comment added.')
     },
-    onError: () => toast.error('Failed to add comment.'),
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Failed to add comment.')),
   })
 
   const nextStatuses = request ? NEXT_STATUSES[request.status] ?? [] : []
+  const isOwnRecord =
+    currentEmployeeId != null && !!request?.employeeId && request.employeeId === currentEmployeeId
 
   return (
     <div className="space-y-6">
@@ -106,10 +110,10 @@ export function ServiceRequestDetailPage() {
               : ''}
           </p>
         </div>
-        {canManage && request && request.status === 'OPEN' && (
+        {canManage && request && request.status === 'OPEN' && !isOwnRecord && (
           <Button onClick={() => setAssignOpen(true)}>Assign</Button>
         )}
-        {canManage && request && (request.status === 'ASSIGNED' || request.status === 'IN_PROGRESS') && (
+        {canManage && request && (request.status === 'ASSIGNED' || request.status === 'IN_PROGRESS') && !isOwnRecord && (
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => setAssignOpen(true)}>Reassign</Button>
             <Button onClick={() => setResolveOpen(true)}>Resolve</Button>
@@ -129,7 +133,7 @@ export function ServiceRequestDetailPage() {
               <p><span className="font-medium text-foreground">Resolved: </span>{request.resolvedAt ? formatDate(request.resolvedAt) : '—'}</p>
               <p><span className="font-medium text-foreground">Closed: </span>{request.closedAt ? formatDate(request.closedAt) : '—'}</p>
             </div>
-            {canManage && nextStatuses.length > 0 && (
+            {canManage && !isOwnRecord && nextStatuses.length > 0 && (
               <div className="flex items-center gap-2 pt-3 border-t border-border">
                 <span className="text-xs font-medium text-muted-foreground">Move to:</span>
                 {nextStatuses.map((s) => (
