@@ -18,9 +18,9 @@ import { PolicyFormDialog } from './PolicyFormDialog'
 import { EnrollDialog } from './EnrollDialog'
 
 const APPROVAL_COLORS: Record<string, string> = {
-  PENDING: 'bg-amber-100 text-amber-700',
-  APPROVED: 'bg-emerald-100 text-emerald-700',
-  REJECTED: 'bg-red-100 text-red-700',
+  PENDING: 'bg-accent-orange/10 text-accent-orange',
+  APPROVED: 'bg-accent-green/10 text-accent-green',
+  REJECTED: 'bg-accent-red/10 text-accent-red',
 }
 
 export function InsurancePage() {
@@ -75,7 +75,7 @@ export function InsurancePage() {
       key: 'type',
       header: 'Type',
       render: (row) => (
-        <Badge className="border-0 text-xs font-medium bg-blue-100 text-blue-700" variant="secondary">{row.type}</Badge>
+        <Badge className="border-0 text-xs font-medium bg-secondary text-secondary-foreground" variant="secondary">{row.type}</Badge>
       ),
     },
     { key: 'provider', header: 'Provider', render: (row) => row.provider },
@@ -91,7 +91,7 @@ export function InsurancePage() {
       header: 'Status',
       render: (row) => (
         <Badge
-          className={`border-0 text-xs font-medium ${row.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}
+          className={`border-0 text-xs font-medium ${row.isActive ? 'bg-accent-green/10 text-accent-green' : 'bg-secondary text-secondary-foreground'}`}
           variant="secondary"
         >
           {row.isActive ? 'Active' : 'Inactive'}
@@ -195,8 +195,8 @@ export function InsurancePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center">
-          <HeartPulse className="h-5 w-5 text-pink-600" />
+        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+          <HeartPulse className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">Insurance</h1>

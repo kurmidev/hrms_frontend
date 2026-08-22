@@ -57,19 +57,19 @@ export function IncentiveLedgerPage() {
             status={row.isHeld ? 'HELD' : 'NOT_HELD'}
             type="generic"
             label={row.isHeld ? 'Held' : 'Not Held'}
-            colorClass={row.isHeld ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}
+            colorClass={row.isHeld ? 'bg-accent-orange/10 text-accent-orange' : 'bg-muted text-muted-foreground'}
           />
           <StatusBadge
             status={row.isReleased ? 'RELEASED' : 'PENDING'}
             type="generic"
             label={row.isReleased ? 'Released' : 'Pending'}
-            colorClass={row.isReleased ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}
+            colorClass={row.isReleased ? 'bg-accent-green/10 text-accent-green' : 'bg-muted text-muted-foreground'}
           />
           <StatusBadge
             status={row.isDeducted ? 'DEDUCTED' : 'NOT_DEDUCTED'}
             type="generic"
             label={row.isDeducted ? 'Deducted' : 'Not Deducted'}
-            colorClass={row.isDeducted ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}
+            colorClass={row.isDeducted ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'}
           />
         </div>
       ),
@@ -101,8 +101,8 @@ export function IncentiveLedgerPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-            <Wallet className="h-5 w-5 text-emerald-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <Wallet className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Incentive Ledger</h1>

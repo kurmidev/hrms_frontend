@@ -15,13 +15,13 @@ import { AssignAssetDialog } from './AssignAssetDialog'
 import { ReturnAssetDialog } from './ReturnAssetDialog'
 
 const STATUS_COLORS: Record<string, string> = {
-  AVAILABLE: 'bg-emerald-100 text-emerald-700',
-  ASSIGNED: 'bg-blue-100 text-blue-700',
-  UNDER_MAINTENANCE: 'bg-amber-100 text-amber-700',
-  RETIRED: 'bg-gray-200 text-gray-700',
-  RETURNED: 'bg-slate-100 text-slate-600',
-  DAMAGED: 'bg-red-100 text-red-700',
-  LOST: 'bg-red-100 text-red-700',
+  AVAILABLE: 'bg-accent-green/10 text-accent-green',
+  ASSIGNED: 'bg-secondary text-secondary-foreground',
+  UNDER_MAINTENANCE: 'bg-accent-orange/10 text-accent-orange',
+  RETIRED: 'bg-muted text-muted-foreground',
+  RETURNED: 'bg-secondary text-secondary-foreground',
+  DAMAGED: 'bg-accent-red/10 text-accent-red',
+  LOST: 'bg-accent-red/10 text-accent-red',
 }
 
 export function AssetDetailPage() {
@@ -50,7 +50,7 @@ export function AssetDetailPage() {
       key: 'recoveredAtExit',
       header: 'Recovered at Exit',
       render: (row) => (
-        <Badge className={`border-0 text-xs font-medium ${row.recoveredAtExit ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`} variant="secondary">
+        <Badge className={`border-0 text-xs font-medium ${row.recoveredAtExit ? 'bg-accent-green/10 text-accent-green' : 'bg-secondary text-secondary-foreground'}`} variant="secondary">
           {row.recoveredAtExit ? 'Yes' : 'No'}
         </Badge>
       ),
@@ -63,8 +63,8 @@ export function AssetDetailPage() {
         <Button variant="ghost" size="icon" onClick={() => navigate('/assets')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-          <Briefcase className="h-5 w-5 text-orange-600" />
+        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+          <Briefcase className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1">
           {isLoading ? (

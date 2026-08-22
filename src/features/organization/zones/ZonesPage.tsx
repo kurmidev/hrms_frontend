@@ -91,7 +91,7 @@ export function ZonesPage() {
         <StatusBadge
           status={row.isActive ? 'Active' : 'Inactive'}
           type="generic"
-          colorClass={row.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}
+          colorClass={row.isActive ? 'bg-accent-green/10 text-accent-green' : 'bg-muted text-muted-foreground'}
         />
       ),
     },
@@ -122,8 +122,8 @@ export function ZonesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
-            <MapPinned className="h-5 w-5 text-teal-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <MapPinned className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Zones</h1>

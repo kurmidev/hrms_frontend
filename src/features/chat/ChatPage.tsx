@@ -124,7 +124,7 @@ export function ChatPage() {
         ) : (
           <>
             <div className="flex items-center gap-3 border-b border-border px-5 py-3.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-teal-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <ActiveIcon className="h-4 w-4" />
               </div>
               <div className="min-w-0">

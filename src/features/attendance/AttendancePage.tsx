@@ -93,7 +93,7 @@ export function AttendancePage() {
   const renderLocation = (name?: string | null, lat?: number | null, lng?: number | null) => {
     if (name) {
       return (
-        <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+        <span className="flex items-center gap-1 text-xs font-medium text-accent-green">
           <MapPin className="h-3 w-3" />
           {name}
         </span>
@@ -146,8 +146,8 @@ export function AttendancePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-            <Clock className="h-5 w-5 text-green-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <Clock className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Attendance</h1>

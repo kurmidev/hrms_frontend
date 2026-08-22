@@ -42,17 +42,17 @@ interface KpiConfig {
 
 export function WidgetRenderer({ widget, kpiValues }: WidgetRendererProps) {
   const kpiMap: Record<string, KpiConfig> = {
-    kpi_total_employees: { icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
-    kpi_active_employees: { icon: UserCheck, color: 'text-green-600', bg: 'bg-green-100' },
-    kpi_on_leave: { icon: Calendar, color: 'text-orange-600', bg: 'bg-orange-100' },
-    kpi_attendance_rate: { icon: BarChart3, color: 'text-purple-600', bg: 'bg-purple-100' },
-    kpi_pending_approvals: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-100' },
-    kpi_payroll_total: { icon: CreditCard, color: 'text-emerald-600', bg: 'bg-emerald-100' },
-    kpi_open_loans: { icon: TrendingUp, color: 'text-indigo-600', bg: 'bg-indigo-100' },
-    kpi_open_assets: { icon: Package, color: 'text-cyan-600', bg: 'bg-cyan-100' },
-    kpi_open_tickets: { icon: Clock, color: 'text-rose-600', bg: 'bg-rose-100' },
-    kpi_my_leave_balance: { icon: Calendar, color: 'text-teal-600', bg: 'bg-teal-100' },
-    kpi_my_performance: { icon: Activity, color: 'text-violet-600', bg: 'bg-violet-100' },
+    kpi_total_employees: { icon: Users, color: 'text-primary', bg: 'bg-primary/10' },
+    kpi_active_employees: { icon: UserCheck, color: 'text-accent-green', bg: 'bg-accent-green/10' },
+    kpi_on_leave: { icon: Calendar, color: 'text-accent-orange', bg: 'bg-accent-orange/10' },
+    kpi_attendance_rate: { icon: BarChart3, color: 'text-primary', bg: 'bg-primary/10' },
+    kpi_pending_approvals: { icon: Clock, color: 'text-accent-orange', bg: 'bg-accent-orange/10' },
+    kpi_payroll_total: { icon: CreditCard, color: 'text-primary', bg: 'bg-primary/10' },
+    kpi_open_loans: { icon: TrendingUp, color: 'text-accent-orange', bg: 'bg-accent-orange/10' },
+    kpi_open_assets: { icon: Package, color: 'text-primary', bg: 'bg-primary/10' },
+    kpi_open_tickets: { icon: Clock, color: 'text-accent-orange', bg: 'bg-accent-orange/10' },
+    kpi_my_leave_balance: { icon: Calendar, color: 'text-primary', bg: 'bg-primary/10' },
+    kpi_my_performance: { icon: Activity, color: 'text-primary', bg: 'bg-primary/10' },
   }
 
   if (widget.widgetType in kpiMap) {

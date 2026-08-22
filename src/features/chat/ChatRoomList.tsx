@@ -36,7 +36,7 @@ export function ChatRoomList({ rooms, activeRoomId, currentEmployeeId, onSelect,
         </div>
         <button
           onClick={onNewChat}
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 text-white shadow-sm transition-transform hover:scale-105 hover:bg-teal-700 active:scale-95"
+          className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white shadow-sm transition-transform hover:scale-105 hover:bg-primary/90 active:scale-95"
           title="New chat"
         >
           <MessageSquarePlus className="h-4 w-4" />
@@ -74,20 +74,20 @@ export function ChatRoomList({ rooms, activeRoomId, currentEmployeeId, onSelect,
                     onClick={() => onSelect(room)}
                     className={cn(
                       'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors',
-                      active ? 'bg-teal-50 border-l-2 border-l-teal-600' : 'hover:bg-slate-100 border-l-2 border-l-transparent'
+                      active ? 'bg-primary/10 border-l-2 border-l-primary' : 'hover:bg-slate-100 border-l-2 border-l-transparent'
                     )}
                   >
                     <div
                       className={cn(
                         'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold',
-                        active ? 'bg-teal-600 text-white' : 'bg-slate-200 text-slate-600'
+                        active ? 'bg-primary text-white' : 'bg-slate-200 text-slate-600'
                       )}
                     >
                       {room.type === 'DIRECT' ? getInitials(label.split(' ')[0], label.split(' ')[1]) : <Icon className="h-4 w-4" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <p className={cn('truncate text-sm font-semibold', active ? 'text-teal-800' : 'text-foreground')}>
+                        <p className={cn('truncate text-sm font-semibold', active ? 'text-primary' : 'text-foreground')}>
                           {label}
                         </p>
                         {room.lastMessage && (

@@ -10,10 +10,10 @@ import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
 
 const STATUS_COLORS: Record<string, string> = {
-  PENDING: 'bg-slate-100 text-slate-600',
-  IN_PROGRESS: 'bg-blue-100 text-blue-700',
-  ACHIEVED: 'bg-emerald-100 text-emerald-700',
-  MISSED: 'bg-red-100 text-red-700',
+  PENDING: 'bg-secondary text-secondary-foreground',
+  IN_PROGRESS: 'bg-accent-orange/10 text-accent-orange',
+  ACHIEVED: 'bg-accent-green/10 text-accent-green',
+  MISSED: 'bg-accent-red/10 text-accent-red',
 }
 
 export function KpiPage() {

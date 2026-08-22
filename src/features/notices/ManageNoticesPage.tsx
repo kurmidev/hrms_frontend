@@ -17,9 +17,9 @@ import { NoticeFormDialog } from './NoticeFormDialog'
 import { ReadReceiptsDialog } from './ReadReceiptsDialog'
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-slate-100 text-slate-600',
-  scheduled: 'bg-amber-100 text-amber-700',
-  published: 'bg-emerald-100 text-emerald-700',
+  draft: 'bg-muted text-muted-foreground',
+  scheduled: 'bg-accent-orange/10 text-accent-orange',
+  published: 'bg-accent-green/10 text-accent-green',
 }
 
 export function ManageNoticesPage() {

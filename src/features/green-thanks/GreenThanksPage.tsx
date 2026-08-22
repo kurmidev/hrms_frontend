@@ -16,9 +16,9 @@ import { SendGreenThanksDialog } from './SendGreenThanksDialog'
 import { ApproveGreenThanksDialog } from './ApproveGreenThanksDialog'
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-100 text-amber-700',
-  approved: 'bg-emerald-100 text-emerald-700',
-  rejected: 'bg-red-100 text-red-700',
+  pending: 'bg-accent-orange/10 text-accent-orange',
+  approved: 'bg-accent-green/10 text-accent-green',
+  rejected: 'bg-accent-red/10 text-accent-red',
 }
 
 export function GreenThanksPage() {
@@ -134,8 +134,8 @@ export function GreenThanksPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-            <HeartHandshake className="h-5 w-5 text-emerald-600" />
+          <div className="w-10 h-10 bg-accent-green/10 rounded-xl flex items-center justify-center">
+            <HeartHandshake className="h-5 w-5 text-accent-green" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Green Thanks</h1>

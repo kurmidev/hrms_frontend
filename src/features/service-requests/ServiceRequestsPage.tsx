@@ -16,18 +16,18 @@ import { SERVICE_REQUEST_CATEGORY_LABELS } from '@/lib/constants'
 import { RaiseServiceRequestDialog } from './RaiseServiceRequestDialog'
 
 const STATUS_COLORS: Record<string, string> = {
-  OPEN: 'bg-slate-100 text-slate-600',
-  ASSIGNED: 'bg-amber-100 text-amber-700',
-  IN_PROGRESS: 'bg-blue-100 text-blue-700',
-  RESOLVED: 'bg-emerald-100 text-emerald-700',
-  CLOSED: 'bg-gray-200 text-gray-700',
+  OPEN: 'bg-muted text-muted-foreground',
+  ASSIGNED: 'bg-accent-orange/10 text-accent-orange',
+  IN_PROGRESS: 'bg-accent-orange/10 text-accent-orange',
+  RESOLVED: 'bg-accent-green/10 text-accent-green',
+  CLOSED: 'bg-muted text-muted-foreground',
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
-  LOW: 'bg-slate-100 text-slate-600',
-  MEDIUM: 'bg-green-100 text-green-700',
-  HIGH: 'bg-orange-100 text-orange-700',
-  CRITICAL: 'bg-red-100 text-red-700',
+  LOW: 'bg-muted text-muted-foreground',
+  MEDIUM: 'bg-accent-green/10 text-accent-green',
+  HIGH: 'bg-accent-orange/10 text-accent-orange',
+  CRITICAL: 'bg-accent-red/10 text-accent-red',
 }
 
 const CATEGORIES: ServiceRequestCategory[] = ['HR', 'IT', 'ADMIN', 'COMPLIANCE', 'FINANCE', 'POLICY_CLARIFICATION', 'SPECIAL_LEAVE']
@@ -104,8 +104,8 @@ export function ServiceRequestsPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-            <Ticket className="h-5 w-5 text-indigo-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <Ticket className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Service Requests</h1>
@@ -122,8 +122,8 @@ export function ServiceRequestsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-            <Ticket className="h-5 w-5 text-indigo-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <Ticket className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Service Requests</h1>

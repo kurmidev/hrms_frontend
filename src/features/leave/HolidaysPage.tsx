@@ -37,8 +37,8 @@ const CURRENT_YEAR = 2026
 const YEAR_OPTIONS = [2024, 2025, 2026, 2027, 2028]
 
 const HOLIDAY_TYPE_COLORS: Record<HolidayType, string> = {
-  NATIONAL: 'bg-green-100 text-green-700',
-  OPTIONAL: 'bg-orange-100 text-orange-700',
+  NATIONAL: 'bg-primary/10 text-primary',
+  OPTIONAL: 'bg-secondary text-secondary-foreground',
 }
 
 const schema = z.object({
@@ -156,7 +156,7 @@ export function HolidaysPage() {
         <StatusBadge
           status={row.appliesToAll ? 'All Employees' : row.zones.map((z) => z.name).join(', ') || 'Zone'}
           type="generic"
-          colorClass={row.appliesToAll ? 'bg-violet-100 text-violet-700' : 'bg-sky-100 text-sky-700'}
+          colorClass={row.appliesToAll ? 'bg-primary/10 text-primary' : 'bg-secondary text-secondary-foreground'}
         />
       ),
     },
@@ -166,8 +166,8 @@ export function HolidaysPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-            <CalendarDays className="h-5 w-5 text-amber-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <CalendarDays className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Holiday Calendar</h1>

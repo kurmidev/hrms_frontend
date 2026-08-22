@@ -160,8 +160,8 @@ export function LeavePoliciesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-            <CalendarDays className="h-5 w-5 text-amber-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <CalendarDays className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Leave Policies</h1>
@@ -198,7 +198,7 @@ export function LeavePoliciesPage() {
                     <Badge
                       key={t.id ?? t.leaveType}
                       variant="secondary"
-                      className="text-[10px] bg-amber-100 text-amber-700 border-0"
+                      className="text-[10px] bg-primary/10 text-primary border-0"
                     >
                       {t.name || LEAVE_TYPE_LABELS[t.leaveType] || t.leaveType} · {t.daysPerYear}d
                     </Badge>
@@ -212,7 +212,7 @@ export function LeavePoliciesPage() {
                 <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                   <div><span className="font-medium text-foreground">{policy.types.length}</span> leave type{policy.types.length === 1 ? '' : 's'}</div>
                   <div><span className="font-medium text-foreground">{policy.employeeCount ?? 0}</span> employees</div>
-                  <div>{policy.isActive ? <span className="text-emerald-600">Active</span> : <span className="text-muted-foreground">Inactive</span>}</div>
+                  <div>{policy.isActive ? <span className="text-accent-green">Active</span> : <span className="text-muted-foreground">Inactive</span>}</div>
                 </div>
               </CardContent>
             </Card>

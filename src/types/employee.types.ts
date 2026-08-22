@@ -118,6 +118,7 @@ export interface Employee {
   reportingManager?: { id: string; firstName: string; lastName: string; profilePhotoUrl: string | null }
   payrollStructure?: { id: string; name: string }
   leavePolicy?: { id: string; name: string }
+  zone?: { id: string; name: string }
   user?: { id: string; email: string; isActive: boolean; mustChangePassword: boolean }
   createdAt: string
   updatedAt: string

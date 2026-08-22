@@ -134,8 +134,8 @@ export function IssueMemoDialog({ open, onOpenChange }: Props) {
             <div
               className={`flex items-center gap-2 rounded-md border p-2 text-xs font-medium ${
                 summary.flaggedForTerminationReview
-                  ? 'border-red-300 bg-red-50 text-red-700'
-                  : 'border-amber-300 bg-amber-50 text-amber-700'
+                  ? 'border-accent-red/30 bg-accent-red/10 text-accent-red'
+                  : 'border-accent-orange/30 bg-accent-orange/10 text-accent-orange'
               }`}
             >
               <AlertTriangle className="h-4 w-4 shrink-0" />

@@ -18,10 +18,10 @@ import { IssueMemoDialog } from './IssueMemoDialog'
 const MEMO_TYPES: DisciplinaryActionType[] = ['VERBAL_WARNING', 'WRITTEN_WARNING', 'DEMOTION', 'SUSPENSION']
 
 const TYPE_COLORS: Record<string, string> = {
-  VERBAL_WARNING: 'bg-amber-100 text-amber-700',
-  WRITTEN_WARNING: 'bg-orange-100 text-orange-700',
-  DEMOTION: 'bg-red-100 text-red-700',
-  SUSPENSION: 'bg-red-100 text-red-700',
+  VERBAL_WARNING: 'bg-accent-orange/10 text-accent-orange',
+  WRITTEN_WARNING: 'bg-accent-orange/10 text-accent-orange',
+  DEMOTION: 'bg-accent-red/10 text-accent-red',
+  SUSPENSION: 'bg-accent-red/10 text-accent-red',
 }
 
 export function DisciplinaryPage() {
@@ -93,8 +93,8 @@ export function DisciplinaryPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-            <AlertOctagon className="h-5 w-5 text-red-600" />
+          <div className="w-10 h-10 bg-accent-red/10 rounded-xl flex items-center justify-center">
+            <AlertOctagon className="h-5 w-5 text-accent-red" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Disciplinary Memos</h1>

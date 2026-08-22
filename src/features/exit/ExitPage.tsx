@@ -20,11 +20,11 @@ const EXIT_TYPES: ExitType[] = ['RESIGNATION', 'TERMINATION', 'ABSCONDING', 'RET
 const EXIT_STATUSES: ExitStatus[] = ['INITIATED', 'CLEARANCE_PENDING', 'CLEARED', 'SETTLED', 'COMPLETED']
 
 const STATUS_COLORS: Record<string, string> = {
-  INITIATED: 'bg-slate-100 text-slate-600',
-  CLEARANCE_PENDING: 'bg-amber-100 text-amber-700',
-  CLEARED: 'bg-blue-100 text-blue-700',
-  SETTLED: 'bg-emerald-100 text-emerald-700',
-  COMPLETED: 'bg-emerald-100 text-emerald-700',
+  INITIATED: 'bg-secondary text-secondary-foreground',
+  CLEARANCE_PENDING: 'bg-accent-orange/10 text-accent-orange',
+  CLEARED: 'bg-accent-green/10 text-accent-green',
+  SETTLED: 'bg-accent-green/10 text-accent-green',
+  COMPLETED: 'bg-accent-green/10 text-accent-green',
 }
 
 export function ExitPage() {
@@ -98,8 +98,8 @@ export function ExitPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-            <DoorOpen className="h-5 w-5 text-purple-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <DoorOpen className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Exit Management</h1>

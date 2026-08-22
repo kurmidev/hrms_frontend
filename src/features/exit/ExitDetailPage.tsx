@@ -17,11 +17,11 @@ import { formatCurrency, formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 
 const STATUS_COLORS: Record<string, string> = {
-  INITIATED: 'bg-slate-100 text-slate-600',
-  CLEARANCE_PENDING: 'bg-amber-100 text-amber-700',
-  CLEARED: 'bg-blue-100 text-blue-700',
-  SETTLED: 'bg-emerald-100 text-emerald-700',
-  COMPLETED: 'bg-emerald-100 text-emerald-700',
+  INITIATED: 'bg-secondary text-secondary-foreground',
+  CLEARANCE_PENDING: 'bg-accent-orange/10 text-accent-orange',
+  CLEARED: 'bg-accent-green/10 text-accent-green',
+  SETTLED: 'bg-accent-green/10 text-accent-green',
+  COMPLETED: 'bg-accent-green/10 text-accent-green',
 }
 
 export function ExitDetailPage() {
@@ -110,8 +110,8 @@ export function ExitDetailPage() {
         <Button variant="ghost" size="icon" onClick={() => navigate('/exit')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-          <DoorOpen className="h-5 w-5 text-purple-600" />
+        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+          <DoorOpen className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1">
           {isLoading ? (
@@ -178,7 +178,7 @@ export function ExitDetailPage() {
                       disabled={!canManage}
                     />
                     <span className="text-sm text-foreground">{d.department}</span>
-                    {d.cleared && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />}
+                    {d.cleared && <CheckCircle2 className="h-3.5 w-3.5 text-accent-green" />}
                   </label>
                 ))}
                 {localDepartments.length === 0 && (
@@ -194,7 +194,7 @@ export function ExitDetailPage() {
                   </p>
                 </div>
                 <Badge
-                  className={`border-0 text-xs font-medium ${assetHandoverCleared ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}
+                  className={`border-0 text-xs font-medium ${assetHandoverCleared ? 'bg-accent-green/10 text-accent-green' : 'bg-accent-red/10 text-accent-red'}`}
                   variant="secondary"
                 >
                   {assetHandoverCleared ? 'Cleared' : 'Pending'}

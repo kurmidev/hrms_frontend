@@ -113,8 +113,8 @@ export function NewChatDialog({ open, onOpenChange, onCreated }: Props) {
                   className={cn(
                     'flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 text-center transition-all',
                     active
-                      ? 'border-teal-500 bg-teal-50 text-teal-700 shadow-sm'
-                      : 'border-border text-muted-foreground hover:border-teal-300 hover:bg-teal-50/40'
+                      ? 'border-primary bg-primary/10 text-primary shadow-sm'
+                      : 'border-border text-muted-foreground hover:border-primary/40 hover:bg-primary/5'
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -170,14 +170,14 @@ export function NewChatDialog({ open, onOpenChange, onCreated }: Props) {
                       onClick={() => toggleMember(emp.id)}
                       className={cn(
                         'flex w-full items-center justify-between gap-2 border-b border-border/60 px-3 py-2 text-left text-sm last:border-b-0 transition-colors',
-                        selected ? 'bg-teal-50 text-teal-800' : 'hover:bg-accent'
+                        selected ? 'bg-primary/10 text-primary' : 'hover:bg-accent'
                       )}
                     >
                       <span className="truncate">
                         {emp.firstName} {emp.lastName}
                         <span className="ml-1.5 text-xs text-muted-foreground">{emp.empCode}</span>
                       </span>
-                      {selected && <span className="h-2 w-2 flex-shrink-0 rounded-full bg-teal-500" />}
+                      {selected && <span className="h-2 w-2 flex-shrink-0 rounded-full bg-primary" />}
                     </button>
                   )
                 })}

@@ -118,8 +118,8 @@ export function MyAttendancePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-          <CalendarClock className="h-5 w-5 text-green-600" />
+        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+          <CalendarClock className="h-5 w-5 text-primary" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">My Attendance</h1>
@@ -143,7 +143,7 @@ export function MyAttendancePage() {
               <span className="text-muted-foreground">Check-in</span>
               <p className="font-medium text-foreground">{todayLog?.checkInAt ? formatDateTime(todayLog.checkInAt) : '—'}</p>
               {todayLog?.checkInLocationName && (
-                <p className="flex items-center gap-1 text-xs text-emerald-600">
+                <p className="flex items-center gap-1 text-xs text-accent-green">
                   <MapPin className="h-3 w-3" />
                   {todayLog.checkInLocationName}
                 </p>
@@ -153,7 +153,7 @@ export function MyAttendancePage() {
               <span className="text-muted-foreground">Check-out</span>
               <p className="font-medium text-foreground">{todayLog?.checkOutAt ? formatDateTime(todayLog.checkOutAt) : '—'}</p>
               {todayLog?.checkOutLocationName && (
-                <p className="flex items-center gap-1 text-xs text-emerald-600">
+                <p className="flex items-center gap-1 text-xs text-accent-green">
                   <MapPin className="h-3 w-3" />
                   {todayLog.checkOutLocationName}
                 </p>

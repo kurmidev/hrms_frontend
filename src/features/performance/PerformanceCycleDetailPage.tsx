@@ -27,9 +27,9 @@ import { formatDate, getApiErrorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-600',
-  ACTIVE: 'bg-emerald-100 text-emerald-700',
-  CLOSED: 'bg-amber-100 text-amber-700',
+  DRAFT: 'bg-secondary text-secondary-foreground',
+  ACTIVE: 'bg-accent-green/10 text-accent-green',
+  CLOSED: 'bg-accent-orange/10 text-accent-orange',
 }
 
 const schema = z.object({

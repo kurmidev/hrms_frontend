@@ -169,8 +169,8 @@ export function ReportsPage() {
   if (!canRead) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center gap-3">
-        <div className="w-14 h-14 bg-rose-100 rounded-xl flex items-center justify-center">
-          <ShieldAlert className="h-7 w-7 text-rose-600" />
+        <div className="w-14 h-14 bg-accent-red/10 rounded-xl flex items-center justify-center">
+          <ShieldAlert className="h-7 w-7 text-accent-red" />
         </div>
         <h2 className="text-lg font-semibold text-foreground">Access Denied</h2>
         <p className="text-sm text-muted-foreground max-w-sm">
@@ -184,8 +184,8 @@ export function ReportsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-            <FileBarChart className="h-5 w-5 text-indigo-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <FileBarChart className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Reports</h1>

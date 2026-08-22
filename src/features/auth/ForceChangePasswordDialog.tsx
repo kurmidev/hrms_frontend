@@ -75,8 +75,8 @@ export function ForceChangePasswordDialog() {
       >
         <DialogHeader>
           <div className="flex items-center gap-3 mb-1">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30">
-              <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent-orange/10 dark:bg-accent-orange/20">
+              <ShieldAlert className="h-5 w-5 text-accent-orange" />
             </div>
             <DialogTitle className="text-lg">Password Change Required</DialogTitle>
           </div>

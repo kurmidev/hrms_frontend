@@ -19,11 +19,11 @@ import { ResolveRequestDialog } from './ResolveRequestDialog'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 
 const STATUS_COLORS: Record<string, string> = {
-  OPEN: 'bg-slate-100 text-slate-600',
-  ASSIGNED: 'bg-amber-100 text-amber-700',
-  IN_PROGRESS: 'bg-blue-100 text-blue-700',
-  RESOLVED: 'bg-emerald-100 text-emerald-700',
-  CLOSED: 'bg-gray-200 text-gray-700',
+  OPEN: 'bg-muted text-muted-foreground',
+  ASSIGNED: 'bg-accent-orange/10 text-accent-orange',
+  IN_PROGRESS: 'bg-accent-orange/10 text-accent-orange',
+  RESOLVED: 'bg-accent-green/10 text-accent-green',
+  CLOSED: 'bg-muted text-muted-foreground',
 }
 
 // Status transitions permitted from the current status, offered via the "Update Status" affordance.
@@ -114,8 +114,8 @@ export function ServiceRequestDetailPage() {
         <Button variant="ghost" size="icon" onClick={() => navigate('/service-requests')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-          <Ticket className="h-5 w-5 text-indigo-600" />
+        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+          <Ticket className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1">
           {isLoading ? (

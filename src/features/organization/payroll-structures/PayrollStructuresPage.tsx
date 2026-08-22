@@ -50,8 +50,8 @@ export function PayrollStructuresPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-            <CreditCard className="h-5 w-5 text-green-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <CreditCard className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Payroll Structures</h1>
@@ -68,8 +68,8 @@ export function PayrollStructuresPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-            <CreditCard className="h-5 w-5 text-green-600" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+            <CreditCard className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Payroll Structures</h1>
@@ -96,7 +96,7 @@ export function PayrollStructuresPage() {
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-sm font-semibold">{s.name}</CardTitle>
                   <div className="flex items-center gap-1">
-                    <Badge variant="secondary" className={`text-[10px] border-0 ${s.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                    <Badge variant="secondary" className={`text-[10px] border-0 ${s.isActive ? 'bg-accent-green/10 text-accent-green' : 'bg-muted text-muted-foreground'}`}>
                       {s.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                     {canEdit && (
@@ -118,7 +118,7 @@ export function PayrollStructuresPage() {
                   {s.components.map((c, i) => (
                     <div key={i} className="flex justify-between text-xs">
                       <span className="text-foreground">{c.name}</span>
-                      <span className={`font-medium ${c.isDeductible ? 'text-red-500' : 'text-emerald-600'}`}>
+                      <span className={`font-medium ${c.isDeductible ? 'text-accent-red' : 'text-accent-green'}`}>
                         {c.isDeductible ? '-' : '+'}
                         {c.type === 'PERCENTAGE' ? `${c.value}%` : `₹${c.value}`}
                       </span>

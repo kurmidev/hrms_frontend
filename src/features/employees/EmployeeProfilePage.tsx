@@ -172,6 +172,9 @@ export function EmployeeProfilePage() {
               <InfoRow label="Designation" value={emp.designation?.name} />
               <InfoRow label="Reporting Manager" value={emp.reportingManager ? `${emp.reportingManager.firstName} ${emp.reportingManager.lastName}` : undefined} />
               <InfoRow label="Employment Type" value={EMPLOYMENT_TYPE_LABELS[emp.employmentType]} />
+              <InfoRow label="Leave Policy" value={emp.leavePolicy?.name} />
+              <InfoRow label="Zone" value={emp.zone?.name} />
+              <InfoRow label="Work Location" value={emp.workLocation ?? undefined} />
               <InfoRow label="Joining Date" value={formatDate(emp.joiningDate)} />
               <InfoRow label="Probation End" value={formatDate(emp.probationEndDate)} />
               <InfoRow label="PF Number" value={emp.pfNumber ?? undefined} />
