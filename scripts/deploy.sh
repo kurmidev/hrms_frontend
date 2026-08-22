@@ -9,7 +9,7 @@
 #   ./scripts/deploy.sh
 #
 # Env vars:
-#   FRONTEND_PORT=4173   Port `serve` listens on (must match ecosystem.config.js / nginx upstream)
+#   FRONTEND_PORT=4173   Port `serve` listens on (must match ecosystem.config.cjs / nginx upstream)
 
 set -euo pipefail
 
@@ -29,7 +29,7 @@ npm run build
 
 echo "==> [frontend] Reloading pm2 process (zero-downtime if already running, starts fresh otherwise)"
 mkdir -p logs
-pm2 startOrReload ecosystem.config.js --env production
+pm2 startOrReload ecosystem.config.cjs --env production
 pm2 save
 
 echo "==> [frontend] Deploy complete — served at http://localhost:${FRONTEND_PORT:-4173}"
