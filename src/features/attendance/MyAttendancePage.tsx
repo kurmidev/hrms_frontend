@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { MapPin, LogIn, LogOut, Loader2, CalendarClock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,18 +15,44 @@ interface Coords {
   accuracy?: number
 }
 
+class LocationError extends Error {
+  constructor(message: string, public readonly permissionDenied: boolean) {
+    super(message)
+  }
+}
+
+function geolocationErrorMessage(error: GeolocationPositionError): string {
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      return 'Location permission was blocked.'
+    case error.POSITION_UNAVAILABLE:
+      return 'Your location could not be determined. Check your device location settings and try again.'
+    case error.TIMEOUT:
+      return 'Location request timed out. Please try again.'
+    default:
+      return 'Unable to fetch your location. Please enable location access.'
+  }
+}
+
 function getCurrentPosition(): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('Geolocation is not supported by this browser.'))
+    if (!('geolocation' in navigator)) {
+      reject(new LocationError('Geolocation is not supported by this browser.', false))
       return
     }
-    navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true,
-      timeout: 10000,
-    })
+    navigator.geolocation.getCurrentPosition(
+      resolve,
+      (error) => reject(new LocationError(geolocationErrorMessage(error), error.code === error.PERMISSION_DENIED)),
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
   })
 }
+
+const BROWSER_LOCATION_RESET_STEPS = [
+  { browser: 'Chrome / Edge', steps: 'Click the lock (or "i") icon left of the address bar → Site settings → set Location to Allow → reload this page.' },
+  { browser: 'Firefox', steps: 'Click the lock icon left of the address bar → clear the location permission (or set it to Allow) → reload this page.' },
+  { browser: 'Safari', steps: 'Safari menu → Settings for This Website → set Location to Allow → reload this page.' },
+]
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
@@ -44,8 +70,34 @@ function monthRange(): { fromDate: string; toDate: string; year: number; month: 
 export function MyAttendancePage() {
   const qc = useQueryClient()
   const [coords, setCoords] = useState<Coords | null>(null)
-  const [locating, setLocating] = useState(false)
+  const [locating, setLocating] = useState(true)
+  const [locationError, setLocationError] = useState<string | null>(null)
+  const [permissionDenied, setPermissionDenied] = useState(false)
+  const [showResetHelp, setShowResetHelp] = useState(false)
   const range = monthRange()
+
+  // Request location as soon as the page loads (not only when Check In is
+  // clicked) so the browser's permission prompt appears immediately on
+  // arrival — check-in/out stay disabled until a location is actually
+  // obtained, since the backend requires lat/lng for check-in regardless.
+  useEffect(() => {
+    setLocating(true)
+    getCurrentPosition()
+      .then((position) => {
+        setCoords({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+        })
+        setLocationError(null)
+        setPermissionDenied(false)
+      })
+      .catch((error: LocationError) => {
+        setLocationError(error.message)
+        setPermissionDenied(error.permissionDenied)
+      })
+      .finally(() => setLocating(false))
+  }, [])
 
   const { data, isLoading } = useQuery({
     queryKey: ['my-attendance', range.fromDate, range.toDate],
@@ -98,10 +150,14 @@ export function MyAttendancePage() {
         accuracy: position.coords.accuracy,
       }
       setCoords(next)
+      setLocationError(null)
+      setPermissionDenied(false)
       if (action === 'in') checkIn()
       else checkOut()
-    } catch {
-      toast.error('Unable to fetch your location. Please enable location access.')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to fetch your location. Please enable location access.'
+      setLocationError(message)
+      setPermissionDenied(error instanceof LocationError && error.permissionDenied)
     } finally {
       setLocating(false)
     }
@@ -132,10 +188,40 @@ export function MyAttendancePage() {
           <CardTitle className="text-sm font-semibold">Today</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {coords && (
+          {locationError ? (
+            <div className="space-y-2 rounded-lg bg-accent-red/10 px-3 py-2 text-xs text-accent-red">
+              <p className="flex items-start gap-1.5">
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                {locationError}
+                {permissionDenied && (
+                  <button
+                    type="button"
+                    onClick={() => setShowResetHelp((v) => !v)}
+                    className="ml-1 shrink-0 underline underline-offset-2 hover:no-underline"
+                  >
+                    {showResetHelp ? 'Hide steps' : 'How to enable it'}
+                  </button>
+                )}
+              </p>
+              {permissionDenied && showResetHelp && (
+                <ul className="space-y-1 border-t border-accent-red/20 pt-2 text-[11px] text-accent-red/90">
+                  {BROWSER_LOCATION_RESET_STEPS.map(({ browser, steps }) => (
+                    <li key={browser}>
+                      <span className="font-semibold">{browser}:</span> {steps}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : coords ? (
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin className="h-3.5 w-3.5" />
               {coords.lat.toFixed(6)}, {coords.lng.toFixed(6)}
+            </p>
+          ) : (
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Requesting your location…
             </p>
           )}
           <div className="grid gap-3 sm:grid-cols-2 text-sm">
@@ -163,7 +249,7 @@ export function MyAttendancePage() {
           <div className="flex gap-3">
             <Button
               onClick={() => handleLocateAndAct('in')}
-              disabled={hasCheckedIn || locating || checkingIn}
+              disabled={hasCheckedIn || locating || checkingIn || !coords}
             >
               {(locating || checkingIn) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
               Check In
@@ -171,7 +257,7 @@ export function MyAttendancePage() {
             <Button
               variant="outline"
               onClick={() => handleLocateAndAct('out')}
-              disabled={!hasCheckedIn || hasCheckedOut || locating || checkingOut}
+              disabled={!hasCheckedIn || hasCheckedOut || locating || checkingOut || !coords}
             >
               {(locating || checkingOut) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
               Check Out

@@ -106,7 +106,7 @@ export function WorkLocationsPage() {
         <StatusBadge
           status={row.isActive ? 'Active' : 'Inactive'}
           type="generic"
-          colorClass={row.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}
+          colorClass={row.isActive ? 'bg-accent-green/10 text-accent-green' : 'bg-muted text-muted-foreground'}
         />
       ),
     },

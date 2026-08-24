@@ -75,7 +75,7 @@ export function LoanDetailPage() {
       header: 'Deducted',
       render: (row) => (
         <Badge
-          className={`border-0 text-xs font-medium ${row.isDeducted ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}
+          className={`border-0 text-xs font-medium ${row.isDeducted ? 'bg-accent-green/10 text-accent-green' : 'bg-muted text-muted-foreground'}`}
           variant="secondary"
         >
           {row.isDeducted ? 'Yes' : 'No'}

@@ -84,7 +84,7 @@ export function IncentiveRulesPage() {
           status={row.isActive ? 'ACTIVE' : 'INACTIVE'}
           type="generic"
           label={row.isActive ? 'Active' : 'Inactive'}
-          colorClass={row.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}
+          colorClass={row.isActive ? 'bg-accent-green/10 text-accent-green' : 'bg-muted text-muted-foreground'}
         />
       ),
     },

@@ -28,7 +28,7 @@ interface Props {
 
 export function StatusBadge({ status, type, label, colorClass }: Props) {
   let displayLabel = label ?? status
-  let classes = colorClass ?? 'bg-slate-100 text-slate-600'
+  let classes = colorClass ?? 'bg-muted text-muted-foreground'
 
   if (type === 'employee') {
     displayLabel = EMPLOYEE_STATUS_LABELS[status as EmployeeStatus] ?? status

@@ -17,11 +17,11 @@ export const EMPLOYEE_STATUS_LABELS: Record<EmployeeStatus, string> = {
 }
 
 export const EMPLOYEE_STATUS_COLORS: Record<EmployeeStatus, string> = {
-  PRE_BOARDING: 'bg-blue-100 text-blue-700',
-  ACTIVE: 'bg-emerald-100 text-emerald-700',
-  ON_LEAVE: 'bg-amber-100 text-amber-700',
-  SUSPENDED: 'bg-orange-100 text-orange-700',
-  EXITED: 'bg-slate-100 text-slate-600',
+  PRE_BOARDING: 'bg-primary/10 text-primary',
+  ACTIVE: 'bg-accent-green/10 text-accent-green',
+  ON_LEAVE: 'bg-accent-orange/10 text-accent-orange',
+  SUSPENDED: 'bg-accent-red/10 text-accent-red',
+  EXITED: 'bg-muted text-muted-foreground',
 }
 
 export const ONBOARDING_STATUS_LABELS: Record<OnboardingStatus, string> = {
@@ -36,14 +36,14 @@ export const ONBOARDING_STATUS_LABELS: Record<OnboardingStatus, string> = {
 }
 
 export const ONBOARDING_STATUS_COLORS: Record<OnboardingStatus, string> = {
-  PENDING: 'bg-slate-100 text-slate-600',
-  IN_PROGRESS: 'bg-blue-100 text-blue-700',
-  SUBMITTED: 'bg-violet-100 text-violet-700',
-  UNDER_REVIEW: 'bg-amber-100 text-amber-700',
-  CHANGES_REQUESTED: 'bg-orange-100 text-orange-700',
-  ACTIVATED: 'bg-emerald-100 text-emerald-700',
-  REJECTED: 'bg-red-100 text-red-700',
-  EXPIRED: 'bg-slate-100 text-slate-500',
+  PENDING: 'bg-muted text-muted-foreground',
+  IN_PROGRESS: 'bg-accent-orange/10 text-accent-orange',
+  SUBMITTED: 'bg-accent-orange/10 text-accent-orange',
+  UNDER_REVIEW: 'bg-accent-orange/10 text-accent-orange',
+  CHANGES_REQUESTED: 'bg-accent-orange/10 text-accent-orange',
+  ACTIVATED: 'bg-accent-green/10 text-accent-green',
+  REJECTED: 'bg-accent-red/10 text-accent-red',
+  EXPIRED: 'bg-muted text-muted-foreground',
 }
 
 export const LEAVE_TYPE_LABELS: Record<string, string> = {
@@ -64,10 +64,10 @@ export const LEAVE_STATUS_LABELS: Record<string, string> = {
 }
 
 export const LEAVE_STATUS_COLORS: Record<string, string> = {
-  PENDING: 'bg-amber-100 text-amber-700',
-  APPROVED: 'bg-emerald-100 text-emerald-700',
-  REJECTED: 'bg-red-100 text-red-700',
-  CANCELLED: 'bg-slate-100 text-slate-600',
+  PENDING: 'bg-accent-orange/10 text-accent-orange',
+  APPROVED: 'bg-accent-green/10 text-accent-green',
+  REJECTED: 'bg-accent-red/10 text-accent-red',
+  CANCELLED: 'bg-muted text-muted-foreground',
 }
 
 export const ATTENDANCE_STATUS_LABELS: Record<string, string> = {
@@ -82,14 +82,14 @@ export const ATTENDANCE_STATUS_LABELS: Record<string, string> = {
 }
 
 export const ATTENDANCE_STATUS_COLORS: Record<string, string> = {
-  PRESENT: 'bg-emerald-100 text-emerald-700',
-  ABSENT: 'bg-red-100 text-red-700',
-  HALF_DAY: 'bg-amber-100 text-amber-700',
-  LOSS_OF_PAY: 'bg-orange-100 text-orange-700',
-  ON_LEAVE: 'bg-blue-100 text-blue-700',
-  HOLIDAY: 'bg-violet-100 text-violet-700',
-  WEEK_OFF: 'bg-slate-100 text-slate-600',
-  ON_DUTY: 'bg-cyan-100 text-cyan-700',
+  PRESENT: 'bg-accent-green/10 text-accent-green',
+  ABSENT: 'bg-accent-red/10 text-accent-red',
+  HALF_DAY: 'bg-accent-orange/10 text-accent-orange',
+  LOSS_OF_PAY: 'bg-accent-red/10 text-accent-red',
+  ON_LEAVE: 'bg-accent-orange/10 text-accent-orange',
+  HOLIDAY: 'bg-primary/10 text-primary',
+  WEEK_OFF: 'bg-muted text-muted-foreground',
+  ON_DUTY: 'bg-primary/10 text-primary',
 }
 
 export const PAYROLL_RUN_STATUS_LABELS: Record<string, string> = {
@@ -101,11 +101,11 @@ export const PAYROLL_RUN_STATUS_LABELS: Record<string, string> = {
 }
 
 export const PAYROLL_RUN_STATUS_COLORS: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-600',
-  PROCESSING: 'bg-blue-100 text-blue-700',
-  COMPLETED: 'bg-amber-100 text-amber-700',
-  APPROVED: 'bg-violet-100 text-violet-700',
-  DISBURSED: 'bg-emerald-100 text-emerald-700',
+  DRAFT: 'bg-muted text-muted-foreground',
+  PROCESSING: 'bg-accent-orange/10 text-accent-orange',
+  COMPLETED: 'bg-primary/10 text-primary',
+  APPROVED: 'bg-primary/20 text-primary',
+  DISBURSED: 'bg-accent-green/10 text-accent-green',
 }
 
 export const LOAN_STATUS_LABELS: Record<string, string> = {
@@ -117,11 +117,11 @@ export const LOAN_STATUS_LABELS: Record<string, string> = {
 }
 
 export const LOAN_STATUS_COLORS: Record<string, string> = {
-  PENDING: 'bg-amber-100 text-amber-700',
-  APPROVED: 'bg-blue-100 text-blue-700',
-  REJECTED: 'bg-red-100 text-red-700',
-  ACTIVE: 'bg-emerald-100 text-emerald-700',
-  CLOSED: 'bg-slate-100 text-slate-600',
+  PENDING: 'bg-accent-orange/10 text-accent-orange',
+  APPROVED: 'bg-primary/10 text-primary',
+  REJECTED: 'bg-accent-red/10 text-accent-red',
+  ACTIVE: 'bg-accent-green/10 text-accent-green',
+  CLOSED: 'bg-muted text-muted-foreground',
 }
 
 export const TODO_STATUS_LABELS: Record<string, string> = {
@@ -132,10 +132,10 @@ export const TODO_STATUS_LABELS: Record<string, string> = {
 }
 
 export const TODO_STATUS_COLORS: Record<string, string> = {
-  PENDING: 'bg-slate-100 text-slate-600',
-  SUBMITTED: 'bg-amber-100 text-amber-700',
-  APPROVED: 'bg-emerald-100 text-emerald-700',
-  REJECTED: 'bg-red-100 text-red-700',
+  PENDING: 'bg-muted text-muted-foreground',
+  SUBMITTED: 'bg-accent-orange/10 text-accent-orange',
+  APPROVED: 'bg-accent-green/10 text-accent-green',
+  REJECTED: 'bg-accent-red/10 text-accent-red',
 }
 
 export const SERVICE_REQUEST_CATEGORY_LABELS: Record<string, string> = {
