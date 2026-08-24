@@ -1,6 +1,16 @@
 import type { PaginatedMeta } from './api.types'
 
-export type ReportType = 'headcount' | 'attendance' | 'leave' | 'payroll' | 'loans' | 'incentives'
+export type ReportType =
+  | 'headcount'
+  | 'attendance'
+  | 'leave'
+  | 'payroll'
+  | 'loans'
+  | 'incentives'
+  | 'attendance-track'
+  | 'performance'
+  | 'todo-incentive'
+  | 'audit'
 
 export interface ReportFilters {
   from?: string
@@ -80,6 +90,33 @@ export interface PayrollComponentBreakdown {
   otherDeductions: number
 }
 
+export interface PayrollEmployeeRow {
+  employeeId: string
+  empCode: string
+  name: string
+  basicSalary: number
+  hra: number
+  specialAllowance: number
+  educationAllowance: number
+  otherAllowances: number
+  incentiveAmount: number
+  overtimeAmount: number
+  travelAllowance: number
+  bonus: number
+  greenThanksAmount: number
+  grossSalary: number
+  pfEmployee: number
+  pfEmployer: number
+  esiEmployee: number
+  esiEmployer: number
+  professionalTax: number
+  tds: number
+  loanDeduction: number
+  advanceDeduction: number
+  otherDeductions: number
+  netSalary: number
+}
+
 export interface PayrollReport {
   runId: string | null
   month: number
@@ -89,6 +126,8 @@ export interface PayrollReport {
   totalGross: number
   totalDisbursed: number
   componentBreakdown: PayrollComponentBreakdown
+  rows: PayrollEmployeeRow[]
+  meta: PaginatedMeta
 }
 
 export interface LoanReportRow {
@@ -124,6 +163,117 @@ export interface IncentiveReport {
   totalAmount: number
   rows: IncentiveReportRow[]
   meta: PaginatedMeta
+}
+
+export interface AttendanceTrackReportRow {
+  employeeId: string
+  empCode: string
+  name: string
+  date: string
+  checkInAt: string | null
+  checkOutAt: string | null
+  checkInLat: number | null
+  checkInLng: number | null
+  checkInLocationName: string | null
+  checkOutLat: number | null
+  checkOutLng: number | null
+  checkOutLocationName: string | null
+  source: string
+  status: string
+  totalHours: number | null
+}
+
+export interface AttendanceTrackLiveRow {
+  employeeId: string
+  empCode: string
+  name: string
+  lat: number
+  lng: number
+  recordedAt: string
+}
+
+export interface AttendanceTrackReport {
+  from: string
+  to: string
+  rows: AttendanceTrackReportRow[]
+  meta: PaginatedMeta
+  liveNow: AttendanceTrackLiveRow[]
+}
+
+export interface PerformanceReportRow {
+  employeeId: string
+  empCode: string
+  name: string
+  cycleId: string
+  cycleName: string
+  rating: number
+  isEligibleForIncrement: boolean
+  ratedBy: string
+  submittedAt: string
+  kpiAssignedCount: number
+  kpiAchievedCount: number
+  kpiAchievementRate: number
+}
+
+export interface PerformanceReport {
+  from: string
+  to: string
+  avgRating: number
+  totalRatingsCount: number
+  rows: PerformanceReportRow[]
+  meta: PaginatedMeta
+}
+
+export interface TodoIncentiveReportRow {
+  employeeId: string
+  empCode: string
+  name: string
+  todosTotal: number
+  todosApproved: number
+  todosRejected: number
+  completionRate: number
+  incentiveTotalAmount: number
+  incentiveReleasedAmount: number
+}
+
+export interface TodoIncentiveReport {
+  orgTodosApproved: number
+  orgIncentiveTotalAmount: number
+  rows: TodoIncentiveReportRow[]
+  meta: PaginatedMeta
+}
+
+export interface AuditHistoryReportRow {
+  userId: string
+  email: string
+  empCode: string | null
+  name: string
+  ipAddress: string | null
+  userAgent: string | null
+  deviceInfo: string | null
+  loginAt: string
+  logoutAt: string | null
+  status: string
+}
+
+export interface AuditSystemChangeRow {
+  action: string
+  entityType: string
+  entityId: string | null
+  actorId: string | null
+  occurredAt: string
+  ipAddress: string | null
+}
+
+export interface AuditHistoryReport {
+  from: string
+  to: string
+  totalLogins: number
+  failedLogins: number
+  uniqueUsers: number
+  rows: AuditHistoryReportRow[]
+  meta: PaginatedMeta
+  systemChanges: AuditSystemChangeRow[]
 }
 
 export interface DashboardKpis {

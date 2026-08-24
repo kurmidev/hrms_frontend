@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Users, UserCheck, Shield, CreditCard, Clock, TrendingUp, BarChart3, ArrowRight,
   Wallet2, Ticket, Package, Star, CalendarClock, Activity, Radar, ListTodo, Sparkles,
-  HandCoins,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -485,101 +484,6 @@ export function LiveTrackingWidget({ widget }: { widget: DashboardWidget }) {
             ))}
           </ul>
         )}
-      </CardContent>
-    </Card>
-  )
-}
-
-export function LoanLeaveSummaryWidget({ widget }: { widget: DashboardWidget }) {
-  const { data: loanData, isLoading: loansLoading, isError: loansError } = useQuery({
-    queryKey: ['dashboard-pending-loans'],
-    queryFn: () => loanApi.list({ status: 'PENDING', limit: 5 }),
-  })
-  const { data: leaveData, isLoading: leavesLoading, isError: leavesError } = useQuery({
-    queryKey: ['dashboard-pending-leaves'],
-    queryFn: () => leaveApi.list({ status: 'PENDING', limit: 5 }),
-  })
-  const loans = (loanData as { data?: Loan[] })?.data ?? []
-  const applications = (leaveData as { data?: LeaveApplication[] })?.data ?? []
-
-  return (
-    <Card className="shadow-sm h-full">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-base flex items-center gap-2">
-          <HandCoins className="h-4 w-4 text-primary" />
-          {widget.title || 'Loan & Leave Summaries'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pending Loans</p>
-            <Link to="/loans" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
-              View All <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          {loansLoading ? (
-            <div className="space-y-2">{Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-9 w-full" />)}</div>
-          ) : loansError ? (
-            <p className="text-xs text-destructive py-2 text-center">Failed to load pending loans.</p>
-          ) : loans.length === 0 ? (
-            <p className="text-xs text-muted-foreground py-2 text-center">No pending loan requests.</p>
-          ) : (
-            <ul className="divide-y divide-border">
-              {loans.map((l) => (
-                <li key={l.id} className="flex items-center justify-between gap-3 py-1.5 first:pt-0 last:pb-0">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{l.employee?.firstName} {l.employee?.lastName}</p>
-                    <p className="text-xs text-muted-foreground">{formatCurrency(l.amountRequested)}</p>
-                  </div>
-                  <StatusBadge status={l.status} type="loan" />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pending Leaves</p>
-            <Link to="/leave" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
-              View All <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          {leavesLoading ? (
-            <div className="space-y-2">{Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-9 w-full" />)}</div>
-          ) : leavesError ? (
-            <p className="text-xs text-destructive py-2 text-center">Failed to load pending leaves.</p>
-          ) : applications.length === 0 ? (
-            <p className="text-xs text-muted-foreground py-2 text-center">No pending leave requests.</p>
-          ) : (
-            <ul className="divide-y divide-border">
-              {applications.map((a) => (
-                <li key={a.id} className="flex items-center justify-between gap-3 py-1.5 first:pt-0 last:pb-0">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{a.employee?.firstName} {a.employee?.lastName}</p>
-                    <p className="text-xs text-muted-foreground">{formatDate(a.fromDate)} – {formatDate(a.toDate)}</p>
-                  </div>
-                  <StatusBadge status={a.status} type="leave" />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-// `list_notifications` reuses the recent-activity data source. A dedicated
-// in-app notification/reminder feed is a separate future feature — today the
-// notifications module is outbound email/SMS only, so recent activity is the
-// closest existing data source and this widget only relabels that card.
-export function NotificationsWidget({ widget }: { widget: DashboardWidget }) {
-  return (
-    <Card className="shadow-sm h-full">
-      <CardHeader><CardTitle className="text-base flex items-center gap-2"><Activity className="h-4 w-4 text-primary" />{widget.title || 'Notifications & Reminders'}</CardTitle></CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground py-4 text-center">Activity feed coming soon.</p>
       </CardContent>
     </Card>
   )

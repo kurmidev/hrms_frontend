@@ -2,13 +2,17 @@ import { toast } from 'sonner'
 import { apiClient, unwrap } from './client'
 import type {
   AttendanceReport,
+  AttendanceTrackReport,
+  AuditHistoryReport,
   HeadcountReport,
   IncentiveReport,
   LeaveReport,
   LoanReport,
   PayrollReport,
+  PerformanceReport,
   ReportFilters,
   ReportType,
+  TodoIncentiveReport,
 } from '@/types/reports.types'
 
 function extractFilename(contentDisposition: string | undefined, fallback: string): string {
@@ -35,6 +39,22 @@ export const reportsApi = {
 
   incentives: (params?: ReportFilters) =>
     apiClient.get<{ data: IncentiveReport }>('/reports/incentives', { params }).then(unwrap<IncentiveReport>),
+
+  attendanceTrack: (params?: ReportFilters) =>
+    apiClient
+      .get<{ data: AttendanceTrackReport }>('/reports/attendance-track', { params })
+      .then(unwrap<AttendanceTrackReport>),
+
+  performance: (params?: ReportFilters) =>
+    apiClient.get<{ data: PerformanceReport }>('/reports/performance', { params }).then(unwrap<PerformanceReport>),
+
+  todoIncentive: (params?: ReportFilters) =>
+    apiClient
+      .get<{ data: TodoIncentiveReport }>('/reports/todo-incentive', { params })
+      .then(unwrap<TodoIncentiveReport>),
+
+  audit: (params?: ReportFilters) =>
+    apiClient.get<{ data: AuditHistoryReport }>('/reports/audit', { params }).then(unwrap<AuditHistoryReport>),
 
   exportReport: async (
     type: ReportType,

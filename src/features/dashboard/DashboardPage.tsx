@@ -16,11 +16,13 @@ import { usePermission } from '@/hooks/usePermission'
 import {
   KpiWidgetCard, KpiSolidStrip, EmployeeStatusChartCard, DepartmentHeadcountChartCard, RecentJoinersTableCard,
   PendingLoansTableCard, PendingLeavesTableCard, ActivityPlaceholderCard, ClockCheckinCard,
-  ShieldPlaceholderCard, UnknownWidgetCard, LiveTrackingWidget, LoanLeaveSummaryWidget, NotificationsWidget,
+  ShieldPlaceholderCard, UnknownWidgetCard, LiveTrackingWidget,
   MyTodosWidget, GreenThanksWidget,
 } from './DashboardWidgets'
 import { NoticeBoardWidget } from './widgets/NoticeBoardWidget'
 import { HolidaysWidget } from './widgets/HolidaysWidget'
+import { LoanLeaveSummaryWidget } from './widgets/LoanLeaveSummaryWidget'
+import { NotificationsRemindersWidget } from './widgets/NotificationsRemindersWidget'
 
 const OPEN_TODO_STATUSES = new Set(['PENDING', 'SUBMITTED'])
 const MAX_DASHBOARD_TODOS = 5
@@ -76,9 +78,9 @@ function renderWidget(widget: DashboardWidget, kpis: DashboardKpis | undefined, 
     case 'map_live_tracking':
       return <LiveTrackingWidget widget={widget} />
     case 'table_loan_leave_summary':
-      return <LoanLeaveSummaryWidget widget={widget} />
+      return <LoanLeaveSummaryWidget />
     case 'list_notifications':
-      return <NotificationsWidget widget={widget} />
+      return <NotificationsRemindersWidget />
     case 'list_my_todos':
       return <MyTodosWidget widget={widget} />
     case 'widget_green_thanks':

@@ -153,7 +153,7 @@ export const PERMISSION_GROUPS: Record<string, string[]> = {
   'Employees': ['employee:read', 'employee:create', 'employee:update', 'employee:delete'],
   'Payroll': ['payroll:read', 'payroll:create', 'payroll:update', 'payroll:delete', 'payroll:run', 'payroll:approve'],
   'Roles': ['role:read', 'role:create', 'role:update', 'role:delete', 'role:assign'],
-  'Reports': ['report:read'],
+  'Reports': ['report:read', 'report:export', 'report:audit'],
   'Dashboard': ['dashboard:read'],
   'Performance': ['performance:read', 'performance:manage'],
   'Incentives': ['incentive:read', 'incentive:manage'],

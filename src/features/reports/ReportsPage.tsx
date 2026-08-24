@@ -10,22 +10,31 @@ import { reportsApi } from '@/api/reports.api'
 import { departmentsApi } from '@/api/departments.api'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, formatDateTime } from '@/lib/utils'
 import type {
   AttendanceReportRow,
+  AttendanceTrackReportRow,
+  AuditHistoryReportRow,
   IncentiveReportRow,
   LeaveReportRow,
   LoanReportRow,
+  PayrollEmployeeRow,
+  PerformanceReportRow,
   ReportType,
+  TodoIncentiveReportRow,
 } from '@/types/reports.types'
 
-const REPORT_TYPE_OPTIONS: { value: ReportType; label: string }[] = [
+const ALL_REPORT_TYPE_OPTIONS: { value: ReportType; label: string }[] = [
   { value: 'headcount', label: 'Headcount' },
   { value: 'attendance', label: 'Attendance' },
   { value: 'leave', label: 'Leave' },
   { value: 'payroll', label: 'Payroll' },
   { value: 'loans', label: 'Loans' },
   { value: 'incentives', label: 'Incentives' },
+  { value: 'attendance-track', label: 'Attendance & Live Track' },
+  { value: 'performance', label: 'Performance' },
+  { value: 'todo-incentive', label: 'Todo & Incentive' },
+  { value: 'audit', label: 'Audit Login & History' },
 ]
 
 function flatDepts(
@@ -40,6 +49,9 @@ function flatDepts(
 export function ReportsPage() {
   const canRead = usePermission('report:read')
   const canExport = usePermission('report:export')
+  const canAudit = usePermission('report:audit')
+
+  const REPORT_TYPE_OPTIONS = ALL_REPORT_TYPE_OPTIONS.filter((opt) => opt.value !== 'audit' || canAudit)
 
   const [reportType, setReportType] = useState<ReportType>('headcount')
   const [from, setFrom] = useState('')
@@ -101,6 +113,30 @@ export function ReportsPage() {
     enabled: canRead && reportType === 'incentives',
   })
 
+  const { data: attendanceTrack, isLoading: attendanceTrackLoading } = useQuery({
+    queryKey: ['reports', 'attendance-track', filters],
+    queryFn: () => reportsApi.attendanceTrack(filters),
+    enabled: canRead && reportType === 'attendance-track',
+  })
+
+  const { data: performance, isLoading: performanceLoading } = useQuery({
+    queryKey: ['reports', 'performance', filters],
+    queryFn: () => reportsApi.performance(filters),
+    enabled: canRead && reportType === 'performance',
+  })
+
+  const { data: todoIncentive, isLoading: todoIncentiveLoading } = useQuery({
+    queryKey: ['reports', 'todo-incentive', filters],
+    queryFn: () => reportsApi.todoIncentive(filters),
+    enabled: canRead && reportType === 'todo-incentive',
+  })
+
+  const { data: audit, isLoading: auditLoading } = useQuery({
+    queryKey: ['reports', 'audit', filters],
+    queryFn: () => reportsApi.audit(filters),
+    enabled: canAudit && reportType === 'audit',
+  })
+
   const handleTypeChange = (value: string | null) => {
     setReportType((value as ReportType) ?? 'headcount')
     reset()
@@ -142,6 +178,59 @@ export function ReportsPage() {
     { key: 'payrollMonth', header: 'Month' },
     { key: 'payrollYear', header: 'Year' },
     { key: 'totalAmount', header: 'Amount', render: (r) => formatCurrency(r.totalAmount) },
+  ]
+
+  const payrollRowColumns: Column<PayrollEmployeeRow>[] = [
+    { key: 'empCode', header: 'Emp Code' },
+    { key: 'name', header: 'Name' },
+    { key: 'grossSalary', header: 'Gross Salary', render: (r) => formatCurrency(r.grossSalary) },
+    { key: 'netSalary', header: 'Net Salary', render: (r) => formatCurrency(r.netSalary) },
+    { key: 'pfEmployee', header: 'PF (Employee)', render: (r) => formatCurrency(r.pfEmployee) },
+    { key: 'esiEmployee', header: 'ESI (Employee)', render: (r) => formatCurrency(r.esiEmployee) },
+    { key: 'tds', header: 'TDS', render: (r) => formatCurrency(r.tds) },
+    { key: 'loanDeduction', header: 'Loan Deduction', render: (r) => formatCurrency(r.loanDeduction) },
+  ]
+
+  const attendanceTrackColumns: Column<AttendanceTrackReportRow>[] = [
+    { key: 'empCode', header: 'Emp Code' },
+    { key: 'name', header: 'Name' },
+    { key: 'date', header: 'Date', render: (r) => formatDateTime(r.date) },
+    { key: 'checkInAt', header: 'Check-In', render: (r) => (r.checkInAt ? formatDateTime(r.checkInAt) : '—') },
+    { key: 'checkInLocationName', header: 'Check-In Location', render: (r) => r.checkInLocationName ?? '—' },
+    { key: 'checkOutAt', header: 'Check-Out', render: (r) => (r.checkOutAt ? formatDateTime(r.checkOutAt) : '—') },
+    { key: 'checkOutLocationName', header: 'Check-Out Location', render: (r) => r.checkOutLocationName ?? '—' },
+    { key: 'status', header: 'Status' },
+    { key: 'totalHours', header: 'Total Hours', render: (r) => r.totalHours ?? '—' },
+  ]
+
+  const performanceColumns: Column<PerformanceReportRow>[] = [
+    { key: 'empCode', header: 'Emp Code' },
+    { key: 'name', header: 'Name' },
+    { key: 'cycleName', header: 'Cycle' },
+    { key: 'rating', header: 'Rating' },
+    { key: 'isEligibleForIncrement', header: 'Eligible for Increment', render: (r) => (r.isEligibleForIncrement ? 'Yes' : 'No') },
+    { key: 'kpiAchievedCount', header: 'KPI Achieved/Assigned', render: (r) => `${r.kpiAchievedCount}/${r.kpiAssignedCount}` },
+    { key: 'kpiAchievementRate', header: 'Achievement Rate', render: (r) => `${(r.kpiAchievementRate * 100).toFixed(0)}%` },
+  ]
+
+  const todoIncentiveColumns: Column<TodoIncentiveReportRow>[] = [
+    { key: 'empCode', header: 'Emp Code' },
+    { key: 'name', header: 'Name' },
+    { key: 'todosTotal', header: 'Todos Total' },
+    { key: 'todosApproved', header: 'Approved' },
+    { key: 'todosRejected', header: 'Rejected' },
+    { key: 'completionRate', header: 'Completion Rate', render: (r) => `${(r.completionRate * 100).toFixed(0)}%` },
+    { key: 'incentiveTotalAmount', header: 'Incentive Total', render: (r) => formatCurrency(r.incentiveTotalAmount) },
+    { key: 'incentiveReleasedAmount', header: 'Incentive Released', render: (r) => formatCurrency(r.incentiveReleasedAmount) },
+  ]
+
+  const auditColumns: Column<AuditHistoryReportRow>[] = [
+    { key: 'email', header: 'Email' },
+    { key: 'name', header: 'Name' },
+    { key: 'ipAddress', header: 'IP Address', render: (r) => r.ipAddress ?? '—' },
+    { key: 'loginAt', header: 'Login At', render: (r) => formatDateTime(r.loginAt) },
+    { key: 'logoutAt', header: 'Logout At', render: (r) => (r.logoutAt ? formatDateTime(r.logoutAt) : '—') },
+    { key: 'status', header: 'Status' },
   ]
 
   const componentLabels: Record<string, string> = {
@@ -198,7 +287,7 @@ export function ReportsPage() {
               <Download className="h-4 w-4 mr-1.5" />
               Export Excel
             </Button>
-            {reportType === 'payroll' && (
+            {['payroll', 'attendance-track', 'performance', 'todo-incentive'].includes(reportType) && (
               <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
                 <Download className="h-4 w-4 mr-1.5" />
                 Export PDF
@@ -224,14 +313,22 @@ export function ReportsPage() {
           </SelectContent>
         </Select>
 
-        {(reportType === 'attendance' || reportType === 'headcount' || reportType === 'leave') && (
+        {(
+          reportType === 'attendance' ||
+          reportType === 'headcount' ||
+          reportType === 'leave' ||
+          reportType === 'attendance-track' ||
+          reportType === 'performance' ||
+          reportType === 'todo-incentive' ||
+          reportType === 'audit'
+        ) && (
           <>
             <Input type="date" value={from} onChange={(e) => { setFrom(e.target.value); reset() }} className="w-44" placeholder="From" />
             <Input type="date" value={to} onChange={(e) => { setTo(e.target.value); reset() }} className="w-44" placeholder="To" />
           </>
         )}
 
-        {(reportType === 'payroll' || reportType === 'incentives') && (
+        {(reportType === 'payroll' || reportType === 'incentives' || reportType === 'todo-incentive') && (
           <>
             <Input
               type="number"
@@ -408,6 +505,15 @@ export function ReportsPage() {
                 ))}
             </CardContent>
           </Card>
+          <DataTable
+            columns={payrollRowColumns}
+            data={payroll?.rows ?? []}
+            isLoading={payrollLoading}
+            pagination={payroll?.meta}
+            onPageChange={setPage}
+            rowKey={(r) => r.employeeId}
+            emptyMessage="No payroll data found."
+          />
         </div>
       )}
 
@@ -450,6 +556,138 @@ export function ReportsPage() {
             rowKey={(r) => `${r.employeeId}-${r.payrollMonth}-${r.payrollYear}`}
             emptyMessage="No incentive data found."
           />
+        </div>
+      )}
+
+      {reportType === 'attendance-track' && (
+        <div className="space-y-4">
+          <Card className="shadow-sm">
+            <CardHeader><CardTitle className="text-base">Live Now</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              {(attendanceTrack?.liveNow ?? []).length === 0 && (
+                <p className="text-sm text-muted-foreground">No employees currently checked in.</p>
+              )}
+              {(attendanceTrack?.liveNow ?? []).map((l) => (
+                <div key={l.employeeId} className="flex items-center justify-between text-sm">
+                  <span className="text-foreground">{l.name} ({l.empCode})</span>
+                  <span className="font-medium text-muted-foreground">
+                    {l.lat.toFixed(4)}, {l.lng.toFixed(4)} — {formatDateTime(l.recordedAt)}
+                  </span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <DataTable
+            columns={attendanceTrackColumns}
+            data={attendanceTrack?.rows ?? []}
+            isLoading={attendanceTrackLoading}
+            pagination={attendanceTrack?.meta}
+            onPageChange={setPage}
+            rowKey={(r) => `${r.employeeId}-${r.date}`}
+            emptyMessage="No attendance track data found."
+          />
+        </div>
+      )}
+
+      {reportType === 'performance' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Card className="shadow-sm"><CardContent className="p-5">
+              <p className="text-sm text-muted-foreground">Avg Rating</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{performance?.avgRating?.toFixed(2) ?? '—'}</p>
+            </CardContent></Card>
+            <Card className="shadow-sm"><CardContent className="p-5">
+              <p className="text-sm text-muted-foreground">Total Ratings</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{performance?.totalRatingsCount ?? 0}</p>
+            </CardContent></Card>
+          </div>
+          <DataTable
+            columns={performanceColumns}
+            data={performance?.rows ?? []}
+            isLoading={performanceLoading}
+            pagination={performance?.meta}
+            onPageChange={setPage}
+            rowKey={(r) => `${r.employeeId}-${r.cycleId}`}
+            emptyMessage="No performance data found."
+          />
+        </div>
+      )}
+
+      {reportType === 'todo-incentive' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Card className="shadow-sm"><CardContent className="p-5">
+              <p className="text-sm text-muted-foreground">Org Todos Approved</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{todoIncentive?.orgTodosApproved ?? 0}</p>
+            </CardContent></Card>
+            <Card className="shadow-sm"><CardContent className="p-5">
+              <p className="text-sm text-muted-foreground">Org Incentive Total</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{formatCurrency(todoIncentive?.orgIncentiveTotalAmount)}</p>
+            </CardContent></Card>
+          </div>
+          <DataTable
+            columns={todoIncentiveColumns}
+            data={todoIncentive?.rows ?? []}
+            isLoading={todoIncentiveLoading}
+            pagination={todoIncentive?.meta}
+            onPageChange={setPage}
+            rowKey={(r) => r.employeeId}
+            emptyMessage="No todo/incentive data found."
+          />
+        </div>
+      )}
+
+      {reportType === 'audit' && canAudit && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Card className="shadow-sm"><CardContent className="p-5">
+              <p className="text-sm text-muted-foreground">Total Logins</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{audit?.totalLogins ?? 0}</p>
+            </CardContent></Card>
+            <Card className="shadow-sm"><CardContent className="p-5">
+              <p className="text-sm text-muted-foreground">Failed Logins</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{audit?.failedLogins ?? 0}</p>
+            </CardContent></Card>
+            <Card className="shadow-sm"><CardContent className="p-5">
+              <p className="text-sm text-muted-foreground">Unique Users</p>
+              <p className="text-2xl font-bold text-foreground mt-1">{audit?.uniqueUsers ?? 0}</p>
+            </CardContent></Card>
+          </div>
+          <DataTable
+            columns={auditColumns}
+            data={audit?.rows ?? []}
+            isLoading={auditLoading}
+            pagination={audit?.meta}
+            onPageChange={setPage}
+            rowKey={(r) => `${r.userId}-${r.loginAt}`}
+            emptyMessage="No login history found."
+          />
+          <Card className="shadow-sm">
+            <CardHeader><CardTitle className="text-base">System Changes</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              {(audit?.systemChanges ?? []).length === 0 && (
+                <p className="text-sm text-muted-foreground">No system change records found.</p>
+              )}
+              {(audit?.systemChanges ?? []).map((c, idx) => (
+                <div key={`${c.entityType}-${c.entityId}-${idx}`} className="flex items-center justify-between text-sm">
+                  <span className="text-foreground">{c.action} — {c.entityType}</span>
+                  <span className="font-medium text-muted-foreground">{formatDateTime(c.occurredAt)}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {reportType === 'audit' && !canAudit && (
+        <div className="flex flex-col items-center justify-center h-[40vh] text-center gap-3">
+          <div className="w-14 h-14 bg-accent-red/10 rounded-xl flex items-center justify-center">
+            <ShieldAlert className="h-7 w-7 text-accent-red" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground">Access Denied</h2>
+          <p className="text-sm text-muted-foreground max-w-sm">
+            You don't have permission to view the audit report.
+          </p>
         </div>
       )}
     </div>
