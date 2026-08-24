@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { FileBarChart, Download, ShieldAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -37,6 +38,10 @@ const ALL_REPORT_TYPE_OPTIONS: { value: ReportType; label: string }[] = [
   { value: 'audit', label: 'Audit Login & History' },
 ]
 
+function isReportType(value: string | undefined): value is ReportType {
+  return ALL_REPORT_TYPE_OPTIONS.some((opt) => opt.value === value)
+}
+
 function flatDepts(
   nodes: { id: string; name: string; children: unknown[] }[]
 ): { id: string; name: string }[] {
@@ -53,7 +58,18 @@ export function ReportsPage() {
 
   const REPORT_TYPE_OPTIONS = ALL_REPORT_TYPE_OPTIONS.filter((opt) => opt.value !== 'audit' || canAudit)
 
-  const [reportType, setReportType] = useState<ReportType>('headcount')
+  const navigate = useNavigate()
+  const { type: typeParam } = useParams<{ type?: string }>()
+  const [reportType, setReportType] = useState<ReportType>(() => (isReportType(typeParam) ? typeParam : 'headcount'))
+
+  // Keep the selected report in sync when navigated to via a sidebar submenu
+  // link (e.g. Reports > Payroll Month-wise), which changes the :type route
+  // param without remounting this page.
+  useEffect(() => {
+    if (isReportType(typeParam) && typeParam !== reportType) {
+      setReportType(typeParam)
+    }
+  }, [typeParam, reportType])
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
   const [departmentId, setDepartmentId] = useState('')
@@ -138,7 +154,9 @@ export function ReportsPage() {
   })
 
   const handleTypeChange = (value: string | null) => {
-    setReportType((value as ReportType) ?? 'headcount')
+    const next = (value as ReportType) ?? 'headcount'
+    setReportType(next)
+    navigate(`/reports/${next}`, { replace: true })
     reset()
   }
 

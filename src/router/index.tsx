@@ -163,6 +163,7 @@ export const router = createBrowserRouter([
       { path: 'settings/sessions', element: <SessionsPage /> },
       { path: 'profile', element: <ProfilePage /> },
       { path: 'reports', element: <ReportsPage /> },
+      { path: 'reports/:type', element: <ReportsPage /> },
     ],
   },
 ])
