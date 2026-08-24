@@ -16,8 +16,11 @@ interface Coords {
 }
 
 class LocationError extends Error {
-  constructor(message: string, public readonly permissionDenied: boolean) {
+  readonly permissionDenied: boolean
+
+  constructor(message: string, permissionDenied: boolean) {
     super(message)
+    this.permissionDenied = permissionDenied
   }
 }
 
