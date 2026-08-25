@@ -103,7 +103,7 @@ export function DepartmentsPage() {
   const [editNode, setEditNode] = useState<DepartmentTreeNode | null>(null)
   const [deleteNode, setDeleteNode] = useState<DepartmentTreeNode | null>(null)
   const [selectedDepartment, setSelectedDepartment] = useState<DepartmentTreeNode | null>(null)
-  const [search, setSearch] = useState('')
+  const [deptFilter, setDeptFilter] = useState('')
 
   const { data: tree = [], isLoading } = useQuery({
     queryKey: ['departments-tree'],
@@ -146,18 +146,18 @@ export function DepartmentsPage() {
     onError: (error) => toast.error(getApiErrorMessage(error, 'Cannot delete — it may have employees or sub-departments.')),
   })
 
-  const filterTree = (nodes: DepartmentTreeNode[], q: string): DepartmentTreeNode[] => {
-    if (!q) return nodes
-    return nodes.flatMap((n) => {
-      const childMatches = filterTree(n.children, q)
-      if (n.name.toLowerCase().includes(q.toLowerCase()) || childMatches.length > 0) {
-        return [{ ...n, children: childMatches }]
-      }
-      return []
-    })
+  const findNode = (nodes: DepartmentTreeNode[], id: string): DepartmentTreeNode | null => {
+    for (const n of nodes) {
+      if (n.id === id) return n
+      const found = findNode(n.children, id)
+      if (found) return found
+    }
+    return null
   }
 
-  const filtered = filterTree(tree, search)
+  const filtered = deptFilter
+    ? [findNode(tree, deptFilter)].filter((n): n is DepartmentTreeNode => n !== null)
+    : tree
 
   if (!canView) {
     return (
@@ -197,12 +197,21 @@ export function DepartmentsPage() {
         )}
       </div>
 
-      <Input
-        placeholder="Search departments…"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="max-w-xs"
-      />
+      <Select
+        items={{ '': 'All Departments', ...Object.fromEntries(flatDepts(tree).map((d) => [d.id, d.name])) }}
+        value={deptFilter}
+        onValueChange={(v) => setDeptFilter(v ?? '')}
+      >
+        <SelectTrigger className="w-48">
+          <SelectValue placeholder="All Departments" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">All Departments</SelectItem>
+          {flatDepts(tree).map((d) => (
+            <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       <div className="rounded-xl border border-border bg-card p-4 shadow-sm min-h-[300px]">
         {isLoading ? (
@@ -211,7 +220,7 @@ export function DepartmentsPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
-            {search ? 'No departments match your search.' : 'No departments yet. Add your first department.'}
+            {deptFilter ? 'No department matches this filter.' : 'No departments yet. Add your first department.'}
           </div>
         ) : (
           <div className="space-y-0.5">
