@@ -36,6 +36,7 @@ export interface AttendanceReportRow {
   name: string
   presentDays: number
   absentDays: number
+  leaveDays: number
   lopDays: number
 }
 
@@ -44,6 +45,7 @@ export interface AttendanceReport {
   to: string
   totalPresent: number
   totalAbsent: number
+  totalLeave: number
   totalLop: number
   byStatus: { status: string; count: number }[]
   rows: AttendanceReportRow[]

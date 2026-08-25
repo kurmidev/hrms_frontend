@@ -27,7 +27,7 @@ import type {
 
 const ALL_REPORT_TYPE_OPTIONS: { value: ReportType; label: string }[] = [
   { value: 'headcount', label: 'Headcount' },
-  { value: 'attendance', label: 'Attendance' },
+  { value: 'attendance', label: 'Attendance Summary' },
   { value: 'leave', label: 'Leave' },
   { value: 'payroll', label: 'Payroll' },
   { value: 'loans', label: 'Loans' },
@@ -169,6 +169,7 @@ export function ReportsPage() {
     { key: 'name', header: 'Name' },
     { key: 'presentDays', header: 'Present' },
     { key: 'absentDays', header: 'Absent' },
+    { key: 'leaveDays', header: 'Leave Days' },
     { key: 'lopDays', header: 'LOP' },
   ]
 
@@ -305,7 +306,7 @@ export function ReportsPage() {
               <Download className="h-4 w-4 mr-1.5" />
               Export Excel
             </Button>
-            {['payroll', 'attendance-track', 'performance', 'todo-incentive'].includes(reportType) && (
+            {['payroll', 'attendance', 'attendance-track', 'performance', 'todo-incentive', 'audit'].includes(reportType) && (
               <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
                 <Download className="h-4 w-4 mr-1.5" />
                 Export PDF

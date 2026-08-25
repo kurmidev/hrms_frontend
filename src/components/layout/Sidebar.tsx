@@ -187,6 +187,7 @@ export const NAV_ITEMS: NavItem[] = [
     permission: 'report:read',
     children: [
       { label: 'Payroll Month-wise', href: '/reports/payroll', permission: 'report:read' },
+      { label: 'Attendance Summary', href: '/reports/attendance', permission: 'report:read' },
       { label: 'Attendance & Live Track', href: '/reports/attendance-track', permission: 'report:read' },
       { label: 'Performance', href: '/reports/performance', permission: 'report:read' },
       { label: 'Todo & Incentive Report', href: '/reports/todo-incentive', permission: 'report:read' },

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { departmentsApi } from '@/api/departments.api'
@@ -110,9 +111,14 @@ export function DepartmentsPage() {
     enabled: canView,
   })
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
   })
+
+  const selectedParentId = watch('parentId')
+
+  const flatDepts = (nodes: DepartmentTreeNode[]): { id: string; name: string }[] =>
+    nodes.flatMap((n) => [{ id: n.id, name: n.name }, ...flatDepts(n.children)])
 
   const openCreate = () => { reset({ name: '', parentId: '' }); setEditNode(null); setOpen(true) }
   const openEdit = (node: DepartmentTreeNode) => { reset({ name: node.name }); setEditNode(node); setOpen(true) }
@@ -239,8 +245,22 @@ export function DepartmentsPage() {
             {!editNode && (
               <div className="space-y-1.5">
                 <Label htmlFor="parentId">Parent Department (optional)</Label>
-                <Input id="parentId" placeholder="Parent department ID" {...register('parentId')} />
-                <p className="text-xs text-muted-foreground">Leave blank to create a root department</p>
+                <Select
+                  items={{ '': 'None (root department)', ...Object.fromEntries(flatDepts(tree).map((d) => [d.id, d.name])) }}
+                  value={selectedParentId ?? ''}
+                  onValueChange={(v) => setValue('parentId', v ?? '')}
+                >
+                  <SelectTrigger className="w-full" id="parentId">
+                    <SelectValue placeholder="None (root department)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">None (root department)</SelectItem>
+                    {flatDepts(tree).map((d) => (
+                      <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Leave unselected to create a root department</p>
               </div>
             )}
             <DialogFooter>
