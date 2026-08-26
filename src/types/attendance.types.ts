@@ -59,7 +59,6 @@ export interface CheckInDto {
 export interface CheckOutDto {
   lat?: number
   lng?: number
-  source?: AttendanceSource
   timestamp?: string
 }
 

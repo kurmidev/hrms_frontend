@@ -133,7 +133,6 @@ export function MyAttendancePage() {
       attendanceApi.checkOut({
         lat: coords?.lat,
         lng: coords?.lng,
-        source: 'WEB',
         timestamp: new Date().toISOString(),
       }),
     onSuccess: () => {
