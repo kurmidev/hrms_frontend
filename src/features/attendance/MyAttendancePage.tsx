@@ -115,9 +115,9 @@ export function MyAttendancePage() {
   const { mutate: checkIn, isPending: checkingIn } = useMutation({
     mutationFn: () =>
       attendanceApi.checkIn({
-        lat: coords!.lat,
-        lng: coords!.lng,
-        accuracy: coords!.accuracy,
+        lat: coords?.lat,
+        lng: coords?.lng,
+        accuracy: coords?.accuracy,
         source: 'WEB',
         timestamp: new Date().toISOString(),
       }),
@@ -155,15 +155,18 @@ export function MyAttendancePage() {
       setCoords(next)
       setLocationError(null)
       setPermissionDenied(false)
-      if (action === 'in') checkIn()
-      else checkOut()
     } catch (error) {
+      // Location is best-effort — the server accepts check-in/out without
+      // it (defaulting to 0,0), so still proceed with whatever `coords`
+      // we already have (possibly null) instead of blocking the action.
       const message = error instanceof Error ? error.message : 'Unable to fetch your location. Please enable location access.'
       setLocationError(message)
       setPermissionDenied(error instanceof LocationError && error.permissionDenied)
     } finally {
       setLocating(false)
     }
+    if (action === 'in') checkIn()
+    else checkOut()
   }
 
   const daysInMonth = new Date(range.year, range.month + 1, 0).getDate()
@@ -252,7 +255,7 @@ export function MyAttendancePage() {
           <div className="flex gap-3">
             <Button
               onClick={() => handleLocateAndAct('in')}
-              disabled={hasCheckedIn || locating || checkingIn || !coords}
+              disabled={hasCheckedIn || locating || checkingIn}
             >
               {(locating || checkingIn) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
               Check In
@@ -260,7 +263,7 @@ export function MyAttendancePage() {
             <Button
               variant="outline"
               onClick={() => handleLocateAndAct('out')}
-              disabled={!hasCheckedIn || hasCheckedOut || locating || checkingOut || !coords}
+              disabled={!hasCheckedIn || hasCheckedOut || locating || checkingOut}
             >
               {(locating || checkingOut) ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
               Check Out

@@ -49,8 +49,8 @@ export interface LiveLocation {
 }
 
 export interface CheckInDto {
-  lat: number
-  lng: number
+  lat?: number
+  lng?: number
   accuracy?: number
   source: AttendanceSource
   timestamp?: string
