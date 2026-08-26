@@ -9,14 +9,18 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { EmployeeSelect } from '@/components/shared/EmployeeSelect'
 import { todosApi, incentiveRulesApi } from '@/api/incentives.api'
 import type { IncentiveRule } from '@/types/incentives.types'
 import { getApiErrorMessage } from '@/lib/utils'
+import { usePermission } from '@/hooks/usePermission'
+import { useAuthStore } from '@/store/auth.store'
 import { toast } from 'sonner'
 
 const schema = z.object({
   title: z.string().min(1, 'Required'),
   description: z.string().optional(),
+  employeeId: z.string().optional(),
   incentiveRuleId: z.string().optional(),
   quantity: z.preprocess(
     (v) => (v === '' ? undefined : Number(v)),
@@ -34,6 +38,8 @@ interface Props {
 
 export function CreateTodoDialog({ open, onOpenChange }: Props) {
   const qc = useQueryClient()
+  const canAssignToOthers = usePermission('todo:approve')
+  const ownEmployeeId = useAuthStore((s) => s.user?.employee?.id ?? '')
 
   const { data: rulesData } = useQuery({
     queryKey: ['incentive-rules', { forSelect: true }],
@@ -44,14 +50,17 @@ export function CreateTodoDialog({ open, onOpenChange }: Props) {
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
+    defaultValues: { employeeId: ownEmployeeId },
   })
   const incentiveRuleId = watch('incentiveRuleId')
+  const employeeId = watch('employeeId')
 
   const { mutate: create, isPending } = useMutation({
     mutationFn: (values: FormValues) =>
       todosApi.create({
         title: values.title,
         description: values.description || undefined,
+        employeeId: values.employeeId || undefined,
         incentiveRuleId: values.incentiveRuleId || undefined,
         quantity: values.quantity,
         unit: values.unit || undefined,
@@ -88,6 +97,21 @@ export function CreateTodoDialog({ open, onOpenChange }: Props) {
             <Label htmlFor="description">Description</Label>
             <Textarea id="description" placeholder="Details…" {...register('description')} />
           </div>
+          {canAssignToOthers && (
+            <div className="space-y-1.5">
+              <Label>Employee {!ownEmployeeId && '*'}</Label>
+              <EmployeeSelect
+                value={employeeId ?? ''}
+                onValueChange={(v) => setValue('employeeId', v, { shouldValidate: true })}
+                placeholder="Select employee"
+              />
+              {!ownEmployeeId && !employeeId && (
+                <p className="text-xs text-muted-foreground">
+                  Your account has no employee record — choose who this todo is for.
+                </p>
+              )}
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label>Incentive Rule</Label>
             <Select

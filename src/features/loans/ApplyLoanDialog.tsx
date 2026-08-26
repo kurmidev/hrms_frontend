@@ -9,11 +9,15 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { EmployeeSelect } from '@/components/shared/EmployeeSelect'
 import { loanApi } from '@/api/loan.api'
 import { toast } from 'sonner'
 import { getApiErrorMessage } from '@/lib/utils'
+import { usePermission } from '@/hooks/usePermission'
+import { useAuthStore } from '@/store/auth.store'
 
 const schema = z.object({
+  employeeId: z.string().optional(),
   amountRequested: z.preprocess(
     (v) => (v === '' ? undefined : Number(v)),
     z.number().min(1, 'Amount must be greater than 0')
@@ -33,14 +37,19 @@ interface Props {
 
 export function ApplyLoanDialog({ open, onOpenChange }: Props) {
   const qc = useQueryClient()
+  const canApplyForOthers = usePermission('loan:approve')
+  const ownEmployeeId = useAuthStore((s) => s.user?.employee?.id ?? '')
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
+    defaultValues: { employeeId: ownEmployeeId },
   })
+  const employeeId = watch('employeeId')
 
   const { mutate: apply, isPending } = useMutation({
     mutationFn: (values: FormValues) =>
       loanApi.apply({
+        employeeId: values.employeeId || undefined,
         amountRequested: values.amountRequested,
         tenureMonths: values.tenureMonths,
         reason: values.reason || undefined,
@@ -61,6 +70,21 @@ export function ApplyLoanDialog({ open, onOpenChange }: Props) {
           <DialogTitle>Apply for Loan</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit((v) => apply(v))} className="space-y-4 py-2">
+          {canApplyForOthers && (
+            <div className="space-y-1.5">
+              <Label>Employee {!ownEmployeeId && '*'}</Label>
+              <EmployeeSelect
+                value={employeeId ?? ''}
+                onValueChange={(v) => setValue('employeeId', v, { shouldValidate: true })}
+                placeholder="Select employee"
+              />
+              {!ownEmployeeId && !employeeId && (
+                <p className="text-xs text-muted-foreground">
+                  Your account has no employee record — choose who this loan is for.
+                </p>
+              )}
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label htmlFor="amountRequested">Amount Requested *</Label>
             <Input
