@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -7,8 +7,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { todosApi } from '@/api/incentives.api'
-import type { TodoTask } from '@/types/incentives.types'
+import { todosApi, incentiveRulesApi } from '@/api/incentives.api'
+import type { TodoTask, IncentiveRule } from '@/types/incentives.types'
 import { toast } from 'sonner'
 import { getApiErrorMessage } from '@/lib/utils'
 
@@ -34,6 +34,20 @@ export function ApproveTodoDialog({ open, onOpenChange, todo }: Props) {
   const [payrollMonth, setPayrollMonth] = useState<number | undefined>(undefined)
   const [payrollYear, setPayrollYear] = useState<number | undefined>(undefined)
   const [rejectionNote, setRejectionNote] = useState('')
+  const [incentiveRuleId, setIncentiveRuleId] = useState('')
+
+  const needsIncentiveRule = !!todo && !todo.incentiveRuleId
+
+  const { data: rulesData } = useQuery({
+    queryKey: ['incentive-rules', { forSelect: true }],
+    queryFn: () => incentiveRulesApi.list({ limit: 100 }),
+    enabled: open && needsIncentiveRule,
+  })
+  const rules = (rulesData as { data?: IncentiveRule[] })?.data ?? []
+
+  useEffect(() => {
+    if (open) setIncentiveRuleId('')
+  }, [open, todo])
 
   const resetForm = () => {
     setDecision('approve')
@@ -41,6 +55,7 @@ export function ApproveTodoDialog({ open, onOpenChange, todo }: Props) {
     setPayrollMonth(undefined)
     setPayrollYear(undefined)
     setRejectionNote('')
+    setIncentiveRuleId('')
   }
 
   const { mutate: review, isPending } = useMutation({
@@ -48,6 +63,7 @@ export function ApproveTodoDialog({ open, onOpenChange, todo }: Props) {
       if (!todo) return Promise.reject(new Error('No todo selected'))
       return todosApi.approve(todo.id, {
         approve: decision === 'approve',
+        incentiveRuleId: decision === 'approve' ? incentiveRuleId || undefined : undefined,
         hold: decision === 'approve' ? hold : undefined,
         payrollMonth: decision === 'approve' ? payrollMonth : undefined,
         payrollYear: decision === 'approve' ? payrollYear : undefined,
@@ -98,6 +114,26 @@ export function ApproveTodoDialog({ open, onOpenChange, todo }: Props) {
 
           {decision === 'approve' && (
             <>
+              {needsIncentiveRule && (
+                <div className="space-y-1.5">
+                  <Label>Incentive Rule *</Label>
+                  <Select
+                    items={Object.fromEntries(rules.map((r) => [r.id, `${r.name} (${r.rate})`]))}
+                    value={incentiveRuleId}
+                    onValueChange={(v) => setIncentiveRuleId(v ?? '')}
+                  >
+                    <SelectTrigger className="w-full"><SelectValue placeholder="Select an incentive rule" /></SelectTrigger>
+                    <SelectContent>
+                      {rules.map((r) => (
+                        <SelectItem key={r.id} value={r.id}>{r.name} ({r.rate})</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    This todo has no linked incentive rule — attach one to compute and approve the payout.
+                  </p>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="hold"
@@ -157,7 +193,7 @@ export function ApproveTodoDialog({ open, onOpenChange, todo }: Props) {
             <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button
               type="button"
-              disabled={isPending}
+              disabled={isPending || (decision === 'approve' && needsIncentiveRule && !incentiveRuleId)}
               className={decision === 'reject' ? 'bg-destructive hover:bg-destructive/90' : ''}
               onClick={() => review()}
             >

@@ -75,6 +75,7 @@ export interface SubmitTodoDto {
 
 export interface ApproveTodoDto {
   approve: boolean
+  incentiveRuleId?: string
   hold?: boolean
   payrollMonth?: number
   payrollYear?: number
