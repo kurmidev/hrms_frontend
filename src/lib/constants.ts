@@ -170,6 +170,7 @@ export const PERMISSION_GROUPS: Record<string, string[]> = {
   'Loans': ['loan:read', 'loan:apply', 'loan:approve'],
   'Tasks': ['todo:read', 'todo:create', 'todo:approve'],
   'Users': ['user:read', 'user:manage'],
+  'SMS Templates': ['sms_template:read', 'sms_template:update'],
 }
 
 export const ALL_PERMISSIONS = Object.values(PERMISSION_GROUPS).flat()

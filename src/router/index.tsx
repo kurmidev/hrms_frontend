@@ -56,6 +56,7 @@ import { AssetDetailPage } from '@/features/assets/AssetDetailPage'
 import { MyAssetsPage } from '@/features/assets/MyAssetsPage'
 import { ChatPage } from '@/features/chat/ChatPage'
 import { SessionsPage } from '@/features/auth/SessionsPage'
+import { SmsTemplatesPage } from '@/features/settings/SmsTemplatesPage'
 import { ProfilePage } from '@/features/profile/ProfilePage'
 import { ReportsPage } from '@/features/reports/ReportsPage'
 import { PlatformLoginPage } from '@/features/platform/PlatformLoginPage'
@@ -161,6 +162,7 @@ export const router = createBrowserRouter([
       { path: 'assets/:id', element: <AssetDetailPage /> },
       { path: 'chat', element: <ChatPage /> },
       { path: 'settings/sessions', element: <SessionsPage /> },
+      { path: 'settings/sms-templates', element: <SmsTemplatesPage /> },
       { path: 'profile', element: <ProfilePage /> },
       { path: 'reports', element: <ReportsPage /> },
       { path: 'reports/:type', element: <ReportsPage /> },

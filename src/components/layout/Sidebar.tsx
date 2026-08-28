@@ -200,6 +200,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Settings,
     children: [
       { label: 'Active Sessions', href: '/settings/sessions' },
+      { label: 'SMS Templates', href: '/settings/sms-templates', permission: 'sms_template:read' },
     ],
   },
 ]
