@@ -47,7 +47,7 @@ export const leaveApi = {
     apiClient.put<{ data: LeaveApplication }>(`/leave/${id}/reject`, data).then(unwrap<LeaveApplication>),
 
   getHolidays: (year?: number) =>
-    apiClient.get<{ data: Holiday[] }>('/leave/holidays', { params: { year } }).then(unwrap<Holiday[]>),
+    apiClient.get('/leave/holidays', { params: { year } }).then(unwrap),
 
   createHoliday: (data: CreateHolidayDto) =>
     apiClient.post<{ data: Holiday }>('/leave/holidays', data).then(unwrap<Holiday>),

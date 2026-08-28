@@ -63,7 +63,7 @@ export function HolidaysPage() {
     queryFn: () => leaveApi.getHolidays(year),
   })
 
-  const holidays: Holiday[] = Array.isArray(data) ? data : []
+  const holidays: Holiday[] = (data as { data?: Holiday[] })?.data ?? []
 
   const { data: globalLeaveData, isLoading: globalLeaveLoading } = useQuery({
     queryKey: ['global-leaves-my', { year }],
