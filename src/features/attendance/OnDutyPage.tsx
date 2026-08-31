@@ -123,52 +123,55 @@ export function OnDutyPage() {
 
   const submitMark = async (values: MarkValues) => {
     setMarkLocating(true)
+    let coords: Coords = { lat: 0, lng: 0 }
     try {
       const pos = await getCurrentPosition()
-      mark({
-        coords: { lat: pos.coords.latitude, lng: pos.coords.longitude },
-        hours: values.hours,
-        reason: values.reason || undefined,
-      })
+      coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
     } catch {
-      toast.error('Unable to fetch your location. Please enable location access.')
+      toast.warning('Recording without location — GPS unavailable.')
     } finally {
       setMarkLocating(false)
     }
+    mark({ coords, hours: values.hours, reason: values.reason || undefined })
   }
 
   const submitAdd = async (values: AddValues) => {
     if (!todayRecord) return
     setAddLocating(true)
+    let coords: Coords = { lat: 0, lng: 0 }
     try {
       const pos = await getCurrentPosition()
-      addLocation({
-        id: todayRecord.id,
-        coords: { lat: pos.coords.latitude, lng: pos.coords.longitude },
-        hours: values.hours,
-      })
+      coords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
     } catch {
-      toast.error('Unable to fetch your location. Please enable location access.')
+      toast.warning('Recording without location — GPS unavailable.')
     } finally {
       setAddLocating(false)
     }
+    addLocation({ id: todayRecord.id, coords, hours: values.hours })
   }
 
   const columns: Column<OdLocationEntry>[] = [
     {
       key: 'locationName',
       header: 'Location',
-      render: (row) =>
-        row.locationName ? (
-          <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-            <MapPin className="h-3.5 w-3.5 text-emerald-600" />
-            {row.locationName}
-          </span>
-        ) : (
+      render: (row) => {
+        if (row.locationName) {
+          return (
+            <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+              <MapPin className="h-3.5 w-3.5 text-emerald-600" />
+              {row.locationName}
+            </span>
+          )
+        }
+        if (row.lat === 0 && row.lng === 0) {
+          return <span className="text-sm text-muted-foreground">Location unavailable</span>
+        }
+        return (
           <span className="text-sm text-muted-foreground">
             {row.lat.toFixed(5)}, {row.lng.toFixed(5)}
           </span>
-        ),
+        )
+      },
     },
     { key: 'minutes', header: 'Duration', render: (row) => minutesToHhMm(row.minutes) },
     { key: 'recordedAt', header: 'Recorded At', render: (row) => formatDateTime(row.recordedAt) },

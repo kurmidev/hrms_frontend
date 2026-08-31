@@ -11,7 +11,7 @@ import { useUiStore } from '@/store/ui.store'
 import { useAuthStore } from '@/store/auth.store'
 import { authApi } from '@/api/auth.api'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export interface NavItem {
   label: string
@@ -213,6 +213,11 @@ export function Sidebar() {
   const organizationLogoUrl = user?.organizationLogoUrl
   const organizationName = user?.organizationName
   const [expanded, setExpanded] = useState<string[]>(['/organization'])
+  const [logoFailed, setLogoFailed] = useState(false)
+
+  useEffect(() => {
+    setLogoFailed(false)
+  }, [organizationLogoUrl])
 
   const userName = user?.employee
     ? getFullName(user.employee.firstName, user.employee.lastName)
@@ -272,12 +277,13 @@ export function Sidebar() {
         {/* Logo */}
         <div className="flex items-center gap-3 px-3 py-4 border-b border-sidebar-border flex-shrink-0">
           {sidebarOpen ? (
-            organizationLogoUrl ? (
+            organizationLogoUrl && !logoFailed ? (
               <div className="flex-1 min-w-0 bg-white rounded-lg px-3 py-2">
                 <img
                   src={organizationLogoUrl}
                   alt={organizationName ?? 'Organization'}
                   className="h-8 w-auto object-contain"
+                  onError={() => setLogoFailed(true)}
                 />
               </div>
             ) : (
