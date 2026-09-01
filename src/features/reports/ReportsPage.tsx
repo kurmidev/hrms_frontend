@@ -689,7 +689,7 @@ export function ReportsPage() {
               )}
               {(audit?.systemChanges ?? []).map((c, idx) => (
                 <div key={`${c.entityType}-${c.entityId}-${idx}`} className="flex items-center justify-between text-sm">
-                  <span className="text-foreground">{c.action} — {c.entityType}</span>
+                  <span className="text-foreground">{c.action} — {c.entityType} by {c.actorName ?? 'System'}</span>
                   <span className="font-medium text-muted-foreground">{formatDateTime(c.occurredAt)}</span>
                 </div>
               ))}

@@ -263,6 +263,8 @@ export interface AuditSystemChangeRow {
   entityType: string
   entityId: string | null
   actorId: string | null
+  actorName: string | null
+  actorEmpCode: string | null
   occurredAt: string
   ipAddress: string | null
 }
