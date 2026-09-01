@@ -66,6 +66,7 @@ import { OrganizationDetailPage } from '@/features/platform/OrganizationDetailPa
 import { PlansPage } from '@/features/platform/PlansPage'
 import { InvoicesPage } from '@/features/platform/InvoicesPage'
 import { SuspendedPage } from '@/features/suspended/SuspendedPage'
+import { NotFoundPage } from '@/features/not-found/NotFoundPage'
 
 export const router = createBrowserRouter([
   {
@@ -167,5 +168,13 @@ export const router = createBrowserRouter([
       { path: 'reports', element: <ReportsPage /> },
       { path: 'reports/:type', element: <ReportsPage /> },
     ],
+  },
+  // Catch-all: any unmatched URL. Unauthenticated visitors are redirected to
+  // /login instead of hitting React Router's default "Unexpected Application
+  // Error! 404 Not Found" boundary; authenticated visitors see a proper
+  // not-found page. Must stay last.
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ])
