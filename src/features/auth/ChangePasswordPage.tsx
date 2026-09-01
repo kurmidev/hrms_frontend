@@ -75,12 +75,13 @@ export function ChangePasswordPage() {
               <Input
                 id={field}
                 type={show[field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm'] ? 'text' : 'password'}
+                className="h-12 rounded-full border-0 bg-muted pl-5 pr-11 text-sm"
                 {...register(field)}
               />
               <button
                 type="button"
                 onClick={() => toggle(field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 {show[field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm'] ? (
                   <EyeOff className="h-4 w-4" />
@@ -89,10 +90,10 @@ export function ChangePasswordPage() {
                 )}
               </button>
             </div>
-            {errors[field] && <p className="text-xs text-destructive">{errors[field]?.message}</p>}
+            {errors[field] && <p className="text-xs text-destructive px-2">{errors[field]?.message}</p>}
           </div>
         ))}
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full h-12 rounded-full text-base font-bold" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Update Password
         </Button>

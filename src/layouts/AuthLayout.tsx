@@ -1,5 +1,6 @@
 import { Outlet, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth.store'
+import { AuthMarketingPanel } from '@/features/auth/AuthMarketingPanel'
 import igreenLogo from '@/assets/igreen-logo.png'
 
 export function AuthLayout() {
@@ -10,15 +11,14 @@ export function AuthLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-[#EAF7E0] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center bg-white rounded-2xl mb-4 px-6 py-4 shadow-sm border border-border">
+    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2 bg-white">
+      <AuthMarketingPanel />
+
+      <div className="flex items-center justify-center px-6 py-12 sm:px-10">
+        <div className="w-full max-w-sm">
+          <div className="mb-8 flex justify-center">
             <img src={igreenLogo} alt="iGreen Technologies" className="h-12 w-auto object-contain" />
           </div>
-          <p className="text-muted-foreground text-sm mt-1">HR Management Portal</p>
-        </div>
-        <div className="bg-card rounded-2xl shadow-lg border border-border p-8">
           <Outlet />
         </div>
       </div>

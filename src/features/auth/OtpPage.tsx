@@ -67,13 +67,18 @@ export function OtpPage() {
       {step === 'phone' ? (
         <form onSubmit={phoneForm.handleSubmit(sendOtp)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="phone">Mobile number</Label>
-            <Input id="phone" placeholder="9876543210" {...phoneForm.register('phone')} />
+            <Label htmlFor="phone" className="sr-only">Mobile number</Label>
+            <Input
+              id="phone"
+              placeholder="Mobile number"
+              className="h-12 rounded-full border-0 bg-muted px-5 text-sm"
+              {...phoneForm.register('phone')}
+            />
             {phoneForm.formState.errors.phone && (
-              <p className="text-xs text-destructive">{phoneForm.formState.errors.phone.message}</p>
+              <p className="text-xs text-destructive px-2">{phoneForm.formState.errors.phone.message}</p>
             )}
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full h-12 rounded-full text-base font-bold" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Send OTP
           </Button>
@@ -81,17 +86,23 @@ export function OtpPage() {
       ) : (
         <form onSubmit={otpForm.handleSubmit(verifyOtp)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="otp">6-digit OTP</Label>
-            <Input id="otp" placeholder="123456" maxLength={6} {...otpForm.register('otp')} />
+            <Label htmlFor="otp" className="sr-only">6-digit OTP</Label>
+            <Input
+              id="otp"
+              placeholder="6-digit OTP"
+              maxLength={6}
+              className="h-12 rounded-full border-0 bg-muted px-5 text-sm"
+              {...otpForm.register('otp')}
+            />
             {otpForm.formState.errors.otp && (
-              <p className="text-xs text-destructive">{otpForm.formState.errors.otp.message}</p>
+              <p className="text-xs text-destructive px-2">{otpForm.formState.errors.otp.message}</p>
             )}
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full h-12 rounded-full text-base font-bold" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Verify OTP
           </Button>
-          <Button type="button" variant="ghost" className="w-full" onClick={() => setStep('phone')}>
+          <Button type="button" variant="ghost" className="w-full rounded-full" onClick={() => setStep('phone')}>
             Change number
           </Button>
         </form>
