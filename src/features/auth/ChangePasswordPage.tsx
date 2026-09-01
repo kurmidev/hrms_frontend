@@ -57,50 +57,46 @@ export function ChangePasswordPage() {
     setShow((prev) => ({ ...prev, [field]: !prev[field] }))
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-amber-500 rounded-2xl mb-4">
-            <Lock className="h-7 w-7 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-white">Change Password</h1>
-          <p className="text-slate-400 text-sm mt-1">You must update your password to continue</p>
+    <div>
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center w-14 h-14 bg-accent-orange rounded-2xl mb-4">
+          <Lock className="h-7 w-7 text-white" />
         </div>
-        <div className="bg-card rounded-2xl shadow-2xl border border-border/50 p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {(['currentPassword', 'newPassword', 'confirmPassword'] as const).map((field) => (
-              <div key={field} className="space-y-1.5">
-                <Label htmlFor={field}>
-                  {field === 'currentPassword' ? 'Current Password' : field === 'newPassword' ? 'New Password' : 'Confirm Password'}
-                </Label>
-                <div className="relative">
-                  <Input
-                    id={field}
-                    type={show[field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm'] ? 'text' : 'password'}
-                    {...register(field)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => toggle(field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {show[field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm'] ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-                {errors[field] && <p className="text-xs text-destructive">{errors[field]?.message}</p>}
-              </div>
-            ))}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Update Password
-            </Button>
-          </form>
-        </div>
+        <h1 className="text-xl font-bold text-foreground">Change Password</h1>
+        <p className="text-muted-foreground text-sm mt-1">You must update your password to continue</p>
       </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {(['currentPassword', 'newPassword', 'confirmPassword'] as const).map((field) => (
+          <div key={field} className="space-y-1.5">
+            <Label htmlFor={field}>
+              {field === 'currentPassword' ? 'Current Password' : field === 'newPassword' ? 'New Password' : 'Confirm Password'}
+            </Label>
+            <div className="relative">
+              <Input
+                id={field}
+                type={show[field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm'] ? 'text' : 'password'}
+                {...register(field)}
+              />
+              <button
+                type="button"
+                onClick={() => toggle(field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {show[field === 'currentPassword' ? 'current' : field === 'newPassword' ? 'new' : 'confirm'] ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            {errors[field] && <p className="text-xs text-destructive">{errors[field]?.message}</p>}
+          </div>
+        ))}
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Update Password
+        </Button>
+      </form>
     </div>
   )
 }

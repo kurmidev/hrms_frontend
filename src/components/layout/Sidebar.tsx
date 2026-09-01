@@ -18,6 +18,7 @@ export interface NavItem {
   href: string
   icon: React.ElementType
   permission?: string
+  section?: string
   children?: { label: string; href: string; permission?: string }[]
 }
 
@@ -26,6 +27,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Dashboard',
     href: '/',
     icon: LayoutDashboard,
+    section: 'Main',
     // No permission — every authenticated user sees their dashboard
   },
   {
@@ -33,6 +35,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/organization',
     icon: Building2,
     permission: 'org:read',
+    section: 'Organization',
     children: [
       { label: 'Profile', href: '/organization', permission: 'org:read' },
       { label: 'Departments', href: '/organization/departments', permission: 'employee:read' },
@@ -49,24 +52,28 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/roles',
     icon: Shield,
     permission: 'role:read',
+    section: 'Organization',
   },
   {
     label: 'Employees',
     href: '/employees',
     icon: Users,
     permission: 'employee:read',
+    section: 'Workforce',
   },
   {
     label: 'Onboarding',
     href: '/onboarding',
     icon: UserCheck,
     permission: 'onboarding:manage',
+    section: 'Workforce',
   },
   {
     label: 'Leave',
     href: '/leave',
     icon: CalendarDays,
     permission: 'leave:read',
+    section: 'Attendance & Leave',
     children: [
       { label: 'My Leave', href: '/leave', permission: 'leave:apply' },
       { label: 'Approvals', href: '/leave/approvals', permission: 'leave:approve' },
@@ -79,6 +86,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/attendance',
     icon: GitBranch,
     permission: 'attendance:read',
+    section: 'Attendance & Leave',
     children: [
       { label: 'My Attendance', href: '/attendance/my', permission: 'attendance:checkin' },
       { label: 'On Duty', href: '/attendance/on-duty', permission: 'attendance:checkin' },
@@ -91,18 +99,21 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/payroll',
     icon: CreditCard,
     permission: 'payroll:read',
+    section: 'Payroll & Finance',
   },
   {
     label: 'Loans',
     href: '/loans',
     icon: Receipt,
     permission: 'loan:read',
+    section: 'Payroll & Finance',
   },
   {
     label: 'Incentives',
     href: '/incentives',
     icon: ClipboardCheck,
     permission: 'todo:create',
+    section: 'Payroll & Finance',
     children: [
       { label: 'Todos', href: '/incentives/todos', permission: 'todo:create' },
       { label: 'Incentive Rules', href: '/incentives/rules', permission: 'todo:approve' },
@@ -114,6 +125,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/green-thanks',
     icon: HeartHandshake,
     permission: 'profile:read',
+    section: 'Engagement',
     children: [
       { label: 'Green Thanks', href: '/green-thanks', permission: 'profile:read' },
       { label: 'Config', href: '/green-thanks/config', permission: 'green_thanks:manage' },
@@ -124,6 +136,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/performance',
     icon: Target,
     permission: 'employee:read',
+    section: 'Engagement',
     children: [
       { label: 'Cycles', href: '/performance', permission: 'employee:read' },
       { label: 'My Ratings', href: '/performance/my-ratings', permission: 'employee:read' },
@@ -135,6 +148,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/notices',
     icon: Megaphone,
     permission: 'employee:read',
+    section: 'Engagement',
     children: [
       { label: 'Notice Board', href: '/notices', permission: 'employee:read' },
       { label: 'Manage Notices', href: '/notices/manage', permission: 'onboarding:manage' },
@@ -144,6 +158,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Chat',
     href: '/chat',
     icon: MessageSquareText,
+    section: 'Engagement',
     // No permission — chat is available to every authenticated employee
   },
   {
@@ -151,6 +166,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/assets',
     icon: Briefcase,
     permission: 'asset:read',
+    section: 'Assets & Compliance',
     children: [
       { label: 'All Assets', href: '/assets', permission: 'asset:read' },
       { label: 'My Assets', href: '/assets/my', permission: 'asset:read' },
@@ -161,30 +177,35 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/disciplinary',
     icon: AlertOctagon,
     permission: 'exit:manage',
+    section: 'Assets & Compliance',
   },
   {
     label: 'Exit Management',
     href: '/exit',
     icon: DoorOpen,
     permission: 'exit:manage',
+    section: 'Assets & Compliance',
   },
   {
     label: 'Insurance',
     href: '/insurance',
     icon: HeartPulse,
     permission: 'employee:read',
+    section: 'Assets & Compliance',
   },
   {
     label: 'Service Requests',
     href: '/service-requests',
     icon: Ticket,
     permission: 'service_request:read',
+    section: 'Support',
   },
   {
     label: 'Reports',
     href: '/reports',
     icon: BarChart3,
     permission: 'report:read',
+    section: 'Insights',
     children: [
       { label: 'Payroll Month-wise', href: '/reports/payroll', permission: 'report:read' },
       { label: 'Attendance Summary', href: '/reports/attendance', permission: 'report:read' },
@@ -198,6 +219,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Settings',
     href: '/settings',
     icon: Settings,
+    section: 'System',
     children: [
       { label: 'Active Sessions', href: '/settings/sessions' },
       { label: 'SMS Templates', href: '/settings/sms-templates', permission: 'sms_template:read' },
@@ -278,7 +300,7 @@ export function Sidebar() {
         <div className="flex items-center gap-3 px-3 py-4 border-b border-sidebar-border flex-shrink-0">
           {sidebarOpen ? (
             organizationLogoUrl && !logoFailed ? (
-              <div className="flex-1 min-w-0 bg-white rounded-lg px-3 py-2">
+              <div className="flex-1 min-w-0 px-1 py-1">
                 <img
                   src={organizationLogoUrl}
                   alt={organizationName ?? 'Organization'}
@@ -287,11 +309,11 @@ export function Sidebar() {
                 />
               </div>
             ) : (
-              <div className="flex-1 min-w-0 bg-white rounded-lg px-3 py-2 flex items-center gap-2">
-                <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center flex-shrink-0">
-                  <Building2 className="h-3.5 w-3.5 text-primary-foreground" />
+              <div className="flex-1 min-w-0 px-1 py-1 flex items-center gap-2">
+                <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Building2 className="h-4 w-4 text-primary-foreground" />
                 </div>
-                <span className="text-sm font-semibold text-foreground truncate">
+                <span className="text-sm font-semibold text-sidebar-foreground truncate">
                   {organizationName ?? 'Organization'}
                 </span>
               </div>
@@ -328,14 +350,14 @@ export function Sidebar() {
               <button
                 onClick={() => navigate('/settings/sessions')}
                 title="Settings"
-                className="h-7 w-7 flex items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+                className="h-7 w-7 flex items-center justify-center rounded-md text-sidebar-foreground/50 hover:bg-muted hover:text-sidebar-foreground transition-colors"
               >
                 <Settings className="h-3.5 w-3.5" />
               </button>
               <button
                 onClick={handleLogout}
                 title="Log out"
-                className="h-7 w-7 flex items-center justify-center rounded-md text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-accent-red transition-colors"
+                className="h-7 w-7 flex items-center justify-center rounded-md text-sidebar-foreground/50 hover:bg-muted hover:text-accent-red transition-colors"
               >
                 <Power className="h-3.5 w-3.5" />
               </button>
@@ -346,73 +368,85 @@ export function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-3 scrollbar-thin">
           <ul className="space-y-0.5 px-2">
-            {filteredItems.map((item) => {
+            {filteredItems.map((item, index) => {
               const Icon = item.icon
               const hasChildren = !!item.children?.length
               const isExpanded = expanded.includes(item.href)
               const active = isActive(item.href)
+              const previousSection = index > 0 ? filteredItems[index - 1].section : undefined
+              const showSectionLabel = sidebarOpen && item.section && item.section !== previousSection
 
               return (
-                <li key={item.href}>
-                  {hasChildren ? (
-                    <>
-                      <button
-                        onClick={() => toggleExpanded(item.href)}
+                <li key={item.href} className="relative">
+                  {showSectionLabel && (
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground px-3 pt-4 pb-1">
+                      {item.section}
+                    </div>
+                  )}
+                  <div className="relative">
+                    {active && (
+                      <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
+                    )}
+                    {hasChildren ? (
+                      <>
+                        <button
+                          onClick={() => toggleExpanded(item.href)}
+                          className={cn(
+                            'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+                            active
+                              ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
+                              : 'text-sidebar-foreground/90 hover:bg-muted hover:text-sidebar-foreground'
+                          )}
+                        >
+                          <Icon className="h-4 w-4 flex-shrink-0" />
+                          {sidebarOpen && (
+                            <>
+                              <span className="flex-1 text-left truncate">{item.label}</span>
+                              {isExpanded ? (
+                                <ChevronDown className="h-3.5 w-3.5 text-current opacity-70" />
+                              ) : (
+                                <ChevronRight className="h-3.5 w-3.5 text-current opacity-70" />
+                              )}
+                            </>
+                          )}
+                        </button>
+                        {sidebarOpen && isExpanded && (
+                          <ul className="mt-0.5 ml-4 space-y-0.5 border-l border-sidebar-border pl-3">
+                            {item.children
+                              ?.filter((c) => !c.permission || hasPermission(c.permission))
+                              .map((child) => (
+                                <li key={child.href}>
+                                  <Link
+                                    to={child.href}
+                                    className={cn(
+                                      'block px-3 py-1.5 rounded-md text-xs transition-colors',
+                                      location.pathname === child.href
+                                        ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+                                        : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-muted'
+                                    )}
+                                  >
+                                    {child.label}
+                                  </Link>
+                                </li>
+                              ))}
+                          </ul>
+                        )}
+                      </>
+                    ) : (
+                      <Link
+                        to={item.href}
                         className={cn(
-                          'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+                          'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                           active
-                            ? 'bg-primary text-primary-foreground'
-                            : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground'
+                            ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
+                            : 'text-sidebar-foreground/90 hover:bg-muted hover:text-sidebar-foreground'
                         )}
                       >
                         <Icon className="h-4 w-4 flex-shrink-0" />
-                        {sidebarOpen && (
-                          <>
-                            <span className="flex-1 text-left truncate">{item.label}</span>
-                            {isExpanded ? (
-                              <ChevronDown className="h-3.5 w-3.5 text-sidebar-foreground/50" />
-                            ) : (
-                              <ChevronRight className="h-3.5 w-3.5 text-sidebar-foreground/50" />
-                            )}
-                          </>
-                        )}
-                      </button>
-                      {sidebarOpen && isExpanded && (
-                        <ul className="mt-0.5 ml-4 space-y-0.5 border-l border-sidebar-border pl-3">
-                          {item.children
-                            ?.filter((c) => !c.permission || hasPermission(c.permission))
-                            .map((child) => (
-                              <li key={child.href}>
-                                <Link
-                                  to={child.href}
-                                  className={cn(
-                                    'block px-3 py-1.5 rounded-md text-xs transition-colors',
-                                    location.pathname === child.href
-                                      ? 'text-primary font-medium'
-                                      : 'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent'
-                                  )}
-                                >
-                                  {child.label}
-                                </Link>
-                              </li>
-                            ))}
-                        </ul>
-                      )}
-                    </>
-                  ) : (
-                    <Link
-                      to={item.href}
-                      className={cn(
-                        'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-                        active
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground'
-                      )}
-                    >
-                      <Icon className="h-4 w-4 flex-shrink-0" />
-                      {sidebarOpen && <span className="truncate">{item.label}</span>}
-                    </Link>
-                  )}
+                        {sidebarOpen && <span className="truncate">{item.label}</span>}
+                      </Link>
+                    )}
+                  </div>
                 </li>
               )
             })}
