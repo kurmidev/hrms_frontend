@@ -415,9 +415,9 @@ export function OrganizationsListPage() {
                           )}
                         </div>
                         <div className="text-right text-xs text-[var(--platform-panel-muted)] space-y-0.5 flex-shrink-0 ml-3">
-                          <p>Monthly: <span className="font-medium text-[var(--platform-panel-label)]">₹{plan.priceMonthly.toLocaleString('en-IN')}</span></p>
-                          <p>Quarterly: <span className="font-medium text-[var(--platform-panel-label)]">₹{plan.priceQuarterly.toLocaleString('en-IN')}</span></p>
-                          <p>Yearly: <span className="font-medium text-[var(--platform-panel-label)]">₹{plan.priceYearly.toLocaleString('en-IN')}</span></p>
+                          <p>Monthly: <span className="font-medium text-[var(--platform-panel-label)]">₹{plan.priceMonthly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+                          <p>Quarterly: <span className="font-medium text-[var(--platform-panel-label)]">₹{plan.priceQuarterly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+                          <p>Yearly: <span className="font-medium text-[var(--platform-panel-label)]">₹{plan.priceYearly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
                         </div>
                       </div>
                     </label>

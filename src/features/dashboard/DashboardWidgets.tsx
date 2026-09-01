@@ -68,7 +68,7 @@ const KPI_WIDGET_CONFIG: Record<string, KpiCardConfig> = {
   },
   kpi_attendance_rate: {
     title: 'Attendance %', icon: BarChart3, color: 'text-foreground', bg: 'bg-foreground/10', href: '/attendance',
-    format: (k) => (k.kpi_attendance_rate != null ? `${k.kpi_attendance_rate}%` : '—'),
+    format: (k) => (k.kpi_attendance_rate != null ? `${Number(k.kpi_attendance_rate).toFixed(2)}%` : '—'),
   },
   kpi_pending_approvals: {
     title: 'Pending Approvals', icon: Clock, color: 'text-accent-orange', bg: 'bg-accent-orange/10', href: '/performance/kpis',
@@ -92,11 +92,11 @@ const KPI_WIDGET_CONFIG: Record<string, KpiCardConfig> = {
   },
   kpi_my_leave_balance: {
     title: 'My Leave Balance', icon: Wallet2, color: 'text-accent-red', bg: 'bg-accent-red/10', href: '/leave/my',
-    format: (k) => (k.kpi_my_leave_balance != null ? k.kpi_my_leave_balance : '—'),
+    format: (k) => (k.kpi_my_leave_balance != null ? Number(k.kpi_my_leave_balance).toFixed(2) : '—'),
   },
   kpi_my_performance: {
     title: 'My Performance', icon: Star, color: 'text-accent-red', bg: 'bg-accent-red/10', href: '/performance/kpis',
-    format: (k) => (k.kpi_my_performance != null ? k.kpi_my_performance : '—'),
+    format: (k) => (k.kpi_my_performance != null ? Number(k.kpi_my_performance).toFixed(2) : '—'),
   },
 }
 
@@ -201,7 +201,7 @@ export function EmployeeStatusChartCard({ widget }: { widget: DashboardWidget })
         {isLoading ? <Skeleton className="h-60 w-full" /> : (
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
-              <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}>
+              <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(2)}%`}>
                 {statusData.map((entry) => (
                   <Cell key={entry.name} fill={STATUS_COLORS[entry.name] ?? '#94a3b8'} />
                 ))}

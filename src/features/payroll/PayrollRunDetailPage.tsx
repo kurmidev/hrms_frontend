@@ -310,7 +310,7 @@ function PayslipRow({
   return (
     <div className={`flex items-center justify-between text-sm ${bold ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>
       <span>{label}</span>
-      <span className={bold ? 'text-foreground' : ''}>{isCurrency ? formatCurrency(value) : value}</span>
+      <span className={bold ? 'text-foreground' : ''}>{isCurrency ? formatCurrency(value) : Number(value).toFixed(2)}</span>
     </div>
   )
 }

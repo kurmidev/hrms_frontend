@@ -118,14 +118,14 @@ export function ApproveTodoDialog({ open, onOpenChange, todo }: Props) {
                 <div className="space-y-1.5">
                   <Label>Incentive Rule *</Label>
                   <Select
-                    items={Object.fromEntries(rules.map((r) => [r.id, `${r.name} (${r.rate})`]))}
+                    items={Object.fromEntries(rules.map((r) => [r.id, `${r.name} (${Number(r.rate).toFixed(2)})`]))}
                     value={incentiveRuleId}
                     onValueChange={(v) => setIncentiveRuleId(v ?? '')}
                   >
                     <SelectTrigger className="w-full"><SelectValue placeholder="Select an incentive rule" /></SelectTrigger>
                     <SelectContent>
                       {rules.map((r) => (
-                        <SelectItem key={r.id} value={r.id}>{r.name} ({r.rate})</SelectItem>
+                        <SelectItem key={r.id} value={r.id}>{r.name} ({Number(r.rate).toFixed(2)})</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

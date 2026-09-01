@@ -171,7 +171,7 @@ export function ServiceRequestDetailPage() {
                 <p><span className="font-medium text-foreground">Leave Type: </span>{request.leavePolicyType?.name ?? '—'}</p>
                 <p><span className="font-medium text-foreground">From: </span>{request.leaveFromDate ? formatDate(request.leaveFromDate) : '—'}</p>
                 <p><span className="font-medium text-foreground">To: </span>{request.leaveToDate ? formatDate(request.leaveToDate) : '—'}</p>
-                <p><span className="font-medium text-foreground">Days: </span>{request.leaveDays ?? '—'}</p>
+                <p><span className="font-medium text-foreground">Days: </span>{request.leaveDays != null ? Number(request.leaveDays).toFixed(2) : '—'}</p>
               </div>
             )}
             {canManage && !isOwnRecord && nextStatuses.length > 0 && (

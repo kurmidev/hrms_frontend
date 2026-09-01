@@ -167,19 +167,19 @@ export function ReportsPage() {
   const attendanceColumns: Column<AttendanceReportRow>[] = [
     { key: 'empCode', header: 'Emp Code' },
     { key: 'name', header: 'Name' },
-    { key: 'presentDays', header: 'Present' },
-    { key: 'absentDays', header: 'Absent' },
-    { key: 'leaveDays', header: 'Leave Days' },
-    { key: 'lopDays', header: 'LOP' },
+    { key: 'presentDays', header: 'Present', render: (r) => Number(r.presentDays).toFixed(2) },
+    { key: 'absentDays', header: 'Absent', render: (r) => Number(r.absentDays).toFixed(2) },
+    { key: 'leaveDays', header: 'Leave Days', render: (r) => Number(r.leaveDays).toFixed(2) },
+    { key: 'lopDays', header: 'LOP', render: (r) => Number(r.lopDays).toFixed(2) },
   ]
 
   const leaveColumns: Column<LeaveReportRow>[] = [
     { key: 'empCode', header: 'Emp Code' },
     { key: 'name', header: 'Name' },
     { key: 'leaveType', header: 'Leave Type' },
-    { key: 'entitledDays', header: 'Entitled' },
-    { key: 'takenDays', header: 'Taken' },
-    { key: 'balanceDays', header: 'Balance' },
+    { key: 'entitledDays', header: 'Entitled', render: (r) => Number(r.entitledDays).toFixed(2) },
+    { key: 'takenDays', header: 'Taken', render: (r) => Number(r.takenDays).toFixed(2) },
+    { key: 'balanceDays', header: 'Balance', render: (r) => Number(r.balanceDays).toFixed(2) },
   ]
 
   const loanColumns: Column<LoanReportRow>[] = [
@@ -219,17 +219,17 @@ export function ReportsPage() {
     { key: 'checkOutAt', header: 'Check-Out', render: (r) => (r.checkOutAt ? formatDateTime(r.checkOutAt) : '—') },
     { key: 'checkOutLocationName', header: 'Check-Out Location', render: (r) => r.checkOutLocationName ?? '—' },
     { key: 'status', header: 'Status' },
-    { key: 'totalHours', header: 'Total Hours', render: (r) => r.totalHours ?? '—' },
+    { key: 'totalHours', header: 'Total Hours', render: (r) => (r.totalHours != null ? Number(r.totalHours).toFixed(2) : '—') },
   ]
 
   const performanceColumns: Column<PerformanceReportRow>[] = [
     { key: 'empCode', header: 'Emp Code' },
     { key: 'name', header: 'Name' },
     { key: 'cycleName', header: 'Cycle' },
-    { key: 'rating', header: 'Rating' },
+    { key: 'rating', header: 'Rating', render: (r) => (r.rating != null ? Number(r.rating).toFixed(2) : '—') },
     { key: 'isEligibleForIncrement', header: 'Eligible for Increment', render: (r) => (r.isEligibleForIncrement ? 'Yes' : 'No') },
     { key: 'kpiAchievedCount', header: 'KPI Achieved/Assigned', render: (r) => `${r.kpiAchievedCount}/${r.kpiAssignedCount}` },
-    { key: 'kpiAchievementRate', header: 'Achievement Rate', render: (r) => `${(r.kpiAchievementRate * 100).toFixed(0)}%` },
+    { key: 'kpiAchievementRate', header: 'Achievement Rate', render: (r) => `${(r.kpiAchievementRate * 100).toFixed(2)}%` },
   ]
 
   const todoIncentiveColumns: Column<TodoIncentiveReportRow>[] = [
@@ -238,7 +238,7 @@ export function ReportsPage() {
     { key: 'todosTotal', header: 'Todos Total' },
     { key: 'todosApproved', header: 'Approved' },
     { key: 'todosRejected', header: 'Rejected' },
-    { key: 'completionRate', header: 'Completion Rate', render: (r) => `${(r.completionRate * 100).toFixed(0)}%` },
+    { key: 'completionRate', header: 'Completion Rate', render: (r) => `${(r.completionRate * 100).toFixed(2)}%` },
     { key: 'incentiveTotalAmount', header: 'Incentive Total', render: (r) => formatCurrency(r.incentiveTotalAmount) },
     { key: 'incentiveReleasedAmount', header: 'Incentive Released', render: (r) => formatCurrency(r.incentiveReleasedAmount) },
   ]

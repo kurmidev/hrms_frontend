@@ -138,7 +138,7 @@ export function PerformanceCycleDetailPage() {
       header: 'Rated By',
       render: (row) => (row.rater ? `${row.rater.firstName} ${row.rater.lastName}` : '—'),
     },
-    { key: 'rating', header: 'Rating', render: (row) => `${row.rating} / 5` },
+    { key: 'rating', header: 'Rating', render: (row) => `${Number(row.rating).toFixed(2)} / 5` },
     {
       key: 'isEligibleForIncrement',
       header: 'Increment Eligible',

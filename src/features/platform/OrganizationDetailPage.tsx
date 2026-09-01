@@ -291,7 +291,7 @@ export function OrganizationDetailPage() {
                       {inv.invoiceNumber}
                     </td>
                     <td className="px-5 py-3 text-white">
-                      {inv.currency} {inv.totalAmount.toLocaleString()}
+                      {inv.currency} {inv.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="px-5 py-3 text-[var(--platform-muted)]">{formatDate(inv.dueDate)}</td>
                     <td className="px-5 py-3">{invoiceStatusBadge(inv.status)}</td>
@@ -322,7 +322,7 @@ export function OrganizationDetailPage() {
             </h3>
             <p className="text-sm text-[var(--platform-panel-muted)] mb-5">
               Invoice {markPaidInvoice.invoiceNumber} — {markPaidInvoice.currency}{' '}
-              {markPaidInvoice.totalAmount.toLocaleString()}
+              {markPaidInvoice.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
             <div className="space-y-4">
               <div>

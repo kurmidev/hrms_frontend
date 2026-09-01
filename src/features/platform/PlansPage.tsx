@@ -199,15 +199,15 @@ export function PlansPage() {
             <div className="bg-[var(--platform-raised)] rounded-lg p-3 space-y-1.5">
               <div className="flex justify-between text-xs">
                 <span className="text-[var(--platform-muted)]">Monthly</span>
-                <span className="text-white font-medium">₹{plan.priceMonthly.toLocaleString('en-IN')}</span>
+                <span className="text-white font-medium">₹{plan.priceMonthly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-[var(--platform-muted)]">Quarterly</span>
-                <span className="text-white font-medium">₹{plan.priceQuarterly.toLocaleString('en-IN')}</span>
+                <span className="text-white font-medium">₹{plan.priceQuarterly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-[var(--platform-muted)]">Yearly</span>
-                <span className="text-white font-medium">₹{plan.priceYearly.toLocaleString('en-IN')}</span>
+                <span className="text-white font-medium">₹{plan.priceYearly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
 

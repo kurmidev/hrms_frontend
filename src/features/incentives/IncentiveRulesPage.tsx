@@ -75,7 +75,7 @@ export function IncentiveRulesPage() {
   const columns: Column<IncentiveRule>[] = [
     { key: 'name', header: 'Name' },
     { key: 'type', header: 'Type' },
-    { key: 'rate', header: 'Rate' },
+    { key: 'rate', header: 'Rate', render: (row) => Number(row.rate).toFixed(2) },
     {
       key: 'isActive',
       header: 'Status',

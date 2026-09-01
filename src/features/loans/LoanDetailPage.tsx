@@ -151,7 +151,7 @@ export function LoanDetailPage() {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold text-foreground">
-                {loan.interestRate != null ? `${loan.interestRate}%` : '—'}
+                {loan.interestRate != null ? `${Number(loan.interestRate).toFixed(2)}%` : '—'}
               </p>
             </CardContent>
           </Card>

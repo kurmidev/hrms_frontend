@@ -212,8 +212,8 @@ export function LeavePage() {
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold text-foreground">
-                  {b.balanceDays}
-                  <span className="text-sm font-normal text-muted-foreground"> / {b.entitledDays} days</span>
+                  {Number(b.balanceDays).toFixed(2)}
+                  <span className="text-sm font-normal text-muted-foreground"> / {Number(b.entitledDays).toFixed(2)} days</span>
                 </p>
               </CardContent>
             </Card>
@@ -245,7 +245,7 @@ export function LeavePage() {
                     .filter((b) => b.leavePolicyType)
                     .map((b) => [
                       b.leavePolicyType!.id,
-                      `${b.leavePolicyType!.name ?? LEAVE_TYPE_LABELS[b.leavePolicyType!.leaveType] ?? b.leavePolicyType!.leaveType} (${b.balanceDays} left)`,
+                      `${b.leavePolicyType!.name ?? LEAVE_TYPE_LABELS[b.leavePolicyType!.leaveType] ?? b.leavePolicyType!.leaveType} (${Number(b.balanceDays).toFixed(2)} left)`,
                     ]),
                 )}
                 value={selectedPolicyTypeId ?? ''}
@@ -255,7 +255,7 @@ export function LeavePage() {
                 <SelectContent>
                   {balanceList.filter((b) => b.leavePolicyType).map((b) => (
                     <SelectItem key={b.leavePolicyType!.id} value={b.leavePolicyType!.id}>
-                      {b.leavePolicyType!.name ?? LEAVE_TYPE_LABELS[b.leavePolicyType!.leaveType] ?? b.leavePolicyType!.leaveType} ({b.balanceDays} left)
+                      {b.leavePolicyType!.name ?? LEAVE_TYPE_LABELS[b.leavePolicyType!.leaveType] ?? b.leavePolicyType!.leaveType} ({Number(b.balanceDays).toFixed(2)} left)
                     </SelectItem>
                   ))}
                 </SelectContent>

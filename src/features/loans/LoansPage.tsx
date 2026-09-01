@@ -66,7 +66,7 @@ export function LoansPage() {
       render: (row) => (row.amountApproved != null ? formatCurrency(row.amountApproved) : '—'),
     },
     { key: 'tenureMonths', header: 'Tenure', render: (row) => (row.tenureMonths != null ? `${row.tenureMonths} mo` : '—') },
-    { key: 'interestRate', header: 'Rate', render: (row) => (row.interestRate != null ? `${row.interestRate}%` : '—') },
+    { key: 'interestRate', header: 'Rate', render: (row) => (row.interestRate != null ? `${Number(row.interestRate).toFixed(2)}%` : '—') },
     { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} type="loan" /> },
     { key: 'createdAt', header: 'Applied', render: (row) => formatDate(row.createdAt) },
     {

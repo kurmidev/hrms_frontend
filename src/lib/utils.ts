@@ -18,7 +18,12 @@ export function formatDateTime(date: string | Date | null | undefined): string {
 
 export function formatCurrency(amount: number | null | undefined, currency = 'INR'): string {
   if (amount == null) return '—'
-  return new Intl.NumberFormat('en-IN', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount)
 }
 
 export function getInitials(firstName: string, lastName?: string): string {

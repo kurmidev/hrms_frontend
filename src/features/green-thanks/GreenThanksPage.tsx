@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { greenThanksApi } from '@/api/green-thanks.api'
+import { formatCurrency } from '@/lib/utils'
 import type { GreenThanks, GreenThanksDirection, GreenThanksStatus } from '@/types/green-thanks.types'
 import type { PaginatedMeta } from '@/types/api.types'
 import { usePagination } from '@/hooks/usePagination'
@@ -89,7 +90,7 @@ export function GreenThanksPage() {
           <p className="text-sm font-medium text-foreground">{row.points}</p>
           {configData && (
             <p className="text-xs text-muted-foreground">
-              ₹{(row.points * configData.inrPerPoint).toLocaleString()}
+              {formatCurrency(row.points * configData.inrPerPoint)}
             </p>
           )}
         </div>
