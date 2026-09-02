@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { onboardingApi } from '@/api/onboarding.api'
 import { ApproveOnboardingDialog } from './ApproveOnboardingDialog'
-import { formatDateTime, getApiErrorMessage } from '@/lib/utils'
+import { copyText, formatDateTime, getApiErrorMessage } from '@/lib/utils'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
@@ -218,8 +218,12 @@ export function OnboardingDetailPage() {
                 size="icon"
                 className="h-7 w-7 flex-shrink-0"
                 onClick={async () => {
-                  await navigator.clipboard.writeText(`${window.location.origin}/onboarding/${link.token}`)
-                  toast.success('Link copied.')
+                  const ok = await copyText(`${window.location.origin}/onboarding/${link.token}`)
+                  if (ok) {
+                    toast.success('Link copied.')
+                  } else {
+                    toast.error('Failed to copy link. Select the link text and copy it manually.')
+                  }
                 }}
               >
                 <Copy className="h-3.5 w-3.5" />

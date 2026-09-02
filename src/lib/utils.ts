@@ -71,3 +71,40 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
   }
   return fallback
 }
+
+/**
+ * Copies text to the clipboard, returning whether it actually succeeded.
+ *
+ * `navigator.clipboard` only exists in a secure context (HTTPS or
+ * localhost) — on a plain-HTTP deployment (no TLS in front of the app) the
+ * API is undefined and a bare `navigator.clipboard.writeText(...)` throws
+ * with no visible error, making "copy" silently do nothing. Falls back to
+ * the legacy `document.execCommand('copy')` approach, which still works
+ * without a secure context, via a temporary offscreen textarea.
+ */
+export async function copyText(text: string): Promise<boolean> {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text)
+      return true
+    } catch {
+      // fall through to the legacy path below
+    }
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.focus()
+  textarea.select()
+  let succeeded = false
+  try {
+    succeeded = document.execCommand('copy')
+  } catch {
+    succeeded = false
+  }
+  document.body.removeChild(textarea)
+  return succeeded
+}

@@ -18,7 +18,7 @@ import { designationsApi } from '@/api/designations.api'
 import type { OnboardingLink } from '@/types/onboarding.types'
 import type { Designation } from '@/types/organization.types'
 import { ONBOARDING_STATUS_LABELS } from '@/lib/constants'
-import { formatDateTime, getApiErrorMessage } from '@/lib/utils'
+import { copyText, formatDateTime, getApiErrorMessage } from '@/lib/utils'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
@@ -40,11 +40,11 @@ function buildOnboardingLink(token: string): string {
 }
 
 async function copyLink(token: string) {
-  try {
-    await navigator.clipboard.writeText(buildOnboardingLink(token))
+  const ok = await copyText(buildOnboardingLink(token))
+  if (ok) {
     toast.success('Link copied.')
-  } catch {
-    toast.error('Failed to copy link.')
+  } else {
+    toast.error('Failed to copy link. Select the link text and copy it manually.')
   }
 }
 
@@ -342,8 +342,12 @@ export function OnboardingHRPage() {
                 size="icon"
                 onClick={async () => {
                   if (!createdLink) return
-                  await navigator.clipboard.writeText(createdLink)
-                  toast.success('Link copied.')
+                  const ok = await copyText(createdLink)
+                  if (ok) {
+                    toast.success('Link copied.')
+                  } else {
+                    toast.error('Failed to copy link. Select the link text and copy it manually.')
+                  }
                 }}
               >
                 <Copy className="h-4 w-4" />
