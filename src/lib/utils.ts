@@ -73,6 +73,32 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
 }
 
 /**
+ * Generates a unique-enough id for client-side use (React list keys, form
+ * row ids, etc.) — NOT for anything security-sensitive.
+ *
+ * `crypto.randomUUID()` only exists in a secure context (HTTPS or
+ * localhost); calling it directly on a plain-HTTP deployment throws
+ * `crypto.randomUUID is not a function` and crashes the whole page (no
+ * route in this app has an `errorElement`, so this becomes React Router's
+ * unhandled-error screen). `crypto.getRandomValues`, unlike `randomUUID`,
+ * is NOT secure-context-gated, so it's used as the fallback; a `Math.random`
+ * fallback covers the (very unlikely) remaining case.
+ */
+export function generateId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const bytes = crypto.getRandomValues(new Uint8Array(16))
+    bytes[6] = (bytes[6] & 0x0f) | 0x40
+    bytes[8] = (bytes[8] & 0x3f) | 0x80
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+  }
+  return `id-${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
+/**
  * Copies text to the clipboard, returning whether it actually succeeded.
  *
  * `navigator.clipboard` only exists in a secure context (HTTPS or

@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select'
 import { onboardingApi } from '@/api/onboarding.api'
 import { toast } from 'sonner'
-import { getApiErrorMessage } from '@/lib/utils'
+import { generateId, getApiErrorMessage } from '@/lib/utils'
 
 const step1Schema = z.object({
   firstName: z.string().min(1),
@@ -66,7 +66,7 @@ interface DocumentRow {
 }
 
 function createEmptyRow(): DocumentRow {
-  return { id: crypto.randomUUID(), documentType: '', file: null, error: null }
+  return { id: generateId(), documentType: '', file: null, error: null }
 }
 
 function validateFile(file: File): string | null {
