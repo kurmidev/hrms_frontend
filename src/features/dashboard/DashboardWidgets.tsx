@@ -91,7 +91,7 @@ const KPI_WIDGET_CONFIG: Record<string, KpiCardConfig> = {
     format: (k) => k.kpi_open_tickets ?? 0,
   },
   kpi_my_leave_balance: {
-    title: 'My Leave Balance', icon: Wallet2, color: 'text-accent-red', bg: 'bg-accent-red/10', href: '/leave/my',
+    title: 'My Leave Balance', icon: Wallet2, color: 'text-accent-red', bg: 'bg-accent-red/10', href: '/leave',
     format: (k) => (k.kpi_my_leave_balance != null ? Number(k.kpi_my_leave_balance).toFixed(2) : '—'),
   },
   kpi_my_performance: {

@@ -89,62 +89,62 @@ function RingChart() {
 
 export function AuthMarketingPanel() {
   return (
-    <div className="hidden lg:flex h-full w-full flex-col justify-center gap-8 bg-gradient-to-br from-[#EAF7E0] via-[#F3FAEE] to-white px-12 py-12 xl:px-20">
-      <div className="flex flex-wrap gap-3">
+    <div className="hidden lg:flex h-full w-full flex-col justify-center gap-4 overflow-y-auto bg-gradient-to-br from-[#EAF7E0] via-[#F3FAEE] to-white px-8 py-6 xl:px-14 2xl:px-20">
+      <div className="flex flex-wrap gap-2">
         {FEATURE_PILLS.map((pill) => (
           <FeaturePillBadge key={pill.label} {...pill} />
         ))}
       </div>
 
-      <div className="rounded-3xl bg-white p-6 shadow-lg">
-        <div className="flex items-center justify-between mb-5">
+      <div className="rounded-2xl bg-white p-4 shadow-lg xl:p-5">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-base font-semibold text-foreground">Attendance Overview</h3>
+            <h3 className="text-sm font-semibold text-foreground xl:text-base">Attendance Overview</h3>
             <Bell className="h-4 w-4 text-muted-foreground" />
           </div>
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
             AD
           </span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2 mb-6">
+        <div className="grid grid-cols-4 gap-2 mb-4">
           {SAMPLE_STATS.map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className={`text-xl font-bold ${stat.className}`}>{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
+              <p className={`text-lg font-bold xl:text-xl ${stat.className}`}>{stat.value}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{stat.label}</p>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-6 items-center">
+        <div className="grid grid-cols-2 gap-4 items-center xl:gap-6">
           <div>
-            <div className="flex items-end gap-1.5 h-16">
+            <div className="flex items-end gap-1.5 h-12 xl:h-14">
               {SAMPLE_SHIFT_BARS.map((height, i) => (
                 <div
                   key={i}
-                  className="w-2.5 rounded-full bg-primary/80"
+                  className="w-2 rounded-full bg-primary/80 xl:w-2.5"
                   style={{ height: `${height}%` }}
                 />
               ))}
             </div>
-            <p className="text-xs text-muted-foreground mt-2">Daily shifts</p>
+            <p className="text-[11px] text-muted-foreground mt-1.5">Daily shifts</p>
           </div>
 
           <div className="flex flex-col items-center">
             <div className="relative flex items-center justify-center">
               <RingChart />
-              <span className="absolute text-lg font-bold text-foreground">209</span>
+              <span className="absolute text-base font-bold text-foreground xl:text-lg">209</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Total employees</p>
+            <p className="text-[11px] text-muted-foreground mt-1">Total employees</p>
           </div>
         </div>
       </div>
 
       <div className="text-center">
-        <h2 className="text-2xl xl:text-3xl font-bold text-foreground leading-tight">
+        <h2 className="text-xl xl:text-2xl font-bold text-foreground leading-tight">
           Built for teams that are growing fast.
         </h2>
-        <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
+        <p className="text-sm text-muted-foreground mt-1.5 max-w-md mx-auto">
           Attendance, leave, payroll and onboarding — one calm place to run your team.
         </p>
       </div>
@@ -153,7 +153,7 @@ export function AuthMarketingPanel() {
         <a
           href="#"
           onClick={(e) => e.preventDefault()}
-          className="flex items-center gap-2 rounded-2xl bg-white px-4 py-3 shadow-sm cursor-default"
+          className="flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 shadow-sm cursor-default"
         >
           <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-secondary">
             <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
@@ -163,7 +163,7 @@ export function AuthMarketingPanel() {
         <a
           href="#"
           onClick={(e) => e.preventDefault()}
-          className="flex items-center gap-2 rounded-2xl bg-white px-4 py-3 shadow-sm cursor-default"
+          className="flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 shadow-sm cursor-default"
         >
           <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-secondary">
             <Bell className="h-3.5 w-3.5 text-muted-foreground" />

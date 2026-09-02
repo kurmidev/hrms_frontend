@@ -11,13 +11,13 @@ export function AuthLayout() {
   }
 
   return (
-    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2 bg-white">
+    <div className="grid h-screen grid-cols-1 lg:grid-cols-2 bg-white overflow-hidden">
       <AuthMarketingPanel />
 
-      <div className="flex items-center justify-center px-6 py-12 sm:px-10">
+      <div className="flex items-center justify-center overflow-y-auto px-6 py-6 sm:px-10">
         <div className="w-full max-w-sm">
-          <div className="mb-8 flex justify-center">
-            <img src={igreenLogo} alt="iGreen Technologies" className="h-12 w-auto object-contain" />
+          <div className="mb-5 flex justify-center">
+            <img src={igreenLogo} alt="iGreen Technologies" className="h-10 w-auto object-contain sm:h-12" />
           </div>
           <Outlet />
         </div>
