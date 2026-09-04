@@ -11,13 +11,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { employeesApi } from '@/api/employees.api'
 import type { Employee } from '@/types/employee.types'
 import { getApiErrorMessage } from '@/lib/utils'
+import { mobileSchema, optionalMobileSchema, sanitizeMobileInput } from '@/lib/validation'
 import { toast } from 'sonner'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
-  phone: z.string().length(10, 'Phone must be exactly 10 digits'),
+  phone: mobileSchema,
   relation: z.string().min(1, 'Relation is required'),
-  alternatePhone: z.string().optional(),
+  alternatePhone: optionalMobileSchema,
   address: z.string().optional(),
 })
 type FormValues = z.infer<typeof schema>
@@ -62,6 +63,9 @@ export function EditEmergencyContactDialog({ open, onOpenChange, employee }: Pro
     onError: (err) => toast.error(getApiErrorMessage(err, 'Failed to update emergency contact.')),
   })
 
+  const phoneField = register('phone')
+  const alternatePhoneField = register('alternatePhone')
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[92vw] sm:w-[85vw] lg:w-[70vw] max-w-3xl max-h-[85vh] overflow-y-auto">
@@ -77,7 +81,15 @@ export function EditEmergencyContactDialog({ open, onOpenChange, employee }: Pro
             </div>
             <div className="space-y-1.5">
               <Label>Phone *</Label>
-              <Input {...register('phone')} />
+              <Input
+                inputMode="numeric"
+                maxLength={10}
+                {...phoneField}
+                onChange={(e) => {
+                  e.target.value = sanitizeMobileInput(e.target.value)
+                  phoneField.onChange(e)
+                }}
+              />
               {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
             </div>
             <div className="space-y-1.5">
@@ -87,7 +99,16 @@ export function EditEmergencyContactDialog({ open, onOpenChange, employee }: Pro
             </div>
             <div className="space-y-1.5">
               <Label>Alternate Phone</Label>
-              <Input {...register('alternatePhone')} />
+              <Input
+                inputMode="numeric"
+                maxLength={10}
+                {...alternatePhoneField}
+                onChange={(e) => {
+                  e.target.value = sanitizeMobileInput(e.target.value)
+                  alternatePhoneField.onChange(e)
+                }}
+              />
+              {errors.alternatePhone && <p className="text-xs text-destructive">{errors.alternatePhone.message}</p>}
             </div>
             <div className="space-y-1.5 sm:col-span-2">
               <Label>Address</Label>
@@ -106,3 +127,4 @@ export function EditEmergencyContactDialog({ open, onOpenChange, employee }: Pro
     </Dialog>
   )
 }
+

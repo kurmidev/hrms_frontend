@@ -14,6 +14,9 @@ export interface Organization {
   currency: string
   isActive: boolean
   allowAnonymousServiceRequests: boolean
+  autoLogoutEnabled: boolean
+  autoLogoutTime: string | null
+  autoLogoutTimezone: string
   createdAt: string
   updatedAt: string
 }

@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { employeesApi } from '@/api/employees.api'
 import type { Employee } from '@/types/employee.types'
 import { getApiErrorMessage } from '@/lib/utils'
+import { mobileSchema, sanitizeMobileInput } from '@/lib/validation'
 import { toast } from 'sonner'
 
 const GENDERS = ['MALE', 'FEMALE', 'OTHER'] as const
@@ -46,7 +47,7 @@ const schema = z.object({
   gender: z.string().optional(),
   nationality: z.string().optional(),
   bloodGroup: z.string().optional(),
-  phone: z.string().min(10, 'Phone must be 10 digits').max(10),
+  phone: mobileSchema,
   email: z.string().email('Invalid email'),
   healthInfoNotes: z.string().optional(),
   address: addressSchema,
@@ -99,6 +100,7 @@ export function EditPersonalDialog({ open, onOpenChange, employee }: Props) {
 
   const prevFields = useFieldArray({ control, name: 'previousEmployment' })
   const refFields = useFieldArray({ control, name: 'referenceContacts' })
+  const phoneField = register('phone')
 
   useEffect(() => {
     if (open) reset(toFormValues(employee))
@@ -159,7 +161,15 @@ export function EditPersonalDialog({ open, onOpenChange, employee }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>Phone *</Label>
-              <Input {...register('phone')} />
+              <Input
+                inputMode="numeric"
+                maxLength={10}
+                {...phoneField}
+                onChange={(e) => {
+                  e.target.value = sanitizeMobileInput(e.target.value)
+                  phoneField.onChange(e)
+                }}
+              />
               {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
             </div>
             <div className="space-y-1.5">

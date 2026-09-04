@@ -24,6 +24,7 @@ export interface AuthUser {
   organizationId: string
   organizationName?: string | null
   organizationLogoUrl?: string | null
+  autoLogout?: { enabled: boolean; time: string | null; timezone: string }
 }
 
 export interface AuthTokens {

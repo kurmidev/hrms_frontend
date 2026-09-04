@@ -35,8 +35,8 @@ import { PayrollRunDetailPage } from '@/features/payroll/PayrollRunDetailPage'
 import { LoansPage } from '@/features/loans/LoansPage'
 import { LoanDetailPage } from '@/features/loans/LoanDetailPage'
 import { IncentiveRulesPage } from '@/features/incentives/IncentiveRulesPage'
-import { TodosPage } from '@/features/incentives/TodosPage'
 import { IncentiveLedgerPage } from '@/features/incentives/IncentiveLedgerPage'
+import { TodosPage } from '@/features/todos/TodosPage'
 import { GreenThanksPage } from '@/features/green-thanks/GreenThanksPage'
 import { GreenThanksConfigPage } from '@/features/green-thanks/GreenThanksConfigPage'
 import { NoticeBoardPage } from '@/features/notices/NoticeBoardPage'
@@ -142,8 +142,8 @@ export const router = createBrowserRouter([
       { path: 'loans', element: <LoansPage /> },
       { path: 'loans/:id', element: <LoanDetailPage /> },
       { path: 'incentives/rules', element: <IncentiveRulesPage /> },
-      { path: 'incentives/todos', element: <TodosPage /> },
       { path: 'incentives/ledger', element: <IncentiveLedgerPage /> },
+      { path: 'todos', element: <TodosPage /> },
       { path: 'green-thanks', element: <GreenThanksPage /> },
       { path: 'green-thanks/config', element: <GreenThanksConfigPage /> },
       { path: 'performance', element: <PerformanceCyclesPage /> },

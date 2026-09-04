@@ -11,7 +11,7 @@ import { employeesApi } from '@/api/employees.api'
 import { loanApi } from '@/api/loan.api'
 import { leaveApi } from '@/api/leave.api'
 import { attendanceApi } from '@/api/attendance.api'
-import { todosApi } from '@/api/incentives.api'
+import { todosApi } from '@/api/todos.api'
 import { greenThanksApi } from '@/api/green-thanks.api'
 import type { AttendanceLog, LiveLocation } from '@/types/attendance.types'
 import type { DashboardWidget } from '@/types/dashboard.types'
@@ -19,7 +19,7 @@ import type { DashboardKpis } from '@/types/reports.types'
 import type { Employee, EmployeeStats } from '@/types/employee.types'
 import type { Loan } from '@/types/loan.types'
 import type { LeaveApplication } from '@/types/leave.types'
-import type { TodoTask } from '@/types/incentives.types'
+import type { TodoTask } from '@/types/todos.types'
 import type { GreenThanks } from '@/types/green-thanks.types'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import {
@@ -505,7 +505,7 @@ export function MyTodosWidget({ widget }: { widget: DashboardWidget }) {
           <ListTodo className="h-4 w-4 text-primary" />
           {widget.title || 'Todo List'}
         </CardTitle>
-        <Link to="/incentives/todos" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
+        <Link to="/todos" className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80">
           View All <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </CardHeader>

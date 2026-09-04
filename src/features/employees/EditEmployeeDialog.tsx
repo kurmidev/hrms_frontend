@@ -20,6 +20,7 @@ import type { Department, Designation, LeavePolicy } from '@/types/organization.
 import type { Zone } from '@/types/zone.types'
 import { EMPLOYMENT_TYPE_LABELS } from '@/lib/constants'
 import { getApiErrorMessage } from '@/lib/utils'
+import { mobileSchema, sanitizeMobileInput } from '@/lib/validation'
 import { toast } from 'sonner'
 
 const EMPLOYMENT_TYPES = ['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERN'] as const
@@ -53,7 +54,7 @@ const schema = z.object({
   firstName: z.string().min(1, 'Required'),
   lastName: z.string().min(1, 'Required'),
   email: z.string().email('Invalid email'),
-  phone: z.string().min(10, 'Phone must be 10 digits').max(10),
+  phone: mobileSchema,
   departmentId: z.string().min(1, 'Required'),
   designationId: z.string().min(1, 'Required'),
   payrollStructureId: z.string().min(1, 'Required'),
@@ -193,6 +194,7 @@ export function EditEmployeeDialog({ open, onOpenChange, employee }: Props) {
     onError: (err) => toast.error(getApiErrorMessage(err, 'Failed to update employee.')),
   })
 
+  const phoneField = register('phone')
   const employmentType = watch('employmentType')
   const gender = watch('gender')
   const departmentId = watch('departmentId')
@@ -315,7 +317,15 @@ export function EditEmployeeDialog({ open, onOpenChange, employee }: Props) {
               </div>
               <div className="space-y-1.5">
                 <Label>Phone *</Label>
-                <Input {...register('phone')} />
+                <Input
+                  inputMode="numeric"
+                  maxLength={10}
+                  {...phoneField}
+                  onChange={(e) => {
+                    e.target.value = sanitizeMobileInput(e.target.value)
+                    phoneField.onChange(e)
+                  }}
+                />
                 {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
               </div>
               <div className="space-y-1.5">

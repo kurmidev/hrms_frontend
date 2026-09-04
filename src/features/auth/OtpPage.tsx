@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { authApi } from '@/api/auth.api'
 import { useAuthStore } from '@/store/auth.store'
+import { sanitizeMobileInput } from '@/lib/validation'
 import { toast } from 'sonner'
 
 const phoneSchema = z.object({ phone: z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number') })
@@ -25,6 +26,7 @@ export function OtpPage() {
 
   const phoneForm = useForm<PhoneValues>({ resolver: zodResolver(phoneSchema) })
   const otpForm = useForm<OtpValues>({ resolver: zodResolver(otpSchema) })
+  const phoneField = phoneForm.register('phone')
 
   const sendOtp = async (values: PhoneValues) => {
     setLoading(true)
@@ -71,8 +73,14 @@ export function OtpPage() {
             <Input
               id="phone"
               placeholder="Mobile number"
+              inputMode="numeric"
+              maxLength={10}
               className="h-12 rounded-full border-0 bg-muted px-5 text-sm"
-              {...phoneForm.register('phone')}
+              {...phoneField}
+              onChange={(e) => {
+                e.target.value = sanitizeMobileInput(e.target.value)
+                phoneField.onChange(e)
+              }}
             />
             {phoneForm.formState.errors.phone && (
               <p className="text-xs text-destructive px-2">{phoneForm.formState.errors.phone.message}</p>

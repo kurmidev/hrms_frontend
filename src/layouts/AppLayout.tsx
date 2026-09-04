@@ -5,10 +5,13 @@ import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import { ForceChangePasswordDialog } from '@/features/auth/ForceChangePasswordDialog'
 import { PendingActivationGate } from '@/features/auth/PendingActivationGate'
 import { useUiStore } from '@/store/ui.store'
+import { useAutoLogout } from '@/hooks/useAutoLogout'
 import { cn } from '@/lib/utils'
 
 export function AppLayout() {
   const { sidebarOpen } = useUiStore()
+  // Authenticated shell only — never mount on public/login routes.
+  useAutoLogout()
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">

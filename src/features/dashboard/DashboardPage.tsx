@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { dashboardApi } from '@/api/dashboard.api'
-import { todosApi } from '@/api/incentives.api'
+import { todosApi } from '@/api/todos.api'
 import { useAuthStore } from '@/store/auth.store'
 import type { DashboardConfig, DashboardWidget } from '@/types/dashboard.types'
-import type { TodoTask } from '@/types/incentives.types'
+import type { TodoTask } from '@/types/todos.types'
 import type { DashboardKpis } from '@/types/reports.types'
 import { formatDate } from '@/lib/utils'
 import { usePermission } from '@/hooks/usePermission'
@@ -168,7 +168,7 @@ export function DashboardPage() {
               My Tasks
             </CardTitle>
             <Link
-              to="/incentives/todos"
+              to="/todos"
               className="flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
             >
               View All

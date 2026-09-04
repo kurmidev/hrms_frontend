@@ -4,7 +4,7 @@ import {
   Briefcase, CalendarDays, CreditCard, Receipt, UserCheck,
   ChevronDown, ChevronRight, X, Ticket, BarChart3, Settings,
   ClipboardCheck, HeartHandshake, Megaphone, MessageSquareText, Target,
-  AlertOctagon, DoorOpen, HeartPulse, Power,
+  AlertOctagon, DoorOpen, HeartPulse, Power, ListChecks,
 } from 'lucide-react'
 import { cn, getInitials, getFullName } from '@/lib/utils'
 import { useUiStore } from '@/store/ui.store'
@@ -115,10 +115,16 @@ export const NAV_ITEMS: NavItem[] = [
     permission: 'todo:create',
     section: 'Payroll & Finance',
     children: [
-      { label: 'Todos', href: '/incentives/todos', permission: 'todo:create' },
       { label: 'Incentive Rules', href: '/incentives/rules', permission: 'todo:approve' },
       { label: 'Incentive Ledger', href: '/incentives/ledger', permission: 'payroll:read' },
     ],
+  },
+  {
+    label: 'Tasks',
+    href: '/todos',
+    icon: ListChecks,
+    permission: 'todo:create',
+    section: 'Payroll & Finance',
   },
   {
     label: 'Green Thanks',

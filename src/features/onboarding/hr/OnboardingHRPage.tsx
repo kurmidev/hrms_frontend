@@ -19,13 +19,17 @@ import type { OnboardingLink } from '@/types/onboarding.types'
 import type { Designation } from '@/types/organization.types'
 import { ONBOARDING_STATUS_LABELS } from '@/lib/constants'
 import { copyText, formatDateTime, getApiErrorMessage } from '@/lib/utils'
+import { mobileSchema, sanitizeMobileInput } from '@/lib/validation'
 import { usePagination } from '@/hooks/usePagination'
 import { usePermission } from '@/hooks/usePermission'
 import { toast } from 'sonner'
 
 const schema = z.object({
   email: z.string().email('Valid email required'),
-  phone: z.string().regex(/^[6-9]\d{9}$/, '10-digit mobile number'),
+  // Canonical shared rule (matches backend CreateOnboardingLinkDto.phone's
+  // `^\d{10}$`) — do NOT use a stricter Indian-only `^[6-9]\d{9}$` here, or
+  // the frontend will reject values the backend genuinely accepts.
+  phone: mobileSchema,
   candidateName: z.string().min(1, 'Name is required'),
   jobTitle: z.string().min(1, 'Job title is required'),
   departmentName: z.string().min(1, 'Department name is required'),
@@ -87,6 +91,7 @@ export function OnboardingHRPage() {
     },
   })
 
+  const phoneField = register('phone')
   const selectedDepartmentName = watch('departmentName')
 
   const flatDepts = (nodes: typeof deptTree): { id: string; name: string }[] =>
@@ -269,7 +274,17 @@ export function OnboardingHRPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="phone">Mobile *</Label>
-                <Input id="phone" placeholder="9876543210" {...register('phone')} />
+                <Input
+                  id="phone"
+                  placeholder="9876543210"
+                  inputMode="numeric"
+                  maxLength={10}
+                  {...phoneField}
+                  onChange={(e) => {
+                    e.target.value = sanitizeMobileInput(e.target.value)
+                    phoneField.onChange(e)
+                  }}
+                />
                 {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
               </div>
               <div className="space-y-1.5">

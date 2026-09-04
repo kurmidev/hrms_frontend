@@ -21,11 +21,15 @@ import {
 import { onboardingApi } from '@/api/onboarding.api'
 import { toast } from 'sonner'
 import { generateId, getApiErrorMessage } from '@/lib/utils'
+import { mobileSchema, sanitizeMobileInput } from '@/lib/validation'
 
 const step1Schema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  phone: z.string().regex(/^[6-9]\d{9}$/, '10-digit mobile number'),
+  // Canonical shared rule (matches backend SubmitDetailsDto.phone's
+  // `^\d{10}$`) — do NOT use a stricter Indian-only `^[6-9]\d{9}$` here, or
+  // the frontend will reject values the backend genuinely accepts.
+  phone: mobileSchema,
   dateOfBirth: z.string().min(1, 'Date of birth required'),
   gender: z.enum(['MALE', 'FEMALE', 'OTHER'], { message: 'Gender is required' }),
   nationality: z.string().optional(),
@@ -250,15 +254,34 @@ export function OnboardingPublicPage() {
                     { id: 'phone', label: 'Mobile *', placeholder: '9876543210' },
                     { id: 'dateOfBirth', label: 'Date of Birth *', placeholder: '1995-06-15', type: 'date' },
                     { id: 'nationality', label: 'Nationality', placeholder: 'Indian' },
-                  ].map(({ id, label, placeholder, type }) => (
-                    <div key={id} className="space-y-1.5">
-                      <Label htmlFor={id}>{label}</Label>
-                      <Input id={id} type={type ?? 'text'} placeholder={placeholder} {...register(id as keyof Step1Values)} />
-                      {errors[id as keyof Step1Values] && (
-                        <p className="text-xs text-destructive">{String(errors[id as keyof Step1Values]?.message)}</p>
-                      )}
-                    </div>
-                  ))}
+                  ].map(({ id, label, placeholder, type }) => {
+                    const isMobile = id === 'phone'
+                    const fieldProps = register(id as keyof Step1Values)
+                    return (
+                      <div key={id} className="space-y-1.5">
+                        <Label htmlFor={id}>{label}</Label>
+                        <Input
+                          id={id}
+                          type={type ?? 'text'}
+                          placeholder={placeholder}
+                          inputMode={isMobile ? 'numeric' : undefined}
+                          maxLength={isMobile ? 10 : undefined}
+                          {...fieldProps}
+                          onChange={
+                            isMobile
+                              ? (e) => {
+                                  e.target.value = sanitizeMobileInput(e.target.value)
+                                  fieldProps.onChange(e)
+                                }
+                              : fieldProps.onChange
+                          }
+                        />
+                        {errors[id as keyof Step1Values] && (
+                          <p className="text-xs text-destructive">{String(errors[id as keyof Step1Values]?.message)}</p>
+                        )}
+                      </div>
+                    )
+                  })}
                   <div className="space-y-1.5">
                     <Label htmlFor="gender">Gender *</Label>
                     <Controller
